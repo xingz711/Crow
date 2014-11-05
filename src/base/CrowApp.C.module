@@ -1,0 +1,42 @@
+#include "CrowApp.h"
+#include "Moose.h"
+#include "AppFactory.h"
+
+template<>
+InputParameters validParams<CrowApp>()
+{
+  InputParameters params = validParams<MooseApp>();
+  return params;
+}
+
+CrowApp::CrowApp(const std::string & name, InputParameters parameters) :
+    MooseApp(name, parameters)
+{
+  srand(processor_id());
+
+  Moose::registerObjects(_factory);
+  CrowApp::registerObjects(_factory);
+
+  Moose::associateSyntax(_syntax, _action_factory);
+  CrowApp::associateSyntax(_syntax, _action_factory);
+}
+
+CrowApp::~CrowApp()
+{
+}
+
+void
+CrowApp::registerApps()
+{
+  registerApp(CrowApp);
+}
+
+void
+CrowApp::registerObjects(Factory & factory)
+{
+}
+
+void
+CrowApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
+{
+}

@@ -3,6 +3,13 @@
 #include "AppFactory.h"
 #include "ModulesApp.h"
 
+#include "CHChemPotential.h" 
+#include "CHTemp.h" 
+#include "ACSinteringGrowth.h"
+#include "PFDiffusion.h"
+#include "PolycrystalSinteringKernelAction.h"
+//#include "MobilityFn.h" 
+
 template<>
 InputParameters validParams<CrowApp>()
 {
@@ -28,6 +35,7 @@ CrowApp::~CrowApp()
 {
 }
 
+
 void
 CrowApp::registerApps()
 {
@@ -37,9 +45,20 @@ CrowApp::registerApps()
 void
 CrowApp::registerObjects(Factory & factory)
 {
+  // Register any custom objects you have built on the MOOSE Framework
+  registerKernel(CHChemPotential);  // <- registration
+  registerKernel(CHTemp);
+  registerKernel(ACSinteringGrowth);
+  registerMaterial(PFDiffusion);
+  
+  //registerFunction(MobilityFn);
 }
+
 
 void
 CrowApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
+  syntax.registerActionSyntax("PolycrystalSinteringKernelAction", "Kernels/PolycrystalKernel");
+
+  registerAction(PolycrystalSinteringKernelAction, "add_kernel");  
 }

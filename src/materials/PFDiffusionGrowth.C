@@ -1,7 +1,7 @@
-#include "PFDiffusion.h"
+#include "PFDiffusionGrowth.h"
 
 template<>
-InputParameters validParams<PFDiffusion>()
+InputParameters validParams<PFDiffusionGrowth>()
 {
   InputParameters params = validParams<Material>();
   params.addParam<Real>("Dvol", 0.01, "Volumetric diffusion ");
@@ -10,14 +10,14 @@ InputParameters validParams<PFDiffusion>()
   params.addParam<Real>("Dgb", 0.4, "Grain Boundary diffusion");
   params.addParam<Real>("beta", 1.0, "The beta multiplier for the interfacial energy");
   params.addParam<Real>("kappa", 1.0, "The kappa multiplier for the interfacial energy");
-  //params.addParam<Real>("L", 1.0, "The Allen-cahn multiplier");
+  params.addParam<Real>("L", 1.0, "The Allen-cahn multiplier");
   params.addRequiredCoupledVar("rho","phase field variable");
-  //params.addRequiredCoupledVar("eta","order parameter");
+  params.addRequiredCoupledVar("eta","order parameter");
 
   return params;
 }
 
-PFDiffusion::PFDiffusion(const std::string & name,
+PFDiffusionGrowth::PFDiffusionGrowth(const std::string & name,
                        InputParameters parameters) :
     Material(name, parameters),
     _Dvol(getParam<Real>("Dvol")),
@@ -26,49 +26,48 @@ PFDiffusion::PFDiffusion(const std::string & name,
     _Dgb(getParam<Real>("Dgb")),
     _beta(getParam<Real>("beta")),
     _kappa(getParam<Real>("kappa")),
-    //_l(getParam<Real>("L")),
+    _l(getParam<Real>("L")),
     
 
     _rho(coupledValue("rho")),
-    //_eta(coupledValue("eta")),
+    _eta(coupledValue("eta")),
 
     _D(declareProperty<Real>("D")),
     _beta_e(declareProperty<Real>("beta_e")),
     _kappa_c(declareProperty<Real>("kappa_c")),
-    //_l_e(declareProperty<Real>("L_e")),
-    _grad_M(declareProperty<RealGradient>("grad_M"))
+    _l_e(declareProperty<Real>("L_e")),
+    _grad_D(declareProperty<RealGradient>("grad_D"))
     
 {
   // Array of coupled variables is created in the constructor
-  //_ncrys = coupledComponents("eta"); //determine number of grains from the number of names passed in.  Note this is the actual number -1
-  //_vals.resize(_ncrys); //Size variable arrays
-  //_vals_var.resize(_ncrys);
+  _ncrys = coupledComponents("eta"); //determine number of grains from the number of names passed in.  Note this is the actual number -1
+  _vals.resize(_ncrys); //Size variable arrays
+  _vals_var.resize(_ncrys);
   
   // _gamma = 1.5;
 
   //Loop through grains and load coupled variables into the arrays
-  //for (unsigned int i = 0; i < _ncrys; ++i)
-  //{
-  //  _vals[i] = &coupledValue("eta", i);
-  //  _vals_var[i] = coupled("eta", i);
-  //}
+  for (unsigned int i = 0; i < _ncrys; ++i)
+  {
+    _vals[i] = &coupledValue("eta", i);
+    _vals_var[i] = coupled("eta", i);
+  }
 }
 
 void
-PFDiffusion::computeQpProperties()
+PFDiffusionGrowth::computeQpProperties()
 {
-    //Real SumEtaj = 0.0;
-    //for (unsigned int i = 0; i < _ncrys; ++i)
-      //SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp]; //Sum all other order parameters
+    Real SumEtaj = 0.0;
+    for (unsigned int i = 0; i < _ncrys; ++i)
+      SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp]; //Sum all other order parameters
   {
     Real phi = _rho[_qp]*_rho[_qp]*_rho[_qp]*(10 - 15*_rho[_qp] + 6*_rho[_qp]*_rho[_qp]);
-    _D[_qp] = _Dvol* phi + _Dvap*(1 - phi) + _Dsurf*_rho[_qp]*(1-_rho[_qp]); 
-    //+ _Dgb*SumEtaj;
+    _D[_qp] = _Dvol* phi + _Dvap*(1 - phi) + _Dsurf*_rho[_qp]*(1-_rho[_qp]) + _Dgb*SumEtaj;
 
     _beta_e[_qp] = _beta;
     _kappa_c[_qp] = _kappa;
-    //_l_e[_qp] = - _l;
+    _l_e[_qp] = - _l;
     Real grad_phi =  30.0*_rho[_qp]*_rho[_qp]*(1 - 2*_rho[_qp] + _rho[_qp]*_rho[_qp]);
-    _grad_M[_qp] = _Dvol* grad_phi - _Dvap*grad_phi + _Dsurf*(1-2.0*_rho[_qp]);
+    _grad_D[_qp] = _Dvol* grad_phi - _Dvap*grad_phi + _Dsurf*(1-2.0*_rho[_qp]);
   }
 }

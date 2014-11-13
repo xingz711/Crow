@@ -7,6 +7,7 @@
 #include "CHTemp.h" 
 #include "ACSinteringGrowth.h"
 #include "PFDiffusion.h"
+#include "PFDiffusionGrowth.h"
 #include "PolycrystalSinteringKernelAction.h"
 //#include "MobilityFn.h" 
 
@@ -50,6 +51,7 @@ CrowApp::registerObjects(Factory & factory)
   registerKernel(CHTemp);
   registerKernel(ACSinteringGrowth);
   registerMaterial(PFDiffusion);
+  registerMaterial(PFDiffusionGrowth);
   
   //registerFunction(MobilityFn);
 }

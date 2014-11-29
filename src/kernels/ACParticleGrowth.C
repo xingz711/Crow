@@ -43,10 +43,10 @@ ACParticleGrowth::computeDFDOP(PFFunctionType type)
   switch (type)
   {
     case Residual:     
-      return 12.0* ((1-_c[_qp]) - (2 - _c[_qp])*_u[_qp]*_u[_qp] + _u[_qp]*SumEtaj) ;
+      return 12.0* ((1-_c[_qp])*_u[_qp] - (2 - _c[_qp])*_u[_qp]*_u[_qp] + _u[_qp]*SumEtaj) ;
 
     case Jacobian:
-      return 12.0*(_phi[_j][_qp]*( - 2*(2 - _c[_qp])*_u[_qp] + SumEtaj)) ;
+      return 12.0*(_phi[_j][_qp]*((1 - _c[_qp])- 2*(2 - _c[_qp])*_u[_qp] + SumEtaj)) ;
   }
 
   mooseError("Invalid type passed in");

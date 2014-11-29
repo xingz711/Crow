@@ -33,13 +33,14 @@ private:
 
   //VariableValue & _T;
   VariableValue & _rho;
+  VariableGradient & _grad_rho;
   //VariableValue & _eta;
 
   MaterialProperty<Real> & _D;
   MaterialProperty<Real> & _beta_e;
   MaterialProperty<Real> & _kappa_c;
   //MaterialProperty<Real> & _l_e;
-  MaterialProperty<RealGradient> & _grad_M;
+  MaterialProperty<RealGradient> & _grad_D;
   //unsigned int _ncrys;
 
 };

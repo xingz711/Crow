@@ -60,7 +60,7 @@ CrowApp::registerObjects(Factory & factory)
 void
 CrowApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
-  syntax.registerActionSyntax("PolycrystalSinteringKernelAction", "Kernels/PolycrystalKernel");
+  syntax.registerActionSyntax("PolycrystalSinteringKernelAction", "Kernels/PolycrystalSinteringKernel");
 
   registerAction(PolycrystalSinteringKernelAction, "add_kernel");  
 }

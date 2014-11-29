@@ -30,13 +30,14 @@ PFDiffusion::PFDiffusion(const std::string & name,
     
 
     _rho(coupledValue("rho")),
+    _grad_rho(coupledGradient("rho")),
     //_eta(coupledValue("eta")),
 
     _D(declareProperty<Real>("D")),
     _beta_e(declareProperty<Real>("beta_e")),
     _kappa_c(declareProperty<Real>("kappa_c")),
     //_l_e(declareProperty<Real>("L_e")),
-    _grad_M(declareProperty<RealGradient>("grad_M"))
+    _grad_D(declareProperty<RealGradient>("grad_D"))
     
 {
   // Array of coupled variables is created in the constructor
@@ -63,12 +64,15 @@ PFDiffusion::computeQpProperties()
   {
     Real phi = _rho[_qp]*_rho[_qp]*_rho[_qp]*(10 - 15*_rho[_qp] + 6*_rho[_qp]*_rho[_qp]);
     _D[_qp] = _Dvol* phi + _Dvap*(1 - phi) + _Dsurf*_rho[_qp]*(1-_rho[_qp]); 
+    
+    RealGradient grad_phi =  30.0*_rho[_qp]*_rho[_qp]*(1 - 2*_rho[_qp] + _rho[_qp]*_rho[_qp])*_grad_rho[_qp];
+    _grad_D[_qp] = _Dvol* grad_phi - _Dvap* grad_phi + _Dsurf*(1 - 2.0*_rho[_qp])*_grad_rho[_qp];
+    
     //+ _Dgb*SumEtaj;
 
     _beta_e[_qp] = _beta;
     _kappa_c[_qp] = _kappa;
     //_l_e[_qp] = - _l;
-    Real grad_phi =  30.0*_rho[_qp]*_rho[_qp]*(1 - 2*_rho[_qp] + _rho[_qp]*_rho[_qp]);
-    _grad_M[_qp] = _Dvol* grad_phi - _Dvap*grad_phi + _Dsurf*(1-2.0*_rho[_qp]);
+    
   }
 }

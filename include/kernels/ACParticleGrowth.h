@@ -30,6 +30,7 @@ private:
   unsigned int _ncrys;
   
   VariableValue & _c;
+  unsigned int _c_var;
   MaterialProperty<Real> & _L;
   
 };

@@ -32,6 +32,7 @@ private:
   Real _l;
 
   VariableValue & _rho;
+  VariableGradient & _grad_rho;
   VariableValue & _eta;
 
   MaterialProperty<Real> & _D;

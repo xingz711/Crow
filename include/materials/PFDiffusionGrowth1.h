@@ -1,27 +1,25 @@
-#ifndef PFDiffusionGrowth_H
-#define PFDiffusionGrowth_H
+#ifndef PFDiffusionGrowth1_H
+#define PFDiffusionGrowth1_H
 
 #include "Material.h"
 
 //Forward Declarations
-class PFDiffusionGrowth;
+class PFDiffusionGrowth1;
 
 template<>
-InputParameters validParams<PFDiffusionGrowth>();
+InputParameters validParams<PFDiffusionGrowth1>();
 
-class PFDiffusionGrowth : public Material
+class PFDiffusionGrowth1 : public Material
 {
 public:
-  PFDiffusionGrowth(const std::string & name,
+  PFDiffusionGrowth1(const std::string & name,
              InputParameters parameters);
 
 protected:
   virtual void computeQpProperties();
 
 private:
-  std::vector<VariableValue *> _vals;
-  std::vector<unsigned int> _vals_var;
-
+  
   Real _Dvol;
   Real _Dvap;
   Real _Dsurf;
@@ -33,12 +31,12 @@ private:
 
   VariableValue & _c;
   VariableGradient & _grad_c;
-  VariableValue & _v;
+  VariableValue & _sumetaj;
 
   MaterialProperty<Real> & _D;
-  MaterialProperty<Real> & _beta_e;
+  MaterialProperty<Real> & _kappa_op;
   MaterialProperty<Real> & _kappa_c;
-  MaterialProperty<Real> & _l_e;
+  MaterialProperty<Real> & _L;
   MaterialProperty<RealGradient> & _grad_D;
   unsigned int _ncrys;
 

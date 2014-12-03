@@ -14,6 +14,7 @@ InputParameters validParams<ACParticleGrowth>()
 ACParticleGrowth::ACParticleGrowth(const std::string & name, InputParameters parameters) :
     ACBulk(name,parameters),
     _c(coupledValue("c")),
+    _c_var(coupled("c")),
     _L(getMaterialProperty<Real>("L"))
 {
   // Array of coupled variables is created in the constructor
@@ -34,6 +35,12 @@ ACParticleGrowth::ACParticleGrowth(const std::string & name, InputParameters par
 Real
 ACParticleGrowth::computeDFDOP(PFFunctionType type)
 {
+  Real c = _c[_qp];
+  if (c < 1.0e-8)
+    c = 0.0;
+  if (c > 1.0)
+    c = 1.0;
+  
   Real SumEtaj = 0.0;
   for (unsigned int i = 0; i < _ncrys; ++i)
     SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp]; //Sum all other order parameters
@@ -43,10 +50,10 @@ ACParticleGrowth::computeDFDOP(PFFunctionType type)
   switch (type)
   {
     case Residual:     
-      return 12.0* ((1-_c[_qp])*_u[_qp] - (2 - _c[_qp])*_u[_qp]*_u[_qp] + _u[_qp]*SumEtaj) ;
+      return 12.0* ((1-c)*_u[_qp] - (2 - c)*_u[_qp]*_u[_qp] + _u[_qp]*SumEtaj) ;
 
     case Jacobian:
-      return 12.0*(_phi[_j][_qp]*((1 - _c[_qp])- 2*(2 - _c[_qp])*_u[_qp] + SumEtaj)) ;
+      return 12.0*(_phi[_j][_qp]*((1 - c)- 2*(2 - c)*_u[_qp] + SumEtaj)) ;
   }
 
   mooseError("Invalid type passed in");
@@ -55,15 +62,19 @@ ACParticleGrowth::computeDFDOP(PFFunctionType type)
 Real
 ACParticleGrowth::computeQpOffDiagJacobian(unsigned int jvar)
 {
+  if (jvar == _c_var)
+    {
+     Real dDFDOP = 12.0 * (_u[_qp] *_u[_qp] - _u[_qp])  * _phi[_j][_qp];
+     return _L[_qp]*_test[_i][_qp]*dDFDOP;
+    }
   for (unsigned int i = 0; i < _ncrys; ++i)
   {
     if (jvar == _vals_var[i])
     {
       Real dSumEtaj = 2.0 * (*_vals[i])[_qp] * _phi[_j][_qp]; //Derivative of SumEtaj
       Real dDFDOP =  12.0 * _u[_qp] * dSumEtaj;
-
-      return _L[_qp] * _test[_i][_qp] * dDFDOP;
-    }
+      return _L[_qp]*_test[_i][_qp]*dDFDOP;
+    }   
   }
 
   return 0.0;

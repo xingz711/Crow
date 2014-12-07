@@ -31,7 +31,7 @@ PFDiffusionGrowth1::PFDiffusionGrowth1(const std::string & name,
     
 
     _c(coupledValue("c")),
-    _grad_c(coupledGradient("grad_c")),
+    _grad_c(coupledGradient("c")),
     _sumetaj(coupledValue("eta")),
 
     _D(declareProperty<Real>("D")),

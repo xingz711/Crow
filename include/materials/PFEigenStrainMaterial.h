@@ -29,10 +29,11 @@ protected:
   //VariableValue & _c;
   
 private: 
-  //VariableValue & _v;
+  VariableValue & _v;
   Real _e_c;
   RankTwoTensor _e_cI;
-  
+  Real _e_v;
+  RankTwoTensor _e_vI;
 };
 
 #endif //PFEIGENSTRAINMATERIAL_H

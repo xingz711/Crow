@@ -35,7 +35,7 @@ PFDiffusionGrowth1::PFDiffusionGrowth1(const std::string & name,
     _sumetaj(coupledValue("eta")),
 
     _D(declareProperty<Real>("D")),
-    _kappa_op(declareProperty<Real>("kappa_op")),//equivalent to beta, notation changes as per kernel requirement
+    _kappa_op(declareProperty<Real>("kappa_op")),//equivalent to beta, notation changed as per kernel requirement
     _kappa_c(declareProperty<Real>("kappa_c")),
     _L(declareProperty<Real>("L")),
     _grad_D(declareProperty<RealGradient>("grad_D"))

@@ -4,6 +4,7 @@ template<>
 InputParameters validParams<PFEigenStrainMaterial>()
 {
   InputParameters params = validParams<EigenStrainBaseMaterial>();
+  params.addRequiredCoupledVar("c", "Concentration");
   params.addRequiredCoupledVar("v", "order parameters");
   params.addParam<Real>("e_c", "lattice missmatch co-eff");
   params.addParam<Real>("e_v", "lattice missmatch co-eff");
@@ -13,6 +14,7 @@ InputParameters validParams<PFEigenStrainMaterial>()
 PFEigenStrainMaterial::PFEigenStrainMaterial(const std::string & name,
                                                  InputParameters parameters) :
     EigenStrainBaseMaterial(name, parameters),
+    _c(coupledValue("c")),
     _v(coupledValue("v")),
     _e_c(getParam<Real>("e_c")),
     _e_v(getParam<Real>("e_c"))

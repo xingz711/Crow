@@ -1,4 +1,5 @@
 #include "PFDiffusionGrowth.h"
+#include "AddV.h"
 
 template<>
 InputParameters validParams<PFDiffusionGrowth>()
@@ -12,14 +13,16 @@ InputParameters validParams<PFDiffusionGrowth>()
   params.addParam<Real>("kappa", 1.0, "The kappa multiplier for the interfacial energy");
   params.addParam<Real>("L", 1.0, "The Allen-cahn multiplier");
   params.addRequiredCoupledVar("c","phase field variable");
-  params.addRequiredCoupledVar("v","order parameters");
+  params.addRequiredCoupledVar("v","array of order parameters");
+  params.addRequiredParam<unsigned int>("op_num", "number of grains");
+  params.addRequiredParam<std::string>("var_name_base", "base for variable names");
 
   return params;
 }
 
 PFDiffusionGrowth::PFDiffusionGrowth(const std::string & name,
                        InputParameters parameters) :
-    Material(name, parameters),
+    Material(name, AddV(parameters)),
     _Dvol(getParam<Real>("Dvol")),
     _Dvap(getParam<Real>("Dvap")),
     _Dsurf(getParam<Real>("Dsurf")),
@@ -34,9 +37,9 @@ PFDiffusionGrowth::PFDiffusionGrowth(const std::string & name,
     _v(coupledValue("v")),
 
     _D(declareProperty<Real>("D")),
-    _beta_e(declareProperty<Real>("beta_e")),
+    _kappa_op(declareProperty<Real>("kappa_op")),
     _kappa_c(declareProperty<Real>("kappa_c")),
-    _l_e(declareProperty<Real>("L_e")),
+    _L(declareProperty<Real>("L")),
     _grad_D(declareProperty<RealGradient>("grad_D"))
     
 {
@@ -67,8 +70,8 @@ PFDiffusionGrowth::computeQpProperties()
     RealGradient grad_phi =  30.0*_c[_qp]*_c[_qp]*(1 - 2*_c[_qp] + _c[_qp]*_c[_qp])*_grad_c[_qp];
     _grad_D[_qp] = _Dvol* grad_phi - _Dvap* grad_phi + _Dsurf*(1 - 2.0*_c[_qp])*_grad_c[_qp];
 
-    _beta_e[_qp] = _beta;
+    _kappa_op[_qp] = _beta;
     _kappa_c[_qp] = _kappa;
-    _l_e[_qp] = - _l;
+    _L[_qp] = - _l;
   }
 }

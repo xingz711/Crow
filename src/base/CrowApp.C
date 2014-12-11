@@ -9,7 +9,16 @@
 #include "PFDiffusion.h"
 #include "PFDiffusionGrowth.h"
 #include "PFDiffusionGrowth1.h"
+#include "PFEigenStrainMaterial.h"
+#include "PFEigenStrainMaterial1.h"
+#include "TwoParticleGrainsIC.h"
+
 #include "PolycrystalSinteringKernelAction.h"
+#include "PolycrystalSinteringMaterialAction.h"
+#include "TwoParticleGrainsICAction.h"
+
+
+
 //#include "MobilityFn.h" 
 
 template<>
@@ -51,9 +60,14 @@ CrowApp::registerObjects(Factory & factory)
   registerKernel(CHChemPotential);  // <- registration
   registerKernel(CHTemp);
   registerKernel(ACSinteringGrowth);
+  
   registerMaterial(PFDiffusion);
   registerMaterial(PFDiffusionGrowth);
   registerMaterial(PFDiffusionGrowth1);
+  registerMaterial(PFEigenStrainMaterial);
+  registerMaterial(PFEigenStrainMaterial1);
+  
+  registerInitialCondition(TwoParticleGrainsIC);
   
   //registerFunction(MobilityFn);
 }
@@ -63,6 +77,11 @@ void
 CrowApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
   syntax.registerActionSyntax("PolycrystalSinteringKernelAction", "Kernels/PolycrystalSinteringKernel");
+  syntax.registerActionSyntax("PolycrystalSinteringMaterialAction", "Materials/PolycrystalSinteringMaterial");
+  syntax.registerActionSyntax("TwoParticleGrainsICAction", "ICs/PolycrystalICs/TwoParticleGrainsIC");
 
-  registerAction(PolycrystalSinteringKernelAction, "add_kernel");  
+
+  registerAction(PolycrystalSinteringKernelAction, "add_kernel"); 
+  registerAction(PolycrystalSinteringMaterialAction, "add_material");  
+  registerAction(TwoParticleGrainsICAction, "add_ic");
 }

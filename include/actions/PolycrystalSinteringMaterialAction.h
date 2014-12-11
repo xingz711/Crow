@@ -1,24 +1,25 @@
-#ifndef POLYCRYSTALSINTERINGKERNELACTION_H
-#define POLYCRYSTALSINTERINGKERNELACTION_H
+#ifndef POLYCRYSTALSINTERINGMATERIALACTION_H
+#define POLYCRYSTALSINTERINGMATERIALACTION_H
 
 #include "Action.h"
+#include "Material.h"
 
-class PolycrystalSinteringKernelAction: public Action
+class PolycrystalSinteringMaterialAction: public Action //, public Material
 {
 public:
-  PolycrystalSinteringKernelAction(const std::string & name, InputParameters params);
+  PolycrystalSinteringMaterialAction(const std::string & name, InputParameters params);
 
   virtual void act();
 
 private:
   unsigned int _op_num;
   std::string _var_name_base;
-  VariableName _c;
+  //VariableName _c;
   bool _implicit;
-  VariableName _T;
+  bool _disp;
 };
 
 template<>
-InputParameters validParams<PolycrystalSinteringKernelAction>();
+InputParameters validParams<PolycrystalSinteringMaterialAction>();
 
 #endif //POLYCRYSTALKERNELACTION_H

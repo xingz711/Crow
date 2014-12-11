@@ -15,7 +15,7 @@ InputParameters validParams<PFEigenStrainMaterial1>()
 
 PFEigenStrainMaterial1::PFEigenStrainMaterial1(const std::string & name,
                                                  InputParameters parameters) :
-    EigenStrainBaseMaterial(name, parameters),
+    EigenStrainBaseMaterial(name, AddV(parameters)),
     _c(coupledValue("c")),
     _e_c(getParam<Real>("e_c")),
     _e_v(getParam<Real>("e_c"))
@@ -35,10 +35,10 @@ PFEigenStrainMaterial1::computeEigenStrain()
   RankTwoTensor _e_vI;
   _e_cI.addIa(_e_c);
   _e_vI.addIa(_e_v);
-  Real sumetaj = 0.0;
+  Real sumeta = 0.0;
   for (unsigned int i = 0; i < _ncrys; ++i)
-    sumetaj += (*_vals[i])[_qp]*(*_vals[i])[_qp]; 
+    sumeta += (*_vals[i])[_qp]*(*_vals[i])[_qp]; 
   
-  _eigenstrain[_qp] = _e_cI*_c[_qp] + _e_vI*sumetaj;
+  _eigenstrain[_qp] = _e_cI*_c[_qp] + _e_vI*sumeta;
 
 }

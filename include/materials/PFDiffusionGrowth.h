@@ -36,9 +36,9 @@ private:
   VariableValue & _v;
 
   MaterialProperty<Real> & _D;
-  MaterialProperty<Real> & _beta_e;
+  MaterialProperty<Real> & _kappa_op;
   MaterialProperty<Real> & _kappa_c;
-  MaterialProperty<Real> & _l_e;
+  MaterialProperty<Real> & _L;
   MaterialProperty<RealGradient> & _grad_D;
   unsigned int _ncrys;
 

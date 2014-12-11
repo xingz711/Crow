@@ -1,7 +1,7 @@
-#include "PFDiffusion.h"
+#include "PFDiffusionGrowthConst.h"
 
 template<>
-InputParameters validParams<PFDiffusion>()
+InputParameters validParams<PFDiffusionGrowthConst>()
 {
   InputParameters params = validParams<Material>();
   params.addParam<Real>("Dvol", 0.01, "Volumetric diffusion ");
@@ -17,16 +17,16 @@ InputParameters validParams<PFDiffusion>()
   return params;
 }
 
-PFDiffusion::PFDiffusion(const std::string & name,
+PFDiffusionGrowthConst::PFDiffusionGrowthConst(const std::string & name,
                        InputParameters parameters) :
     Material(name, parameters),
     _Dvol(getParam<Real>("Dvol")),
     _Dvap(getParam<Real>("Dvap")),
     _Dsurf(getParam<Real>("Dsurf")),
     _Dgb(getParam<Real>("Dgb")),
-    //_beta(getParam<Real>("beta")),
+    _beta(getParam<Real>("beta")),
     _kappa(getParam<Real>("kappa")),
-   // _l(getParam<Real>("L")),
+    _l(getParam<Real>("L")),
     
 
     _rho(coupledValue("rho")),
@@ -34,9 +34,9 @@ PFDiffusion::PFDiffusion(const std::string & name,
     //_eta(coupledValue("eta")),
 
     _D(declareProperty<Real>("D")),
-    //_kappa_op(declareProperty<Real>("kappa_op")),
+    _kappa_op(declareProperty<Real>("kappa_op")),
     _kappa_c(declareProperty<Real>("kappa_c")),
-    //_L(declareProperty<Real>("L")),
+    _L(declareProperty<Real>("L")),
     _grad_D(declareProperty<RealGradient>("grad_D"))
     
 {
@@ -56,7 +56,7 @@ PFDiffusion::PFDiffusion(const std::string & name,
 }
 
 void
-PFDiffusion::computeQpProperties()
+PFDiffusionGrowthConst::computeQpProperties()
 {
     //Real SumEtaj = 0.0;
     //for (unsigned int i = 0; i < _ncrys; ++i)
@@ -70,9 +70,9 @@ PFDiffusion::computeQpProperties()
     
     //+ _Dgb*SumEtaj;
 
-    //_kappa_op[_qp] = _beta;
+    _kappa_op[_qp] = _beta;
     _kappa_c[_qp] = _kappa;
-    //_L[_qp] = - _l;
+    _L[_qp] = - _l;
     
   }
 }

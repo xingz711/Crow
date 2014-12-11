@@ -1,18 +1,18 @@
-#ifndef PFDIFFUSION_H
-#define PFDIFFUSION_H
+#ifndef PFDIFFUSIONGROWTHCONST_H
+#define PFDIFFUSIONGROWTHCONST_H
 
 #include "Material.h"
 
 //Forward Declarations
-class PFDiffusion;
+class PFDiffusionGrowthConst;
 
 template<>
-InputParameters validParams<PFDiffusion>();
+InputParameters validParams<PFDiffusionGrowthConst>();
 
-class PFDiffusion : public Material
+class PFDiffusionGrowthConst : public Material
 {
 public:
-  PFDiffusion(const std::string & name,
+  PFDiffusionGrowthConst(const std::string & name,
              InputParameters parameters);
 
 protected:
@@ -27,9 +27,9 @@ private:
   Real _Dsurf;
   Real _Dgb;
   
-  //Real _beta;
+  Real _beta;
   Real _kappa;
-  //Real _l;
+  Real _l;
 
   //VariableValue & _T;
   VariableValue & _rho;
@@ -37,15 +37,15 @@ private:
   //VariableValue & _eta;
 
   MaterialProperty<Real> & _D;
-  //MaterialProperty<Real> & _kappa_op;
+  MaterialProperty<Real> & _kappa_op;
   MaterialProperty<Real> & _kappa_c;
-  //MaterialProperty<Real> & _L;
+  MaterialProperty<Real> & _L;
   MaterialProperty<RealGradient> & _grad_D;
   //unsigned int _ncrys;
 
 };
 
-#endif //PFDIFFUSION_H
+#endif //PFDIFFUSIONGROWTHCONST_H
 
 
 

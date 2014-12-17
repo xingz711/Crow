@@ -5,7 +5,7 @@ InputParameters validParams<PFEigenStrainMaterial>()
 {
   InputParameters params = validParams<EigenStrainBaseMaterial>();
   params.addRequiredCoupledVar("c", "Concentration");
-  params.addRequiredCoupledVar("v", "order parameters");
+  params.addCoupledVar("v", 0.0, "order parameters");
   params.addParam<Real>("e_c", "lattice missmatch co-eff");
   params.addParam<Real>("e_v", "lattice missmatch co-eff");
   return params;

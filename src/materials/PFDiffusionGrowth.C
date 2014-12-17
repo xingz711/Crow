@@ -9,9 +9,9 @@ InputParameters validParams<PFDiffusionGrowth>()
   params.addParam<Real>("Dvap", 0.001, "Vapor Diffusion ");
   params.addParam<Real>("Dsurf", 4, "surface diffusion");
   params.addParam<Real>("Dgb", 0.4, "Grain Boundary diffusion");
-  params.addParam<Real>("beta", 1.0, "The beta multiplier for the interfacial energy");
+  //params.addParam<Real>("beta", 1.0, "The beta multiplier for the interfacial energy");
   params.addParam<Real>("kappa", 1.0, "The kappa multiplier for the interfacial energy");
-  params.addParam<Real>("L", 1.0, "The Allen-cahn multiplier");
+  //params.addParam<Real>("L", 1.0, "The Allen-cahn multiplier");
   params.addRequiredCoupledVar("c","phase field variable");
   params.addRequiredCoupledVar("v","array of order parameters");
   params.addRequiredParam<unsigned int>("op_num", "number of grains");
@@ -27,9 +27,9 @@ PFDiffusionGrowth::PFDiffusionGrowth(const std::string & name,
     _Dvap(getParam<Real>("Dvap")),
     _Dsurf(getParam<Real>("Dsurf")),
     _Dgb(getParam<Real>("Dgb")),
-    _beta(getParam<Real>("beta")),
+    //_beta(getParam<Real>("beta")),
     _kappa(getParam<Real>("kappa")),
-    _l(getParam<Real>("L")),
+    //_l(getParam<Real>("L")),
     
 
     _c(coupledValue("c")),
@@ -37,9 +37,9 @@ PFDiffusionGrowth::PFDiffusionGrowth(const std::string & name,
     _v(coupledValue("v")),
 
     _D(declareProperty<Real>("D")),
-    _kappa_op(declareProperty<Real>("kappa_op")),
+    //_kappa_op(declareProperty<Real>("kappa_op")),
     _kappa_c(declareProperty<Real>("kappa_c")),
-    _L(declareProperty<Real>("L")),
+    //_L(declareProperty<Real>("L")),
     _grad_D(declareProperty<RealGradient>("grad_D"))
     
 {
@@ -70,8 +70,8 @@ PFDiffusionGrowth::computeQpProperties()
     RealGradient grad_phi =  30.0*_c[_qp]*_c[_qp]*(1 - 2*_c[_qp] + _c[_qp]*_c[_qp])*_grad_c[_qp];
     _grad_D[_qp] = _Dvol* grad_phi - _Dvap* grad_phi + _Dsurf*(1 - 2.0*_c[_qp])*_grad_c[_qp];
 
-    _kappa_op[_qp] = _beta;
+    //_kappa_op[_qp] = _beta;
     _kappa_c[_qp] = _kappa;
-    _L[_qp] = - _l;
+    //_L[_qp] = - _l;
   }
 }

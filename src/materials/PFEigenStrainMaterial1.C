@@ -5,9 +5,9 @@ InputParameters validParams<PFEigenStrainMaterial1>()
 {
   InputParameters params = validParams<EigenStrainBaseMaterial>();
   params.addRequiredCoupledVar("c", "Concentration");
-  params.addRequiredCoupledVar("v", "order parameters");
-  params.addRequiredParam<unsigned int>("op_num", "number of grains");
-  params.addRequiredParam<std::string>("var_name_base", "base for variable names");
+  params.addCoupledVar("v", "order parameters");
+  params.addParam<unsigned int>("op_num", "number of grains");
+  params.addParam<std::string>("var_name_base", "base for variable names");
   params.addParam<Real>("e_c", "lattice mismatch co-eff");
   params.addParam<Real>("e_v", "lattice mismatch co-eff");
   return params;

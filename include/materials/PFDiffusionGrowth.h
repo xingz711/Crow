@@ -29,16 +29,16 @@ private:
   
   Real _beta;
   Real _kappa;
-  Real _l;
+  //Real _l;
 
   VariableValue & _c;
   VariableGradient & _grad_c;
   VariableValue & _v;
 
   MaterialProperty<Real> & _D;
-  MaterialProperty<Real> & _kappa_op;
+  //MaterialProperty<Real> & _kappa_op;
   MaterialProperty<Real> & _kappa_c;
-  MaterialProperty<Real> & _L;
+  //MaterialProperty<Real> & _L;
   MaterialProperty<RealGradient> & _grad_D;
   unsigned int _ncrys;
 

@@ -20,7 +20,7 @@ TwoParticleGrainsIC::TwoParticleGrainsIC(const std::string & name,
     _op_index(getParam<unsigned int>("op_index"))
 {
   if (_op_num != 2)
-    mooseError("Tricrystal ICs must have op_num = 2");
+    mooseError("Two Particle ICs must have op_num = 2");
 
   //Set up domain bounds with mesh tools
   for (unsigned int i = 0; i < LIBMESH_DIM; i++)

@@ -40,13 +40,17 @@ protected:
   MooseMesh & _mesh;
   /// A reference to the nonlinear system
   NonlinearSystem & _nl;
-
+ 
+  Real _minvalue;
+  Real _maxvalue;
+  Real _rangevalue;
+  
   unsigned int _op_num;
-  unsigned int _op_index;
+  std::vector<Real> _radius;
 
   Point _bottom_left;
   Point _top_right;
-  Point _range;
+  Point _rangedomain;
 };
 
 #endif //TWOPARTICLEDENSITYIC_H

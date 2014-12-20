@@ -43,10 +43,11 @@ protected:
 
   unsigned int _op_num;
   unsigned int _op_index;
+  //std::vector<Real> _radius;
 
   Point _bottom_left;
   Point _top_right;
-  Point _range;
+  Point _rangedomain;
 };
 
 #endif //TWOPARTICLEGRAINSIC_H

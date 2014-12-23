@@ -27,7 +27,7 @@ private:
   Real _Dsurf;
   Real _Dgb;
   
-  Real _beta;
+  //Real _beta;
   Real _kappa;
   //Real _l;
 

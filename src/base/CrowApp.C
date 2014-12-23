@@ -10,6 +10,7 @@
 #include "PFDiffusionGrowthConst.h"
 #include "PFDiffusionGrowth.h"
 #include "PFDiffusionGrowth1.h"
+#include "PFParticleGrowth.h"
 #include "PFEigenStrainMaterial.h"
 #include "PFEigenStrainMaterial1.h"
 #include "TwoParticleGrainsIC.h"
@@ -69,6 +70,7 @@ CrowApp::registerObjects(Factory & factory)
   registerMaterial(PFDiffusionGrowth1);
   registerMaterial(PFEigenStrainMaterial);
   registerMaterial(PFEigenStrainMaterial1);
+  registerMaterial(PFParticleGrowth);
   
   registerInitialCondition(TwoParticleGrainsIC);
   registerInitialCondition(TwoParticleDensityIC);

@@ -37,7 +37,7 @@ PFDiffusionGrowth::PFDiffusionGrowth(const std::string & name,
     _v(coupledValue("v")),
 
     _D(declareProperty<Real>("D")),
-    //_kappa_op(declareProperty<Real>("kappa_op")),
+   // _kappa_op(declareProperty<Real>("kappa_op")),
     _kappa_c(declareProperty<Real>("kappa_c")),
     //_L(declareProperty<Real>("L")),
     _grad_D(declareProperty<RealGradient>("grad_D"))

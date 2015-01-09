@@ -12,7 +12,7 @@ InputParameters validParams<PFDiffusionGrowth>()
   //params.addParam<Real>("beta", 1.0, "The beta multiplier for the interfacial energy");
   params.addParam<Real>("kappa", 1.0, "The kappa multiplier for the interfacial energy");
   //params.addParam<Real>("L", 1.0, "The Allen-cahn multiplier");
-  params.addRequiredCoupledVar("c","phase field variable");
+  params.addRequiredCoupledVar("rho","phase field variable");
   params.addRequiredCoupledVar("v","array of order parameters");
   params.addRequiredParam<unsigned int>("op_num", "number of grains");
   params.addRequiredParam<std::string>("var_name_base", "base for variable names");
@@ -32,8 +32,8 @@ PFDiffusionGrowth::PFDiffusionGrowth(const std::string & name,
     //_l(getParam<Real>("L")),
     
 
-    _c(coupledValue("c")),
-    _grad_c(coupledGradient("grad_c")),
+    _rho(coupledValue("rho")),
+    _grad_rho(coupledGradient("rho")),
     _v(coupledValue("v")),
 
     _D(declareProperty<Real>("D")),
@@ -64,11 +64,11 @@ PFDiffusionGrowth::computeQpProperties()
       for (unsigned int j = 0; j < _ncrys; ++j)
       SumEtaj += (*_vals[i])[_qp]*(*_vals[j])[_qp]; //Sum all other order parameters
   {
-    Real phi = _c[_qp]*_c[_qp]*_c[_qp]*(10 - 15*_c[_qp] + 6*_c[_qp]*_c[_qp]);
-    _D[_qp] = _Dvol* phi + _Dvap*(1 - phi) + _Dsurf*_c[_qp]*(1-_c[_qp])+ _Dgb*SumEtaj; 
+    Real phi = _rho[_qp]*_rho[_qp]*_rho[_qp]*(10 - 15*_rho[_qp] + 6*_rho[_qp]*_rho[_qp]);
+    _D[_qp] = _Dvol* phi + _Dvap*(1 - phi) + _Dsurf*_rho[_qp]*(1-_rho[_qp])+ _Dgb*SumEtaj; 
     
-    RealGradient grad_phi =  30.0*_c[_qp]*_c[_qp]*(1 - 2*_c[_qp] + _c[_qp]*_c[_qp])*_grad_c[_qp];
-    _grad_D[_qp] = _Dvol* grad_phi - _Dvap* grad_phi + _Dsurf*(1 - 2.0*_c[_qp])*_grad_c[_qp];
+    RealGradient grad_phi =  30.0*_rho[_qp]*_rho[_qp]*(1 - 2*_rho[_qp] + _rho[_qp]*_rho[_qp])*_grad_rho[_qp];
+    _grad_D[_qp] = _Dvol* grad_phi - _Dvap* grad_phi + _Dsurf*(1 - 2.0*_rho[_qp])*_grad_rho[_qp];
 
     //_kappa_op[_qp] = _beta;
     _kappa_c[_qp] = _kappa;

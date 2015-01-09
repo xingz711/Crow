@@ -14,6 +14,7 @@
 #include "PFEigenStrainMaterial.h"
 #include "PFEigenStrainMaterial1.h"
 #include "TwoParticleGrainsIC.h"
+#include "PFTempMobility.h"
 
 #include "PolycrystalSinteringKernelAction.h"
 #include "PolycrystalSinteringMaterialAction.h"
@@ -71,6 +72,7 @@ CrowApp::registerObjects(Factory & factory)
   registerMaterial(PFEigenStrainMaterial);
   registerMaterial(PFEigenStrainMaterial1);
   registerMaterial(PFParticleGrowth);
+  registerMaterial(PFTempMobility);
   
   registerInitialCondition(TwoParticleGrainsIC);
   registerInitialCondition(TwoParticleDensityIC);

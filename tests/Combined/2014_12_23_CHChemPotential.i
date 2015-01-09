@@ -94,11 +94,6 @@
 []
 
 [ICs]
-  max = 0.01
-  op_num = 2
-  radius = '9.0 7.0'
-  variable = c
-  type = TwoParticleDensityIC
   block = 0
   [./2pdens]
     max = 0.01

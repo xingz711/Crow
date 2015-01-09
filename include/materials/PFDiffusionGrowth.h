@@ -31,8 +31,8 @@ private:
   Real _kappa;
   //Real _l;
 
-  VariableValue & _c;
-  VariableGradient & _grad_c;
+  VariableValue & _rho;
+  VariableGradient & _grad_rho;
   VariableValue & _v;
 
   MaterialProperty<Real> & _D;

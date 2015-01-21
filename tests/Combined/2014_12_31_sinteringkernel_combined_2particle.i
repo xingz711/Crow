@@ -170,9 +170,9 @@
   output_initial = true # Output initial condition
   exodus = true # Exodus file will be outputted
   csv = true
+  print_perf_log = true
   [./console]
     type = Console
-    perf_log = true # Performance log will be printed to screen
     max_rows = 20 # Will print the 20 most recent postprocessor values to the screen
   [../]
 []

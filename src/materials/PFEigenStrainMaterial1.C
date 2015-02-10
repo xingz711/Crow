@@ -18,26 +18,27 @@ PFEigenStrainMaterial1::PFEigenStrainMaterial1(const std::string & name,
 {
   _ncrys = coupledComponents("v");
   _vals.resize(_ncrys);
-  _deigenstrain_dv.resize(_ncrys);
-  _d2eigenstrain_dv2.resize(_ncrys);
+  _v_name.resize(_ncrys);
+  _delastic_strain_dv.resize(_ncrys);
+  _d2elastic_strain_dv2.resize(_ncrys);
   _delasticity_tensor_dv.resize(_ncrys);
   _d2elasticity_tensor_dv2.resize(_ncrys);
-
+ 
   for (unsigned int i=0; i < _ncrys; ++i)
   {
     _vals[i] = &coupledValue("v", i);
     _v_name[i] = getVar("v", i)->name();
         
     // the derivatives of elastic strain w.r.t v are provided here
-    _deigenstrain_dv[i] = &declarePropertyDerivative<RankTwoTensor>(_base_name + "elastic_strain", _v_name[i]);
+    _delastic_strain_dv[i] = &declarePropertyDerivative<RankTwoTensor>(_base_name + "elastic_strain", _v_name[i]);
     _delasticity_tensor_dv[i] = &declarePropertyDerivative<ElasticityTensorR4>(_elasticity_tensor_name, _v_name[i]);
            
-    _d2eigenstrain_dv2[i].resize(_ncrys);
+    _d2elastic_strain_dv2[i].resize(_ncrys);
     _d2elasticity_tensor_dv2[i].resize(_ncrys);
     
     for (unsigned int j=0; j < _ncrys; ++j)      
     {
-      _d2eigenstrain_dv2[i][j] = _d2eigenstrain_dv2[j][i] = &declarePropertyDerivative<RankTwoTensor>(_base_name + "elastic_strain", _v_name[i], _v_name[j]);
+      _d2elastic_strain_dv2[i][j] = _d2elastic_strain_dv2[j][i] = &declarePropertyDerivative<RankTwoTensor>(_base_name + "elastic_strain", _v_name[i], _v_name[j]);
       _d2elasticity_tensor_dv2[i][j] = &declarePropertyDerivative<ElasticityTensorR4>(_elasticity_tensor_name, _v_name[i], _v_name[j]);
     }
   }
@@ -54,14 +55,14 @@ void PFEigenStrainMaterial1::computeEigenStrain()
   // first derivative w.r.t. v
   for (unsigned int i = 0; i < _ncrys; ++i)
   {
-   (*_deigenstrain_dv[i])[_qp].zero();
-   (*_deigenstrain_dv[i])[_qp].addIa(2.0*_e_v*(*_vals[i])[_qp]);
+   (*_delastic_strain_dv[i])[_qp].zero();
+   (*_delastic_strain_dv[i])[_qp].addIa(- 2.0*_e_v*(*_vals[i])[_qp]);
 
   // second derivative w.r.t. v
    for (unsigned int j=0; j < _ncrys; ++j)
    {
-    (*_d2eigenstrain_dv2[i][j])[_qp].zero();
-    (*_d2eigenstrain_dv2[i][j])[_qp].addIa(2.0*_e_v);
+    (*_d2elastic_strain_dv2[i][j])[_qp].zero();
+    (*_d2elastic_strain_dv2[i][j])[_qp].addIa(- 2.0*_e_v);
    }
   }
 }

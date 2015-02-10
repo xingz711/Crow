@@ -23,9 +23,9 @@ protected:
   std::vector<VariableName> _v_name;
   unsigned int _ncrys;
   
-  std::vector<MaterialProperty<RankTwoTensor> *> _deigenstrain_dv;
+  std::vector<MaterialProperty<RankTwoTensor> *> _delastic_strain_dv;
   std::vector<MaterialProperty<ElasticityTensorR4> *> _delasticity_tensor_dv;
-  std::vector<std::vector<MaterialProperty<RankTwoTensor> *> > _d2eigenstrain_dv2;
+  std::vector<std::vector<MaterialProperty<RankTwoTensor> *> > _d2elastic_strain_dv2;
   std::vector<std::vector<MaterialProperty<ElasticityTensorR4> *> > _d2elasticity_tensor_dv2;
   
    

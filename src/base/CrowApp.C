@@ -7,6 +7,7 @@
 #include "CHTemp.h" 
 #include "ACSinteringGrowth.h"
 #include "PFDiffusion.h"
+#include "TempDiffusion.h"
 #include "PFDiffusionGrowthConst.h"
 #include "PFDiffusionGrowth.h"
 #include "PFDiffusionGrowth1.h"
@@ -20,8 +21,6 @@
 #include "PolycrystalSinteringMaterialAction.h"
 #include "TwoParticleGrainsICAction.h"
 #include "TwoParticleDensityIC.h"
-
-
 
 //#include "MobilityFn.h" 
 
@@ -66,6 +65,7 @@ CrowApp::registerObjects(Factory & factory)
   registerKernel(ACSinteringGrowth);
   
   registerMaterial(PFDiffusion);
+  registerMaterial(TempDiffusion);
   registerMaterial(PFDiffusionGrowthConst);
   registerMaterial(PFDiffusionGrowth);
   registerMaterial(PFDiffusionGrowth1);

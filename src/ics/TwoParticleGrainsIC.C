@@ -37,8 +37,8 @@ Real
 TwoParticleGrainsIC::value(const Point & p)
 {
   //_redius.resize(2);
-  Real radius_left = 9.0; //_radius[0];
-  Real radius_right = 7.0; //_radius[1];
+  Real radius_left = 20.0; //_radius[0];
+  Real radius_right = 20.0; //_radius[1];
   
   Point grain_center_left;
   grain_center_left(0) = _bottom_left(0) + _rangedomain(0)/2.0 - radius_left;

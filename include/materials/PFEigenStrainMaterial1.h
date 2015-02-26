@@ -10,7 +10,7 @@
  * order derivatives with respect to c, elasticity_tensor and its 1st and 2nd
  * order derivatives wrt c if it is a function of c instead of a constant.
  */
-class PFEigenStrainMaterial1 : public SimpleEigenStrainMaterial
+class PFEigenStrainMaterial1 : public EigenStrainBaseMaterial
 {
 public:
   PFEigenStrainMaterial1(const std:: string & name, InputParameters parameters);
@@ -31,6 +31,8 @@ protected:
    
 private: 
     Real _e_v;
+    Real _epsilon0;
+    Real _c0;
 };
 
 #endif //PFEIGENSTRAINMATERIAL1_H

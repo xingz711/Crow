@@ -1,34 +1,71 @@
 #include "PFEigenStrainMaterial.h"
-
+//#include "AddV.h"
 template<>
 InputParameters validParams<PFEigenStrainMaterial>()
 {
-  InputParameters params = validParams<EigenStrainBaseMaterial>();
+  InputParameters params = validParams<PFEigenStrainBaseMaterial>();
+  params.addRequiredParam<Real>("epsilon0", "Initial eigen strain value");
+  params.addParam<Real>("c0", 0.0, "Initial concentration value");
   params.addRequiredCoupledVar("c", "Concentration");
-  params.addCoupledVar("v", 0.0, "order parameters");
-  params.addParam<Real>("e_c", "lattice missmatch co-eff");
-  params.addParam<Real>("e_v", "lattice missmatch co-eff");
+  params.addCoupledVar("v", "order parameters");
+  params.addParam<std::vector<Real> >("e_v", "lattice mismatch co-eff");
+
   return params;
 }
 
 PFEigenStrainMaterial::PFEigenStrainMaterial(const std::string & name,
                                                  InputParameters parameters) :
-    EigenStrainBaseMaterial(name, parameters),
-    _c(coupledValue("c")),
-    _v(coupledValue("v")),
-    _e_c(getParam<Real>("e_c")),
-    _e_v(getParam<Real>("e_c"))
+     PFEigenStrainBaseMaterial(name, parameters),
+    _epsilon0(getParam<Real>("epsilon0")),
+    _c0(getParam<Real>("c0")),
+    _e_v(getParam<std::vector<Real> >("e_v"))
     
 {
 }
 
-void
-PFEigenStrainMaterial::computeEigenStrain()
+void PFEigenStrainMaterial::computeEigenStrain()
 {
-  RankTwoTensor _e_cI;
-  RankTwoTensor _e_vI;
-  _e_cI.addIa(_e_c);
-  _e_vI.addIa(_e_v);
-  _eigenstrain[_qp] = _e_cI*_c[_qp] + _e_vI*_v[_qp];
+  Real sumeta = 0.0;
+  for (unsigned int i = 0; i < _ncrys; ++i)
+      sumeta += _e_v[i]*(*_vals[i])[_qp]*(*_vals[i])[_qp]; 
+  
+    _eigenstrain[_qp].addIa(_epsilon0 * (_c[_qp] - _c0) + sumeta);
 
+  // first derivative w.r.t. v
+  for (unsigned int i = 0; i < _ncrys; ++i)
+  {
+   (*_delastic_strain_dv[i])[_qp].zero();
+   (*_delastic_strain_dv[i])[_qp].addIa(- 2.0*_e_v[i]*(*_vals[i])[_qp]);
+
+  // second derivative w.r.t. v
+   for (unsigned int j=0; j < _ncrys; ++j)
+   {
+    (*_d2elastic_strain_dv2[i][j])[_qp].zero();
+    (*_d2elastic_strain_dv2[i][j])[_qp].addIa(- 2.0*_e_v[j]);
+   }
+  }
+  // first derivative w.r.t. c
+  _delastic_strain_dc[_qp].zero();
+  _delastic_strain_dc[_qp].addIa(-_epsilon0); // delastic_strain/dc = -deigenstrain/dc
+
+  // second derivative w.r.t. c (vanishes)
+  _d2elastic_strain_dc2[_qp].zero();
+}
+
+void PFEigenStrainMaterial::computeQpElasticityTensor()
+{
+  _Jacobian_mult[_qp] = _elasticity_tensor[_qp] = _Cijkl;
+
+  // the elasticity tensor is independent of v
+  for (unsigned int i = 0; i < _ncrys; ++i)
+  {
+   (*_delasticity_tensor_dv[i])[_qp].zero();
+   //(*_d2elasticity_tensor_dv2[i])[_qp].zero();
+   
+    for (unsigned int j=0; j < _ncrys; ++j)
+     (*_d2elasticity_tensor_dv2[i][j])[_qp].zero();
+   }
+   // the elasticity tensor is independent of c
+  _delasticity_tensor_dc[_qp].zero();
+  _d2elasticity_tensor_dc2[_qp].zero();
 }

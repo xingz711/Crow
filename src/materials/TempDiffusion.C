@@ -36,7 +36,7 @@ TempDiffusion::computeQpProperties()
  
     _D[_qp] = (_Dv* _c[_qp])/(_kb*_T); 
     
-    _grad_D[_qp] = (_Dv)/(_kb*_T);  
+    _grad_D[_qp] = (_Dv)/(_kb*_T)*_grad_c[_qp];  
     
     _kappa_c[_qp] = _kappa;
   

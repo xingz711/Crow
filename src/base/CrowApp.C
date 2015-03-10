@@ -6,6 +6,8 @@
 #include "CHChemPotential.h" 
 #include "CHTemp.h" 
 #include "ACSinteringGrowth.h"
+#include "VacancySourceTermKernel.h"
+#include "VacancyAnnihilationKernel.h"
 #include "PFDiffusion.h"
 #include "TempDiffusion.h"
 #include "PFDiffusionGrowthConst.h"
@@ -63,6 +65,9 @@ CrowApp::registerObjects(Factory & factory)
   registerKernel(CHChemPotential);  // <- registration
   registerKernel(CHTemp);
   registerKernel(ACSinteringGrowth);
+  registerKernel(VacancySourceTermKernel);
+  registerKernel(VacancyAnnihilationKernel);
+
   
   registerMaterial(PFDiffusion);
   registerMaterial(TempDiffusion);

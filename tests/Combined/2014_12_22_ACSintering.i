@@ -80,9 +80,6 @@
   output_initial = true
   exodus = true
   output_final = true
-  [./Console]
-    type = Console
-  [../]
 []
 
 [ICs]

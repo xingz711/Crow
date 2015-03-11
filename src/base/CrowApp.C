@@ -52,6 +52,7 @@ CrowApp::~CrowApp()
 }
 
 
+extern "C" void CrowApp__registerApps() { CrowApp::registerApps(); }
 void
 CrowApp::registerApps()
 {

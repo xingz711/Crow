@@ -4,9 +4,9 @@
 *.d
 *.o
 *.a
-*-opt
-*-dbg
-*-oprof
+*-opt*
+*-dbg*
+*-oprof*
 *.e
 *.nav
 *.log
@@ -15,7 +15,7 @@
 *.snm
 *.csv
 *.dylib
-*.so
+*.so*
 *.gitignore*
 *.vrb
 *.jou

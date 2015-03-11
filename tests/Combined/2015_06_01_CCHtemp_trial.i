@@ -98,9 +98,6 @@
 []
 
 [Outputs]
-  [./console]
-    type = Console
-  [../]
   [./exodus]
     type = Exodus
     output_on = 'timestep_end initial'

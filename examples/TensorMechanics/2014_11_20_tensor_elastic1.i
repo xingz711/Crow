@@ -60,11 +60,11 @@
   output_initial = true
   exodus = true
   output_final = true
+  print_linear_residuals = true
+  print_perf_log = true
   [./console]
     type = Console
-    perf_log = true
     scientific_time = true
-    linear_residuals = true
   [../]
 []
 

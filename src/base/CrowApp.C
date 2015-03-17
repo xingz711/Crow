@@ -7,6 +7,7 @@
 #include "CHTemp.h" 
 #include "ACSinteringGrowth.h"
 #include "VacancySourceTermKernel.h"
+#include "RandomVacancySourceTermKernel.h"
 #include "VacancyAnnihilationKernel.h"
 #include "PFDiffusion.h"
 #include "TempDiffusion.h"
@@ -18,6 +19,9 @@
 #include "PFEigenStrainMaterial1.h"
 #include "TwoParticleGrainsIC.h"
 #include "PFTempMobility.h"
+#include "RandomVacancySourceTermMaterial.h"
+#include "RandomNumberGeneration.h"
+
 
 #include "PolycrystalSinteringKernelAction.h"
 #include "PolycrystalSinteringMaterialAction.h"
@@ -67,8 +71,10 @@ CrowApp::registerObjects(Factory & factory)
   registerKernel(CHTemp);
   registerKernel(ACSinteringGrowth);
   registerKernel(VacancySourceTermKernel);
+  registerKernel(RandomVacancySourceTermKernel);
   registerKernel(VacancyAnnihilationKernel);
 
+  registerFunction(RandomNumberGeneration);
   
   registerMaterial(PFDiffusion);
   registerMaterial(TempDiffusion);
@@ -79,6 +85,7 @@ CrowApp::registerObjects(Factory & factory)
   registerMaterial(PFEigenStrainMaterial1);
   registerMaterial(PFParticleGrowth);
   registerMaterial(PFTempMobility);
+  registerMaterial(RandomVacancySourceTermMaterial);
   
   registerInitialCondition(TwoParticleGrainsIC);
   registerInitialCondition(TwoParticleDensityIC);

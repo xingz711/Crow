@@ -21,10 +21,13 @@ protected:
  // virtual Real computeQpJacobian();
 
 private:
-  VariableValue & _c;
-  VariableValue & _R1;
-  VariableValue & _R2;
-  Real _Pcasc;
+  VariableValue & _eta;
+  //VariableValue & _R1;
+ // VariableValue & _R2;
+  
+  std::string _rand_num;
+  MaterialProperty<Real> & _R;
+  //Real _Pcasc;
   Real _Vg;
 };
 

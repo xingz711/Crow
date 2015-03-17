@@ -1,24 +1,26 @@
 #include "VacancySourceTermKernel.h"
-#include "MooseRandom.h"
 
 template<>
 InputParameters validParams<VacancySourceTermKernel>()
 {
   InputParameters params = validParams<Kernel>();
-  params.addRequiredCoupledVar("c", "Phase Field Variable");
-  params.addCoupledVar("R1", "Random no. generation");
-  params.addCoupledVar("R2", "Random no. generation");
-  params.addParam<Real>("Pcasc", 0.5 ,"Probability of cascade occurance");
+  params.addRequiredCoupledVar("eta", "order parameter for void");
+  //params.addCoupledVar("R1", "Random no. generation");
+  //params.addCoupledVar("R2", "Random no. generation");
+  params.addParam<std::string>("Rand_num", "R", "variable for random number");
+  //params.addParam<Real>("Pcasc", 0.5 ,"Probability of cascade occurance");
   params.addParam<Real>("Vg", 0.5 ,"Maximum increase in vacancy concentration");
   return params;
 }
 
 VacancySourceTermKernel::VacancySourceTermKernel(const std::string & name, InputParameters parameters) :
     Kernel(name, parameters),
-    _c(coupledValue("c")),
-    _R1(coupledValue("R1")),
-    _R2(coupledValue("R2")),
-    _Pcasc(getParam<Real>("Pcasc")),
+    _eta(coupledValue("eta")),
+    //_R1(coupledValue("R1")),
+    //_R2(coupledValue("R2")),
+    _rand_num(getParam<std::string>("Rand_num")),
+    _R(getMaterialProperty<Real>(_rand_num)),
+   // _Pcasc(getParam<Real>("Pcasc")),
     _Vg(getParam<Real>("Vg"))
     
 {
@@ -27,11 +29,12 @@ VacancySourceTermKernel::VacancySourceTermKernel(const std::string & name, Input
 Real
 VacancySourceTermKernel::computeQpResidual()
 {
-  Real c = _c[_qp];
-  Real R1 = _R1[_qp];
+  Real e = _eta[_qp];
+ // Real R1 = _R1[_qp];
   
-  if ( c <= 0.8 && R1<_Pcasc)
-    return - _R2[_qp]*_Vg*_test[_i][_qp];
+  //if ( e <= 0.8 && R1<_Pcasc)
+    if ( e <= 0.8 )
+    return _R[_qp]*_Vg*_test[_i][_qp];
       
   return 0.0; 
 }

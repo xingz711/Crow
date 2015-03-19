@@ -1,0 +1,51 @@
+#include "LangevinNoiseVoid.h"
+#include "MooseRandom.h"
+
+template<>
+InputParameters validParams<LangevinNoiseVoid>()
+{
+  InputParameters params = validParams<Kernel>();
+  params.addRequiredParam<Real>("amplitude", "Amplitude"); // per sqrt(time)");
+  params.addParam<std::string>("multiplier", "Material property to multiply the random numbers with (defaults to 1.0 if omitted)");
+  params.addRequiredCoupledVar("eta", "order parameter for void");
+  params.addParam<Real>("min", 0.0, "Lower bound of the randomly generated values");
+  params.addParam<Real>("max", 1.0, "Upper bound of the randomly generated values");
+  return params;
+}
+LangevinNoiseVoid::LangevinNoiseVoid(const std::string & name,
+                             InputParameters parameters) :
+    Kernel(name, parameters),
+    _amplitude(getParam<Real>("amplitude")),
+    _multiplier_prop(parameters.isParamValid("multiplier") ? &getMaterialProperty<Real>(getParam<std::string>("multiplier")) : NULL),
+    _eta(coupledValue("eta")),
+    _min(getParam<Real>("min")),
+    _max(getParam<Real>("max")),
+    _range(_max - _min)
+    
+{
+}
+
+void
+LangevinNoiseVoid::residualSetup()
+{
+  unsigned int rseed = _t_step;
+  MooseRandom::seed(rseed);
+}
+
+Real
+LangevinNoiseVoid::computeQpResidual()
+{
+  
+  Real R2 = MooseRandom::rand();
+  //Between 0 and range
+  R2*= _range;
+  //Between min and max
+  R2 += _min;
+  
+  Real e = _eta[_qp];
+  
+  if ( e <= 0.8 )
+  return -_test[_i][_qp] * R2 * _amplitude * (_multiplier_prop == NULL ? 1.0 : (*_multiplier_prop)[_qp]);
+  
+  return 0.0;
+}

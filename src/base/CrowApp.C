@@ -1,7 +1,13 @@
 #include "CrowApp.h"
 #include "Moose.h"
 #include "AppFactory.h"
-#include "ModulesApp.h"
+//#include "ModulesApp.h"
+#include "PhaseFieldApp.h"
+#include "SolidMechanicsApp.h"
+#include "TensorMechanicsApp.h"
+//#include "HeatTransferApp.h"
+#include "MiscApp.h"
+
 
 #include "CHChemPotential.h" 
 #include "CHTemp.h" 
@@ -9,6 +15,7 @@
 #include "VacancySourceTermKernel.h"
 #include "RandomVacancySourceTermKernel.h"
 #include "VacancyAnnihilationKernel.h"
+#include "LangevinNoiseVoid.h"
 #include "PFDiffusion.h"
 #include "TempDiffusion.h"
 #include "PFDiffusionGrowthConst.h"
@@ -21,12 +28,17 @@
 #include "PFTempMobility.h"
 #include "RandomVacancySourceTermMaterial.h"
 #include "RandomNumberGeneration.h"
+#include "ConservedLangevinNoiseVoidSource.h"
 
 
 #include "PolycrystalSinteringKernelAction.h"
 #include "PolycrystalSinteringMaterialAction.h"
 #include "TwoParticleGrainsICAction.h"
 #include "TwoParticleDensityIC.h"
+
+#include "RandomVoidSourceAux.h"
+
+#include "ConservedUniformVoidSource.h"
 
 //#include "MobilityFn.h" 
 
@@ -42,12 +54,26 @@ CrowApp::CrowApp(const std::string & name, InputParameters parameters) :
 {
   srand(processor_id());
 
-  Moose::registerObjects(_factory);
-  ModulesApp::registerObjects(_factory);
-  CrowApp::registerObjects(_factory);
+   Moose::registerObjects(_factory);
+//  ModulesApp::registerObjects(_factory);
+   PhaseFieldApp::registerObjects(_factory);
+   SolidMechanicsApp::registerObjects(_factory);
+   TensorMechanicsApp::registerObjects(_factory);
+//+  HeatTransferApp:: registerObjects(_factory);
+   MiscApp::registerObjects(_factory);
+//  CombinedApp::registerObjects(_factory);
+//+  MooseTestApp::registerObjects(_factory);
+   CrowApp::registerObjects(_factory);
 
-  Moose::associateSyntax(_syntax, _action_factory);
-  ModulesApp::associateSyntax(_syntax, _action_factory);
+   Moose::associateSyntax(_syntax, _action_factory);
+//  ModulesApp::associateSyntax(_syntax, _action_factory);
+   PhaseFieldApp::associateSyntax(_syntax, _action_factory);
+   SolidMechanicsApp::associateSyntax(_syntax, _action_factory);
+   TensorMechanicsApp::associateSyntax(_syntax, _action_factory);
+//+  HeatTransferApp::associateSyntax(_syntax, _action_factory);
+   MiscApp::associateSyntax(_syntax, _action_factory);
+//  CombinedApp::associateSyntax(_syntax, _action_factory);
+//+  MooseTestApp::associateSyntax(_syntax, _action_factory);
   CrowApp::associateSyntax(_syntax, _action_factory);
 }
 
@@ -73,6 +99,8 @@ CrowApp::registerObjects(Factory & factory)
   registerKernel(VacancySourceTermKernel);
   registerKernel(RandomVacancySourceTermKernel);
   registerKernel(VacancyAnnihilationKernel);
+  registerKernel(ConservedLangevinNoiseVoidSource);
+  registerKernel(LangevinNoiseVoid);
 
   registerFunction(RandomNumberGeneration);
   
@@ -91,6 +119,11 @@ CrowApp::registerObjects(Factory & factory)
   registerInitialCondition(TwoParticleDensityIC);
   
   //registerFunction(MobilityFn);
+  registerAux(RandomVoidSourceAux);
+  
+  registerUserObject(ConservedUniformVoidSource);
+  
+  
 }
 
 

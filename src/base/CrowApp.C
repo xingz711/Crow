@@ -29,12 +29,14 @@
 #include "RandomVacancySourceTermMaterial.h"
 #include "RandomNumberGeneration.h"
 #include "ConservedLangevinNoiseVoidSource.h"
+#include "BicrystalIC.h"
 
 
 #include "PolycrystalSinteringKernelAction.h"
 #include "PolycrystalSinteringMaterialAction.h"
 #include "TwoParticleGrainsICAction.h"
 #include "TwoParticleDensityIC.h"
+#include "BicrystalICAction.h"
 
 #include "RandomVoidSourceAux.h"
 
@@ -117,7 +119,7 @@ CrowApp::registerObjects(Factory & factory)
   
   registerInitialCondition(TwoParticleGrainsIC);
   registerInitialCondition(TwoParticleDensityIC);
-  
+  registerInitialCondition(BicrystalIC);
   //registerFunction(MobilityFn);
   registerAux(RandomVoidSourceAux);
   
@@ -133,9 +135,10 @@ CrowApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
   syntax.registerActionSyntax("PolycrystalSinteringKernelAction", "Kernels/PolycrystalSinteringKernel");
   syntax.registerActionSyntax("PolycrystalSinteringMaterialAction", "Materials/PolycrystalSinteringMaterial");
   syntax.registerActionSyntax("TwoParticleGrainsICAction", "ICs/PolycrystalICs/TwoParticleGrainsIC");
-
+  syntax.registerActionSyntax("BicrystalICAction", "ICs/PolycrystalICs/BicrystalIC");
 
   registerAction(PolycrystalSinteringKernelAction, "add_kernel"); 
   registerAction(PolycrystalSinteringMaterialAction, "add_material");  
   registerAction(TwoParticleGrainsICAction, "add_ic");
+  registerAction(BicrystalICAction, "add_ic");
 }

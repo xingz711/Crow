@@ -30,7 +30,7 @@
 #include "RandomNumberGeneration.h"
 #include "ConservedLangevinNoiseVoidSource.h"
 #include "BicrystalIC.h"
-
+#include "VacancyRecombinationTermKernel.h"
 
 #include "PolycrystalSinteringKernelAction.h"
 #include "PolycrystalSinteringMaterialAction.h"
@@ -103,7 +103,7 @@ CrowApp::registerObjects(Factory & factory)
   registerKernel(VacancyAnnihilationKernel);
   registerKernel(ConservedLangevinNoiseVoidSource);
   registerKernel(LangevinNoiseVoid);
-
+  registerKernel(VacancyRecombinationTermKernel);
   registerFunction(RandomNumberGeneration);
   
   registerMaterial(PFDiffusion);

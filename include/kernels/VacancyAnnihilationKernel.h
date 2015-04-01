@@ -34,7 +34,7 @@ private:
 unsigned int _ncrys;
   Real _ceq;
 
-  VariableValue & _c;
+  //VariableValue & _c;
 };
 
 #endif //VacancyAnnihilationKernel_h

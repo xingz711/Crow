@@ -40,6 +40,7 @@ private:
   MaterialProperty<Real> & _kappa_c;
   //MaterialProperty<Real> & _L;
   MaterialProperty<RealGradient> & _grad_D;
+  MaterialProperty<Real> & _DD;
   unsigned int _ncrys;
 
 };

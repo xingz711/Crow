@@ -40,7 +40,8 @@ PFDiffusionGrowth::PFDiffusionGrowth(const std::string & name,
    // _kappa_op(declareProperty<Real>("kappa_op")),
     _kappa_c(declareProperty<Real>("kappa_c")),
     //_L(declareProperty<Real>("L")),
-    _grad_D(declareProperty<RealGradient>("grad_D"))
+    _grad_D(declareProperty<RealGradient>("grad_D")),
+    _DD(declareProperty<Real>("DD"))
     
 {
   // Array of coupled variables is created in the constructor
@@ -69,6 +70,9 @@ PFDiffusionGrowth::computeQpProperties()
     
     RealGradient grad_phi =  30.0*_rho[_qp]*_rho[_qp]*(1 - 2*_rho[_qp] + _rho[_qp]*_rho[_qp])*_grad_rho[_qp];
     _grad_D[_qp] = _Dvol* grad_phi - _Dvap* grad_phi + _Dsurf*(1 - 2.0*_rho[_qp])*_grad_rho[_qp];
+    
+     Real Dphi =  30.0*_rho[_qp]*_rho[_qp]*(1 - 2*_rho[_qp] + _rho[_qp]*_rho[_qp]);
+    _DD[_qp] = _Dvol* Dphi - _Dvap* Dphi + _Dsurf*(1 - 2.0*_rho[_qp]);
 
     //_kappa_op[_qp] = _beta;
     _kappa_c[_qp] = _kappa;

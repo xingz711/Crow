@@ -7,7 +7,7 @@ InputParameters validParams<VacancyAnnihilationKernel>()
 {
   InputParameters params = validParams<Kernel>();
   params.addRequiredCoupledVar("v", "Array of coupled order parameters");
-  params.addCoupledVar("c", "Concentration field");
+  //params.addCoupledVar("c", "Concentration field");
   params.addParam<Real>("ceq", "Equilibrium concentration");
   params.addParam<std::string>("Svgb", "S", "Efficiency of void nucleation/annihilation");
   return params;
@@ -17,8 +17,8 @@ VacancyAnnihilationKernel::VacancyAnnihilationKernel(const std::string & name, I
     Kernel(name,parameters),
     _Svgb_name(getParam<std::string>("Svgb")),
     _Svgb(getMaterialProperty<Real>(_Svgb_name)),
-    _ceq(getParam<Real>("ceq")),
-    _c(coupledValue("c"))
+    _ceq(getParam<Real>("ceq"))
+    //_c(coupledValue("c"))
     
 {
   // Array of coupled variables is created in the constructor
@@ -41,8 +41,9 @@ VacancyAnnihilationKernel::computeQpResidual()
 {
   Real SumEtaj = 0.0;
   for (unsigned int i = 0; i < _ncrys; ++i)
-    SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp]; //Sum all other order parameters
+    //SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp]; //Sum all other order parameters
 
+    SumEtaj = (*_vals[i])[_qp];
   
   return _Svgb[_qp]* (1-SumEtaj)*(_u[_qp] - _ceq)*_test[_i][_qp];
 
@@ -53,7 +54,8 @@ VacancyAnnihilationKernel::computeQpJacobian()
 {
   Real SumEtaj = 0.0;
   for (unsigned int i = 0; i < _ncrys; ++i)
-    SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp]; //Sum all other order parameters
+    //SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp]; //Sum all other order parameters
+    SumEtaj = (*_vals[i])[_qp];
 
   return  _test[_i][_qp] * _Svgb[_qp]* (1-SumEtaj)* _phi[_j][_qp];  
 }

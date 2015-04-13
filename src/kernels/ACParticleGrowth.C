@@ -37,9 +37,9 @@ ACParticleGrowth::computeDFDOP(PFFunctionType type)
 {
   Real c = _c[_qp];
   if (c < 1.0e-8)
-    c = 0.0;
+    c = 1e-6;
   if (c > 1.0)
-    c = 1.0;
+    c = 0.999;
   
   Real SumEtaj = 0.0;
   for (unsigned int i = 0; i < _ncrys; ++i)

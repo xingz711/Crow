@@ -22,10 +22,10 @@ CHTemp::computeGradDFDCons(PFFunctionType type)
   switch (type)
   {
     case Residual:
-      return _r*_temp*_grad_u[_qp]/_u[_qp] + _r*_temp*_grad_u[_qp]/(1 - _u[_qp])  ; // return Residual value
+      return 12*16*_u[_qp]*_u[_qp]*_grad_u[_qp] - 12*16*_u[_qp]*_grad_u[_qp] + 34*_grad_u[_qp] + _r*_temp*_grad_u[_qp]*2.0 + _r*_temp*_grad_u[_qp]/_u[_qp] + _r*_temp*_grad_u[_qp]/(1 - _u[_qp])  ; // return Residual value
 
     case Jacobian:
-      return -_r*_temp*_grad_u[_qp]*_phi[_j][_qp]/(_u[_qp]*_u[_qp]) + _r*_temp*_grad_u[_qp]*_phi[_j][_qp]/((1 - _u[_qp])*(1 - _u[_qp])) + _r*_temp*_grad_phi[_j][_qp]/_u[_qp] + _r*_temp*_grad_phi[_j][_qp]/(1 - _u[_qp]) ; //return Jacobian value
+      return 24*16*_u[_qp]*_phi[_j][_qp]*_grad_u[_qp] - 12*16*_phi[_j][_qp]*_grad_u[_qp] + 12*16*_u[_qp]*_u[_qp]*_grad_phi[_j][_qp] - 12*16*_u[_qp]*_grad_phi[_j][_qp] + 34*_grad_phi[_j][_qp] + _r*_temp*_grad_phi[_j][_qp]/_u[_qp] + _r*_temp*_grad_phi[_j][_qp]/(1 - _u[_qp]) - _r*_temp*_phi[_j][_qp]*_grad_u[_qp]/(_u[_qp]*_u[_qp]) + _r*_temp*_phi[_j][_qp]* _grad_u[_qp]/((1 - _u[_qp])*(1 - _u[_qp]))  ; //return Jacobian value
   }
 
   mooseError("Invalid type passed in");

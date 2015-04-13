@@ -41,9 +41,10 @@ protected:
   /// A reference to the nonlinear system
   NonlinearSystem & _nl;
  
-  Real _minvalue;
-  Real _maxvalue;
-  Real _rangevalue;
+  //Real _minvalue;
+  //Real _maxvalue;
+  //Real _rangevalue;
+  Real _tol;
   
   unsigned int _op_num;
   std::vector<Real> _radius;

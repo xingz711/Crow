@@ -41,11 +41,12 @@ VacancyAnnihilationKernel::computeQpResidual()
 {
   Real SumEtaj = 0.0;
   for (unsigned int i = 0; i < _ncrys; ++i)
-    //SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp]; //Sum all other order parameters
+    //for (unsigned int j = 0; j < _ncrys; ++j)
+    SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp]; //Sum all other order parameters
 
-    SumEtaj = (*_vals[i])[_qp];
+    //SumEtaj = (*_vals[i])[_qp];
   
-  return _Svgb[_qp]* (1-SumEtaj)*(_u[_qp] - _ceq)*_test[_i][_qp];
+  return  _Svgb[_qp]* (1-SumEtaj)*(_u[_qp] - _ceq)*_test[_i][_qp];
 
 }
 
@@ -54,8 +55,9 @@ VacancyAnnihilationKernel::computeQpJacobian()
 {
   Real SumEtaj = 0.0;
   for (unsigned int i = 0; i < _ncrys; ++i)
-    //SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp]; //Sum all other order parameters
-    SumEtaj = (*_vals[i])[_qp];
+    //for (unsigned int j = 0; j < _ncrys; ++j)
+    SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp];//Sum all other order parameters
+    //SumEtaj = (*_vals[i])[_qp];
 
-  return  _test[_i][_qp] * _Svgb[_qp]* (1-SumEtaj)* _phi[_j][_qp];  
+  return   _test[_i][_qp] * _Svgb[_qp]* (1-SumEtaj)* _phi[_j][_qp];  
 }

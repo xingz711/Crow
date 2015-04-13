@@ -5,9 +5,10 @@ template<>
 InputParameters validParams<TwoParticleDensityIC>()
 {
   InputParameters params = validParams<InitialCondition>();
-  params.addParam<Real>("min", 0.0, "Lower bound of the randomly generated values");
-  params.addParam<Real>("max", 1.0, "Upper bound of the randomly generated values");
-  params.addParam<unsigned int>("seed", 0, "Seed value for the random number generator");
+  //params.addParam<Real>("min", 0.0, "Lower bound of the randomly generated values");
+  //params.addParam<Real>("max", 1.0, "Upper bound of the randomly generated values");
+  //params.addParam<unsigned int>("seed", 0, "Seed value for the random number generator");
+  params.addParam<Real>("tol", 1e-6, "Upper bound of the randomly generated values");
   params.addRequiredParam<unsigned int>("op_num", "Number of grain order parameters");
   params.addRequiredParam<std::vector<Real> >("radius", "radius of the particles given as a vector input: r1, r2");
 
@@ -19,9 +20,10 @@ TwoParticleDensityIC::TwoParticleDensityIC(const std::string & name,
     InitialCondition(name, parameters),
     _mesh(_fe_problem.mesh()),
     _nl(_fe_problem.getNonlinearSystem()),
-    _minvalue(getParam<Real>("min")),
-    _maxvalue(getParam<Real>("max")),
-    _rangevalue(_maxvalue - _minvalue),
+    //_minvalue(getParam<Real>("min")),
+    //_maxvalue(getParam<Real>("max")),
+    //_rangevalue(_maxvalue - _minvalue),
+    _tol(getParam<Real>("tol")),
     _op_num(getParam<unsigned int>("op_num")),
     _radius(getParam<std::vector<Real> >("radius"))
     
@@ -38,19 +40,19 @@ TwoParticleDensityIC::TwoParticleDensityIC(const std::string & name,
   }
     _rangedomain = _top_right - _bottom_left;
     
-    MooseRandom::seed(getParam<unsigned int>("seed"));
+   // MooseRandom::seed(getParam<unsigned int>("seed"));
 }
 
 Real
 TwoParticleDensityIC::value(const Point & p)
 {
-  Real rand_num = MooseRandom::rand();
+  //Real rand_num = MooseRandom::rand();
 
   //Between 0 and range
-  rand_num *= _rangevalue;
+  //rand_num *= _rangevalue;
 
   //Between min and max
-  rand_num += _minvalue;
+  //rand_num += _minvalue;
   
   ////////////////////////////////////////
   
@@ -74,7 +76,7 @@ TwoParticleDensityIC::value(const Point & p)
   for ( unsigned int _op_index = 0.0; _op_index < _op_num; _op_index++) 
  {
   if ((dist_left <= radius_left && _op_index == 0) || (dist_right <= radius_right && _op_index == 1))
-    return 0.999;
+    return 1.0 - _tol;
  }
-  return rand_num;
+  return 0.0 + _tol;
  }

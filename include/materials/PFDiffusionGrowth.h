@@ -41,6 +41,8 @@ private:
   //MaterialProperty<Real> & _L;
   MaterialProperty<RealGradient> & _grad_D;
   MaterialProperty<Real> & _DD;
+  MaterialProperty<RealGradient> & _Dgrad_Mnp;
+  MaterialProperty<Real> & _Dgrad_Mngp;
   unsigned int _ncrys;
 
 };

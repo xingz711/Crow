@@ -31,12 +31,16 @@
 #include "ConservedLangevinNoiseVoidSource.h"
 #include "BicrystalIC.h"
 #include "VacancyRecombinationTermKernel.h"
+#include "RigidBodyMotionKernel.h"
+#include "SinteringFreeEnergy.h"
 
 #include "PolycrystalSinteringKernelAction.h"
 #include "PolycrystalSinteringMaterialAction.h"
 #include "TwoParticleGrainsICAction.h"
 #include "TwoParticleDensityIC.h"
 #include "BicrystalICAction.h"
+#include "MultiSmoothParticleIC.h"
+#include "MultiSmoothParticleICAction.h"
 
 #include "RandomVoidSourceAux.h"
 
@@ -104,6 +108,7 @@ CrowApp::registerObjects(Factory & factory)
   registerKernel(ConservedLangevinNoiseVoidSource);
   registerKernel(LangevinNoiseVoid);
   registerKernel(VacancyRecombinationTermKernel);
+  registerKernel(RigidBodyMotionKernel);
   registerFunction(RandomNumberGeneration);
   
   registerMaterial(PFDiffusion);
@@ -116,10 +121,12 @@ CrowApp::registerObjects(Factory & factory)
   registerMaterial(PFParticleGrowth);
   registerMaterial(PFTempMobility);
   registerMaterial(RandomVacancySourceTermMaterial);
+  registerMaterial(SinteringFreeEnergy);
   
   registerInitialCondition(TwoParticleGrainsIC);
   registerInitialCondition(TwoParticleDensityIC);
   registerInitialCondition(BicrystalIC);
+  registerInitialCondition(MultiSmoothParticleIC);
   //registerFunction(MobilityFn);
   registerAux(RandomVoidSourceAux);
   
@@ -136,9 +143,11 @@ CrowApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
   syntax.registerActionSyntax("PolycrystalSinteringMaterialAction", "Materials/PolycrystalSinteringMaterial");
   syntax.registerActionSyntax("TwoParticleGrainsICAction", "ICs/PolycrystalICs/TwoParticleGrainsIC");
   syntax.registerActionSyntax("BicrystalICAction", "ICs/PolycrystalICs/BicrystalIC");
+  syntax.registerActionSyntax("MultiSmoothParticleICAction", "ICs/PolycrystalICs/MultiSmoothParticleIC");
 
   registerAction(PolycrystalSinteringKernelAction, "add_kernel"); 
   registerAction(PolycrystalSinteringMaterialAction, "add_material");  
   registerAction(TwoParticleGrainsICAction, "add_ic");
   registerAction(BicrystalICAction, "add_ic");
+  registerAction(MultiSmoothParticleICAction, "add_ic");
 }

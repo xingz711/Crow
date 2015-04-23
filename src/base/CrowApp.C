@@ -12,6 +12,7 @@
 #include "CHChemPotential.h" 
 #include "CHTemp.h" 
 #include "ACSinteringGrowth.h"
+#include "ACParticleGrowth.h"
 #include "VacancySourceTermKernel.h"
 #include "RandomVacancySourceTermKernel.h"
 #include "VacancyAnnihilationKernel.h"
@@ -102,6 +103,7 @@ CrowApp::registerObjects(Factory & factory)
   registerKernel(CHChemPotential);  // <- registration
   registerKernel(CHTemp);
   registerKernel(ACSinteringGrowth);
+  registerKernel(ACParticleGrowth);
   registerKernel(VacancySourceTermKernel);
   registerKernel(RandomVacancySourceTermKernel);
   registerKernel(VacancyAnnihilationKernel);

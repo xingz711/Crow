@@ -53,7 +53,7 @@ ACParticleGrowth::computeDFDOP(PFFunctionType type)
       return 12.0* ((1-c)*_u[_qp] - (2 - c)*_u[_qp]*_u[_qp] + _u[_qp]*SumEtaj);
 
     case Jacobian:
-      return 12.0*(_phi[_j][_qp]*((1 - c)- 2*(2 - c)*_u[_qp] + SumEtaj));
+      return 12.0*(_phi[_j][_qp]*((1 - c)- 2*(2 - c)*_u[_qp] + SumEtaj + 2 * _u[_qp] * _u[_qp]));
   }
 
   mooseError("Invalid type passed in");

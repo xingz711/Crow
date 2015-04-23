@@ -51,7 +51,7 @@ ACSinteringGrowth::computeDFDOP(PFFunctionType type)
     case Residual:
       if (_has_T)
         tgrad_correction = _tgrad_corr_mult[_qp]*_grad_u[_qp]*(*_grad_T)[_qp];
-      return 12.0* ((1-_rho[_qp]) - (2 - _rho[_qp])*_u[_qp]*_u[_qp] + _u[_qp]*SumEtaj) + tgrad_correction;
+      return 12.0* ((1-_rho[_qp]) * _u[_qp] - (2 - _rho[_qp])*_u[_qp]*_u[_qp] + _u[_qp]*SumEtaj) + tgrad_correction;
 
     case Jacobian:
       if (_has_T)

@@ -14,6 +14,7 @@ InputParameters validParams<PolycrystalSinteringKernelAction>()
   params.addParam<Real>("en_ratio", 1.0, "Ratio of surface to GB energy");
   params.addParam<bool>("implicit", true, "Whether kernels are implicit or not");
   params.addParam<VariableName>("T", "NONE", "Name of temperature variable");
+  params.addParam<std::vector<VariableName > >("v", "Array of coupled variable names");
   params.addParam<bool>("use_displaced_mesh", false, "Whether to use displaced mesh in the kernels");
 
   return params;
@@ -25,7 +26,9 @@ PolycrystalSinteringKernelAction::PolycrystalSinteringKernelAction(const std::st
     _var_name_base(getParam<std::string>("var_name_base")),
     _c(getParam<VariableName>("c")),
     _implicit(getParam<bool>("implicit")),
-    _T(getParam<VariableName>("T"))
+    _T(getParam<VariableName>("T")),
+    _vals(getParam<std::vector<VariableName > >("v"))
+    
 {
 }
 
@@ -107,6 +110,7 @@ PolycrystalSinteringKernelAction::act()
     poly_params = _factory.getValidParams("ACParticleGrowth");
     poly_params.set<NonlinearVariableName>("variable") = var_name;
     poly_params.set<std::vector<VariableName> >("c").push_back(_c);
+    poly_params.set<std::vector<VariableName> >("v") = _vals;
     poly_params.set<bool>("implicit")=getParam<bool>("implicit");
     poly_params.set<bool>("use_displaced_mesh") = getParam<bool>("use_displaced_mesh");
 

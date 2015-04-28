@@ -31,7 +31,7 @@ void PFEigenStrainMaterial::computeEigenStrain()
   
     _eigenstrain[_qp].addIa(_epsilon0 * (_c[_qp] - _c0) + sumeta);
 
-  // first derivative w.r.t. v
+  // first derivative w.r.t. v.  true dat!!!!
   for (unsigned int i = 0; i < _ncrys; ++i)
   {
    (*_delastic_strain_dv[i])[_qp].zero();

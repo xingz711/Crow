@@ -79,9 +79,10 @@ PolycrystalSinteringMaterialAction::act()
     _problem->addMaterial("PFDiffusionGrowth", material_name, poly_params);
 
     /************/
-    if (_disp = true)
-      
+    if (_disp == true)
+    {      
     poly_params = _factory.getValidParams("PFEigenStrainMaterial1");
+    }
     poly_params.set<NonlinearVariableName>("variable") = var_name;
     poly_params.set<std::vector<VariableName> >("v") = v;
     poly_params.set<bool>("implicit")=_implicit;

@@ -28,7 +28,7 @@ public:
   RandomNumberGeneration(const std::string & name, InputParameters parameters);
   virtual ~RandomNumberGeneration();
 
-  virtual Real value(Real t, const Point & pt);
+  virtual Real value(Real /*t*/, const Point & /*p*/);
 
 protected:
   Real _min;

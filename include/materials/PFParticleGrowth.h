@@ -1,4 +1,4 @@
-#ifndef PFPAERTICLEGROWTH_H
+#ifndef PFPARTICLEGROWTH_H
 #define PFPARTICLEGROWTH_H
 
 #include "Material.h"

@@ -32,7 +32,7 @@ private:
   
   Real _int_width;
   bool _3D_spheres;
-  //unsigned int _num_dim;
+  unsigned int _num_dim;
 
   //unsigned int _numbub;
   //Real _bubspac;

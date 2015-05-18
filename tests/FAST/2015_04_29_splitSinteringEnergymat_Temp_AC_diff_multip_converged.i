@@ -209,7 +209,7 @@
   [./PolycrystalICs]
     [./MultiSmoothParticleIC]
       x_positions = '4.0 11.0 18.0 25.0 4.0 11.0 18.0 25.0'
-      z_positions = 0
+      z_positions = '0. 0. 0. 0. 0. 0. 0. 0.'
       radii = '3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0'
       y_positions = '4.0 4.0 4.0 4.0 11.0 11.0 11.0 11.0'
       3D_spheres = false
@@ -226,7 +226,7 @@
   [./multip]
     x_positions = '4.0 11.0 18.0 25.0 4.0 11.0 18.0 25.0'
     int_width = 1.0
-    z_positions = 0
+    z_positions = '0. 0. 0. 0. 0. 0. 0. 0.'
     y_positions = '4.0 4.0 4.0 4.0 11.0 11.0 11.0 11.0'
     radii = '3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0'
     3D_spheres = false

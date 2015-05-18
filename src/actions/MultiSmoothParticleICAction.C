@@ -58,8 +58,8 @@ MultiSmoothParticleICAction::MultiSmoothParticleICAction(const std::string & nam
     _z_positions(getParam<std::vector<Real> >("z_positions")),
     _input_radii(getParam<std::vector<Real> >("radii")),
     _int_width(getParam<Real>("int_width")),
-    _3D_spheres(getParam<bool>("3D_spheres"))
-    //_num_dim(_3D_spheres ? 3 : 2),
+    _3D_spheres(getParam<bool>("3D_spheres")),
+    _num_dim(_3D_spheres ? 3 : 2)
     //_numbub(getParam<unsigned int>("numbub")),
     //_bubspac(getParam<Real>("bubspac")),
     //_numtries(getParam<unsigned int>("numtries")),
@@ -92,7 +92,11 @@ MultiSmoothParticleICAction::act()
     //poly_params.set<unsigned int>("numbub") = _op_num;
     poly_params.set<Real>("x1") = _x_positions[op];
     poly_params.set<Real>("y1") = _y_positions[op];
+    if(_num_dim == 3)
+    {
     poly_params.set<Real>("z1") = _z_positions[op];
+    }
+
     poly_params.set<Real>("radius") = _input_radii[op];
     poly_params.set<unsigned int>("op_index") = op;
     poly_params.set<Real>("int_width") = _int_width;

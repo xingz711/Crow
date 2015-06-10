@@ -18,11 +18,21 @@ public:
 protected:
   virtual void computeEigenStrain();
   virtual void computeQpElasticityTensor();
-      
-private: 
+
+  std::vector<VariableValue *> _vals;
+  std::vector<VariableName> _v_name;
+  unsigned int _ncrys;
+
+  std::vector<MaterialProperty<RankTwoTensor> *> _delastic_strain_dv;
+  std::vector<MaterialProperty<ElasticityTensorR4> *> _delasticity_tensor_dv;
+  std::vector<std::vector<MaterialProperty<RankTwoTensor> *> > _d2elastic_strain_dv2;
+  std::vector<std::vector<MaterialProperty<ElasticityTensorR4> *> > _d2elasticity_tensor_dv2;
+
+
+  private:
+    Real _e_v;
     Real _epsilon0;
     Real _c0;
-    std::vector<Real> _e_v;
 };
 
 #endif //PFEIGENSTRAINMATERIAL1_H

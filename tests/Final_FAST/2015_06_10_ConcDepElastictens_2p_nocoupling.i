@@ -74,7 +74,7 @@
 [Functions]
   [./load]
     type = PiecewiseLinear
-    y = '0.0 -1.5 -1.5 0.0'
+    y = '0.0 -2.0 -2.0 0.0'
     x = '0.0  30.0 45.0 60.0'
   [../]
   [./temp]
@@ -239,7 +239,7 @@
 []
 
 [Materials]
-  active = 'AC_mat stress temp Elstc_en ElasticityTensor sum CH_mat strain free_energy'
+  active = 'AC_mat stress temp ElasticityTensor sum CH_mat strain free_energy'
   [./constant]
     type = PFMobility
     block = 0
@@ -285,7 +285,7 @@
   [./sum]
     type = DerivativeSumMaterial
     block = 0
-    sum_materials = 'S Ft E'
+    sum_materials = 'S Ft'
     args = 'c gr0 gr1'
     derivative_order = 2
     outputs = console
@@ -390,11 +390,12 @@
   output_on = 'initial timestep_end'
   interval = 10
   print_linear_residuals = true
+  file_base = nocoupling
   [./console]
     type = Console
     perf_log = true
     output_on = 'timestep_end failed nonlinear linear'
-    file_base = comb_multip
+    file_base = nocoupling
   [../]
 []
 
@@ -434,3 +435,4 @@
 [Debug]
   show_var_residual_norms = true
 []
+

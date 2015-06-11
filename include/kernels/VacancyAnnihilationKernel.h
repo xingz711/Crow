@@ -22,15 +22,15 @@ public:
 protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
-  
+
   std::string _Svgb_name;
 
 private:
   std::vector<VariableValue *> _vals;
   std::vector<unsigned int> _vals_var;
 
- MaterialProperty<Real> & _Svgb;
- 
+ const MaterialProperty<Real> & _Svgb;
+
 unsigned int _ncrys;
   Real _ceq;
 

@@ -74,8 +74,8 @@
 [Functions]
   [./load]
     type = PiecewiseLinear
-    y = '0.0 -1.5 -1.5 0.0'
-    x = '0.0  30.0 45.0 60.0'
+    y = '0.0 -1.0 0.0'
+    x = '0.0 45.0 60.0'
   [../]
   [./temp]
     type = PiecewiseLinear
@@ -290,6 +290,20 @@
     derivative_order = 2
     outputs = console
   [../]
+  [./Eigen]
+    type = PFEigenStrainMaterial1
+    block = 0
+    c = c
+    disp_y = disp_y
+    disp_x = disp_x
+    epsilon0 = 0.05
+    C_ijkl = '153e-3 180e-3'
+    fill_method = symmetric_isotropic
+    v = 'gr0 gr1'
+    e_v = 0.01
+    thermal_expansion_coeff = 4.3e-6
+    T = T
+  [../]
   [./Elstc_en]
     type = ElasticEnergyMaterial
     block = 0
@@ -303,7 +317,7 @@
     block = 0
     c = c
     C1_ijkl = '30.141 35.46'
-    C0_ijkl = '5.0 5.0'
+    C0_ijkl = '10.0 10.0'
     fill_method1 = symmetric_isotropic
     fill_method0 = symmetric_isotropic
   [../]
@@ -388,7 +402,7 @@
 [Outputs]
   exodus = true
   output_on = 'initial timestep_end'
-  interval = 10
+  interval = 5
   print_linear_residuals = true
   [./console]
     type = Console
@@ -421,7 +435,7 @@
     int_width = 2.0
     z_positions = '0 0'
     y_positions = '0.0 15.0 '
-    radii = '7.0 7.0 '
+    radii = '6.0 6.0 '
     3D_spheres = false
     outvalue = 0.001
     variable = c

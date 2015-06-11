@@ -28,11 +28,11 @@ private:
   std::vector<unsigned int> _vals_var;
 
   unsigned int _ncrys;
-  
+
   VariableValue & _c;
   unsigned int _c_var;
-  MaterialProperty<Real> & _L;
-  
+  const MaterialProperty<Real> & _L;
+
 };
 
 #endif //ACParticleGrowth_H

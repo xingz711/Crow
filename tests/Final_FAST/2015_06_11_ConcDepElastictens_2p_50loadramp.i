@@ -61,7 +61,7 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
-  [./C111]
+  [./C1111]
     order = CONSTANT
     family = MONOMIAL
   [../]
@@ -75,7 +75,7 @@
   [./load]
     type = PiecewiseLinear
     y = '0.0 -1.5 -1.5 0.0'
-    x = '0.0  30.0 45.0 60.0'
+    x = '0.0 30.0 45.0 60.0'
   [../]
   [./temp]
     type = PiecewiseLinear
@@ -197,13 +197,13 @@
   [../]
   [./C1111]
     type = RankFourAux
-    variable = C111
+    variable = C1111
     rank_four_tensor = elasticity_tensor
     index_l = 0
     index_j = 0
     index_k = 0
     index_i = 0
-    boundary = 0
+    block = 0
   [../]
   [./C2222]
     type = RankFourAux
@@ -290,6 +290,20 @@
     derivative_order = 2
     outputs = console
   [../]
+  [./Eigen]
+    type = PFEigenStrainMaterial1
+    block = 0
+    c = c
+    disp_y = disp_y
+    disp_x = disp_x
+    epsilon0 = 0.05
+    C_ijkl = '153e-3 180e-3'
+    fill_method = symmetric_isotropic
+    v = 'gr0 gr1'
+    e_v = 0.01
+    thermal_expansion_coeff = 4.3e-6
+    T = T
+  [../]
   [./Elstc_en]
     type = ElasticEnergyMaterial
     block = 0
@@ -303,7 +317,7 @@
     block = 0
     c = c
     C1_ijkl = '30.141 35.46'
-    C0_ijkl = '5.0 5.0'
+    C0_ijkl = '10.0 10.0'
     fill_method1 = symmetric_isotropic
     fill_method0 = symmetric_isotropic
   [../]

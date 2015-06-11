@@ -22,7 +22,7 @@ public:
 protected:
   virtual RealGradient precomputeQpResidual();
   virtual RealGradient precomputeQpJacobian();
-  
+
   std::string _k_name;
 
 private:
@@ -31,15 +31,15 @@ private:
   std::vector<unsigned int> _vals_var;
   std::vector<Real> _SumEtaj;
   std::vector<RealGradient> _GradEtaj;
-  
-  MaterialProperty<Real> & _k;
+
+  const MaterialProperty<Real> & _k;
   Real _ceq;
   Real _cgb;
   Real _mt;
- 
+
   unsigned int _ncrys;
- 
-  
+
+
 
   //VariableValue & _c;
 };

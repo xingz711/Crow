@@ -44,4 +44,4 @@ private:
   //VariableValue & _c;
 };
 
-#endif //RigidBodyMotionKernel_h
+#endif //RigidBodyMotionKernel_H

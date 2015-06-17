@@ -32,6 +32,7 @@ private:
   VariableValue & _c;
   unsigned int _c_var;
   const MaterialProperty<Real> & _L;
+  Real _B;
 
 };
 

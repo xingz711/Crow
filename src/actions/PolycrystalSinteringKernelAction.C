@@ -16,7 +16,8 @@ InputParameters validParams<PolycrystalSinteringKernelAction>()
   params.addParam<VariableName>("T", "NONE", "Name of temperature variable");
   params.addParam<std::vector<VariableName > >("v", "Array of coupled variable names");
   params.addParam<bool>("use_displaced_mesh", false, "Whether to use displaced mesh in the kernels");
-  //InputParameters 
+  params.addParam<Real>("B", 1.0, "Constant value for B");
+  //InputParameters
   //params.addParam<std::vector<VariableName > >("args", "Vector of additional arguments to F");
 
   return params;
@@ -30,9 +31,10 @@ PolycrystalSinteringKernelAction::PolycrystalSinteringKernelAction(const std::st
     _c(getParam<VariableName>("c")),
     _implicit(getParam<bool>("implicit")),
     _T(getParam<VariableName>("T")),
-    _vals(getParam<std::vector<VariableName > >("v"))
+    _vals(getParam<std::vector<VariableName > >("v")),
+    _B(getParam<Real>("B"))
     //_args(getParam<std::vector<VariableName > >("args")
-    
+
 {
 }
 
@@ -83,9 +85,9 @@ PolycrystalSinteringKernelAction::act()
     //kernel_name.append(var_name);
 
     //_problem->addKernel("ACSinteringGrowth", kernel_name, poly_params);
-    
+
     /************/
-    
+
     InputParameters poly_params = _factory.getValidParams("ACInterface");
     poly_params.set<NonlinearVariableName>("variable") = var_name;
     poly_params.set<bool>("implicit")=getParam<bool>("implicit");
@@ -95,7 +97,7 @@ PolycrystalSinteringKernelAction::act()
     kernel_name.append(var_name);
 
     _problem->addKernel("ACInterface", kernel_name, poly_params);
-    
+
     //*******************
 
     poly_params = _factory.getValidParams("TimeDerivative");
@@ -117,14 +119,15 @@ PolycrystalSinteringKernelAction::act()
     poly_params.set<std::vector<VariableName> >("v") = _vals;
     poly_params.set<bool>("implicit")=getParam<bool>("implicit");
     poly_params.set<bool>("use_displaced_mesh") = getParam<bool>("use_displaced_mesh");
+    poly_params.set<Real>("B") = _B;
 
     kernel_name = "ACBulk_";
     kernel_name.append(var_name);
 
     _problem->addKernel("ACParticleGrowth", kernel_name, poly_params);
     //*******************
-  } 
-  
+  }
+
  // if (_disp == true)
   //{
    // poly_params = _factory.getValidParams("ACParsed");
@@ -139,6 +142,6 @@ PolycrystalSinteringKernelAction::act()
 
     //_problem->addKernel("ACParsed", kernel_name, poly_params);
     //*******************
-  //}    
+  //}
   }
 }

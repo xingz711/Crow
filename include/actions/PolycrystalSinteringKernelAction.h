@@ -16,9 +16,10 @@ private:
   VariableName _c;
   bool _implicit;
   VariableName _T;
-  
+
   std::vector<VariableName > _vals;
   //std::vector<unsigned int> _vals_var;
+  Real _B;
 
   unsigned int _ncrys;
 };

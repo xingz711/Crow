@@ -404,6 +404,7 @@
   output_on = 'initial timestep_end'
   interval = 10
   print_linear_residuals = true
+  csv = true
   [./console]
     type = Console
     perf_log = true

@@ -36,9 +36,8 @@ private:
   VariableGradient * _grad_T;
 
   unsigned int _ncrys;
-  // Real _gamma;
-
   VariableValue & _rho;
+  Real _B;
 };
 
 #endif //ACSinteringGrowth_H

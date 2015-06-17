@@ -35,7 +35,9 @@ private:
   /// Coupled variable value for the concentration \f$ \c \f$.
   VariableValue & _c;
   unsigned int _c_var;
-  //Real _kbT;
+  Real _A;
+  Real _B;
+
   std::vector<VariableValue *> _vals;
   std::vector<unsigned int> _vals_var;
   unsigned int _ncrys;

@@ -80,13 +80,11 @@ ComputeGrainCenterUserObject::threadJoin(const UserObject & y)
 Real
 ComputeGrainCenterUserObject::computeIntegral()
 {
-  std::vector<Real> integral.resize(_nargs);
   for (unsigned int i = 0; i < _nargs; ++i)
   {
-    integral[i] = 0.0;
     for (_qp=0; _qp<_qrule->n_points(); _qp++)
-    integral[i] += _JxW[_qp]*_coord[_qp]*computeQpIntegral();
-    return integral[i];
+    _grain_volume [i] += _JxW[_qp]*_coord[_qp]*computeQpIntegral();
+    return _grain_volume [i];
   }
 }
 

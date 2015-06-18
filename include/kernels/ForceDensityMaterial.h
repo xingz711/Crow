@@ -36,7 +36,7 @@ private:
   Real _cgb;
   Real _k;
 
-  unsigned int _nargs;
+  unsigned int _ncrys;
 
   std::vector<MaterialProperty<RealGradient> *> _dF;
 

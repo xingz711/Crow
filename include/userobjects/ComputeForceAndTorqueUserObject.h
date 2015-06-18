@@ -12,48 +12,46 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#ifndef COMPUTEGRAINCENTERUSEROBJECT_H
-#define COMPUTEGRAINCENTERUSEROBJECT_H
 
-#include "ElementPostprocessor.h"
-#include "MooseVariableInterface.h"
-#include "Coupleable.h"
+#ifndef COMPUTEFORCEANDTORQUEUSEROBJECT_H
+#define COMPUTEFORCEANDTORQUEUSEROBJECT_H
+
+#include "ElementUserObject.h"
 
 //Forward Declarations
-class ComputeGrainCenterUserObject;
+class ComputeForceAndTorqueUserObject;
 
 template<>
-InputParameters validParams<ComputeGrainCenterUserObject>();
+InputParameters validParams<ComputeForceAndTorqueUserObject>();
 
-/**
- * This postprocessor computes a volume integral of the specified variable.
- *
- * Note that specializations of this integral are possible by deriving from this
- * class and overriding computeQpIntegral().
- */
-class ComputeGrainCenterUserObject :
-public ElementUserObject,
-public MooseVariableInterface
+/* This class is here to combine the Postprocessor interface and the
+ * base class Postprocessor object along with adding MooseObject to the inheritance tree*/
+class ComputeForceAndTorqueUserObject :  public ElementUserObject
 {
 public:
-  ComputeGrainCenterUserObject(const std::string & name, InputParameters parameters);
+  ComputeForceAndTorqueUserObject(const std::string & name, InputParameters parameters);
+
+  //virtual ~ComputeForceAndTorqueUserObject() {}
 
   virtual void initialize();
   virtual void execute();
-  virtual void threadJoin(const UserObject & y);
   virtual void finalize();
+  virtual void threadJoin(const UserObject & y);
+
+  virtual RealGradient computeQpIntegral(unsigned int i);
+  virtual RealGradient computeIntegral(unsigned int i);
 
 protected:
-  virtual void computeIntegral();
 
   unsigned int _qp;
-  std::vector<MooseVariable> & _var;
-  std::vector<VariableValue *> _vals;
-  std::vector<Point> _grain_center;
-  std::vector<Real> _grain_center_output;
+  std::string _dF_name;
+  const MaterialProperty<std::vector<RealGradient> > & _dF;
+  std::vector<RealGradient> _force_value;
+  std::vector<RealGradient> _torque_value;
 
   unsigned int _ncrys;
-  unsigned int _ncomp;
+
+  const ComputeGrainCenterUserObject & _grain_center;
 };
 
-#endif //COMPUTEGRAINCENTERUSEROBJECT_H
+#endif //COMPUTEFORCEANDTORQUEUSEROBJECT_H

@@ -24,23 +24,23 @@ ForceDensityMaterial::ForceDensityMaterial(const std::string & name, InputParame
 
 {
   // Array of coupled variables is created in the constructor
-  _nargs = coupledComponents("etas"); //determine number of grains from the number of names passed in.  Note this is the actual number -1
-  _vals.resize(_nargs); //Size variable arrays
-  _grad_vals.resize(_nargs);
-  _vals_var.resize(_nargs);
-  _product_etas.resize(_nargs);
-  _diff_grad_etas.resize(_nargs);
-  _dF.resize(_nargs);
-  //_vadv.resize(_nargs);
+  _ncrys = coupledComponents("etas"); //determine number of grains from the number of names passed in.  Note this is the actual number -1
+  _vals.resize(_ncrys); //Size variable arrays
+  _grad_vals.resize(_ncrys);
+  _vals_var.resize(_ncrys);
+  _product_etas.resize(_ncrys);
+  _diff_grad_etas.resize(_ncrys);
+  _dF.resize(_ncrys);
+  //_vadv.resize(_ncrys);
   // _gamma = 1.5;
 
   //Loop through grains and load coupled variables into the arrays
-  for (unsigned int i = 0; i < _nargs; ++i)
+  for (unsigned int i = 0; i < _ncrys; ++i)
   {
     _vals[i] = &coupledValue("etas", i);
     _grad_vals[i] = &coupledGradient("etas", i);
     _vals_var[i] = coupled("etas", i);
-    _dF[i]  = &declareProperty<RealGradient>("dF");
+    _dF[i]  = &declareProperty<RealGradient>("force_density");
   }
 }
 
@@ -49,11 +49,11 @@ ForceDensityMaterial::computeQpProperties()
 {
   Real product_eta_value = 0.0;
 
-  for (unsigned int i = 0; i < _nargs; ++i)
+  for (unsigned int i = 0; i < _ncrys; ++i)
   {
     _product_etas[i] = 0.0;
     _diff_grad_etas[i] = 0.0;
-    for (unsigned int j = 0; j < _nargs; ++j)
+    for (unsigned int j = 0; j < _ncrys; ++j)
     {
       if(i!=j)
       {

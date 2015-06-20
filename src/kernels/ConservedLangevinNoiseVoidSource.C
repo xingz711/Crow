@@ -20,9 +20,9 @@ Real
 ConservedLangevinNoiseVoidSource::computeQpResidual()
 {
   Real e = _eta[_qp];
-  
+
   if ( e <= 0.8 )
-  return -_test[_i][_qp] * _noise.getQpValue(_current_elem->id(), _qp) * _amplitude * (_multiplier_prop == NULL ? 1.0 : (*_multiplier_prop)[_qp]);
-  
+  return -_test[_i][_qp] * _noise.getQpValue(_current_elem->id(), _qp) * _amplitude * _multiplier_prop[_qp];
+
   return 0.0;
 }

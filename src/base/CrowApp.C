@@ -9,8 +9,8 @@
 #include "MiscApp.h"
 
 
-#include "CHChemPotential.h" 
-#include "CHTemp.h" 
+#include "CHChemPotential.h"
+#include "CHTemp.h"
 #include "ACSinteringGrowth.h"
 #include "ACParticleGrowth.h"
 #include "VacancySourceTermKernel.h"
@@ -27,6 +27,7 @@
 #include "PFEigenStrainMaterial1.h"
 #include "TwoParticleGrainsIC.h"
 #include "PFTempMobility.h"
+#include "Mobility.h"
 #include "RandomVacancySourceTermMaterial.h"
 #include "RandomNumberGeneration.h"
 #include "ConservedLangevinNoiseVoidSource.h"
@@ -47,7 +48,7 @@
 
 #include "ConservedUniformVoidSource.h"
 
-//#include "MobilityFn.h" 
+//#include "MobilityFn.h"
 
 template<>
 InputParameters validParams<CrowApp>()
@@ -112,7 +113,7 @@ CrowApp::registerObjects(Factory & factory)
   registerKernel(VacancyRecombinationTermKernel);
   registerKernel(RigidBodyMotionKernel);
   registerFunction(RandomNumberGeneration);
-  
+
   registerMaterial(PFDiffusion);
   registerMaterial(TempDiffusion);
   registerMaterial(PFDiffusionGrowthConst);
@@ -122,19 +123,20 @@ CrowApp::registerObjects(Factory & factory)
   registerMaterial(PFEigenStrainMaterial1);
   registerMaterial(PFParticleGrowth);
   registerMaterial(PFTempMobility);
+  registerMaterial(Mobility);
   registerMaterial(RandomVacancySourceTermMaterial);
   registerMaterial(SinteringFreeEnergy);
-  
+
   registerInitialCondition(TwoParticleGrainsIC);
   registerInitialCondition(TwoParticleDensityIC);
   registerInitialCondition(BicrystalIC);
   registerInitialCondition(MultiSmoothParticleIC);
   //registerFunction(MobilityFn);
   registerAux(RandomVoidSourceAux);
-  
+
   registerUserObject(ConservedUniformVoidSource);
-  
-  
+
+
 }
 
 
@@ -147,8 +149,8 @@ CrowApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
   syntax.registerActionSyntax("BicrystalICAction", "ICs/PolycrystalICs/BicrystalIC");
   syntax.registerActionSyntax("MultiSmoothParticleICAction", "ICs/PolycrystalICs/MultiSmoothParticleIC");
 
-  registerAction(PolycrystalSinteringKernelAction, "add_kernel"); 
-  registerAction(PolycrystalSinteringMaterialAction, "add_material");  
+  registerAction(PolycrystalSinteringKernelAction, "add_kernel");
+  registerAction(PolycrystalSinteringMaterialAction, "add_material");
   registerAction(TwoParticleGrainsICAction, "add_ic");
   registerAction(BicrystalICAction, "add_ic");
   registerAction(MultiSmoothParticleICAction, "add_ic");

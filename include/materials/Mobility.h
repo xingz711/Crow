@@ -23,6 +23,7 @@ protected:
 
   ///Variable values
   VariableValue & _c;
+  VariableName & _c_name;
   VariableValue & _T;
 
   ///Mateiral property declarations

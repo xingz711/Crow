@@ -136,7 +136,7 @@
 []
 
 [Kernels]
-  active = 'AC_int w_res c_dot ints_noise e_dot c_res CH_noise ci_res AC_bulk wi_res cv_recomb CH_Pv_rand ci_dot'
+  active = 'AC_int w_res c_dot ints_noise e_dot c_res CH_noise ci_res AC_bulk wi_res ci_dot'
   [./c_dot]
     type = CoupledImplicitEuler
     variable = wv

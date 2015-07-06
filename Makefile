@@ -3,7 +3,7 @@
 ###############################################################################
 #
 # Optional Environment variables
-# MOOSE_DIR        - Root directory of the MOOSE project 
+# MOOSE_DIR        - Root directory of the MOOSE project
 #
 ###############################################################################
 # Use the MOOSE submodule if it exists and MOOSE_DIR is not set
@@ -24,9 +24,9 @@ include $(FRAMEWORK_DIR)/moose.mk
 PHASE_FIELD       := yes
 SOLID_MECHANICS   := yes
 TENSOR_MECHANICS  := yes
-#+HEAT_CONDUCTION   := yes
+HEAT_CONDUCTION   := yes
 MISC              := yes
-#COMBINED              := yes
+COMBINED              := yes
 include $(MOOSE_DIR)/modules/modules.mk
 ###############################################################################
 

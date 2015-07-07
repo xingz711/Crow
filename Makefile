@@ -26,7 +26,7 @@ SOLID_MECHANICS   := yes
 TENSOR_MECHANICS  := yes
 HEAT_CONDUCTION   := yes
 MISC              := yes
-COMBINED              := yes
+COMBINED          := yes
 include $(MOOSE_DIR)/modules/modules.mk
 ###############################################################################
 

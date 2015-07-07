@@ -1,3 +1,8 @@
+#
+# Example problem showing how to use the DerivativeParsedMaterial with CHParsed.
+# The free energy is identical to that from CHMath, f_bulk = 1/4*(1-c)^2*(1+c)^2.
+#
+
 [Mesh]
   type = GeneratedMesh
   dim = 2
@@ -168,7 +173,7 @@
     block = 0
     prop_names = 'L kappa_op kappa_c M_cv'
     prop_values = '1.0 2.0 1.0 1.0'
-[../]
+  [../]
   [./Rand_mat]
     type = RandomVacancySourceTermMaterial
     block = 0

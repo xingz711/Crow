@@ -1,3 +1,8 @@
+# 
+# Example problem showing how to use the DerivativeParsedMaterial with CHParsed.
+# The free energy is identical to that from CHMath, f_bulk = 1/4*(1-c)^2*(1+c)^2.
+# 
+
 [Mesh]
   type = GeneratedMesh
   dim = 2
@@ -10,6 +15,7 @@
 []
 
 [Variables]
+  active = 'e wv cv'
   [./cv]
     order = FIRST
     family = LAGRANGE
@@ -20,7 +26,39 @@
     family = LAGRANGE
     block = 0
   [../]
+  [./ci]
+    order = FIRST
+    family = LAGRANGE
+    block = 0
+  [../]
+  [./wi]
+    order = FIRST
+    family = LAGRANGE
+    block = 0
+  [../]
   [./e]
+    order = FIRST
+    family = LAGRANGE
+    block = 0
+  [../]
+  [./gr0]
+    block = 0
+  [../]
+  [./gr1]
+    block = 0
+  [../]
+[]
+
+[AuxVariables]
+  active = ''
+  [./gr0]
+    block = 0
+  [../]
+  [./gr1]
+    block = 0
+  [../]
+  [./bnds]
+    block = 0
   [../]
 []
 
@@ -71,6 +109,30 @@
     type = ConstantIC
     block = 0
   [../]
+  [./IC_gr0]
+    y2 = 64
+    x1 = -64
+    y1 = -64
+    inside = 1.0000
+    grain_side = left
+    x2 = 0
+    variable = gr0
+    int_width = 2
+    type = BicrystalIC
+    block = 0
+  [../]
+  [./IC_gr1]
+    y2 = 64
+    x1 = 0
+    y1 = -64
+    inside = 1.0
+    grain_side = right
+    x2 = 64
+    variable = gr1
+    int_width = 2
+    type = BicrystalIC
+    block = 0
+  [../]
 []
 
 [Kernels]
@@ -92,7 +154,7 @@
   [./w_res]
     type = SplitCHWRes
     variable = wv
-    mob_name = M_cv
+    mob_name = D
   [../]
   [./AC_bulk]
     type = ACParsed
@@ -125,11 +187,19 @@
     block = 0
   [../]
   [./CH_noise]
-    type = LangevinNoise
+    type = LangevinNoiseVoid
     variable = cv
-    amplitude = 0.4
+    amplitude = 0.1
     block = 0
-    noise = noise
+    eta = e
+    Pcasc = 0.25
+  [../]
+  [./VacancyAhhihilation]
+    type = VacancyAnnihilationKernel
+    variable = cv
+    ceq = 1.13e-4
+    v = 'gr0  gr1'
+    block = 0
   [../]
 []
 
@@ -141,8 +211,8 @@
     function = '(e^2-1)^2*(Ef*cv+ kbT*(cv*log(cv)+(1-cv)*log(1-cv))) - A*(cv-cv0)^2*(e^4-3*e^3+2*e)+B*(cv-1)^2*e^2'
     args = 'cv e'
     constant_names = 'Ef   kbT A cv0 B'
-    constant_expressions = '1.0  0.11 1.0 1.13e-4 1.0'
-    tol_values = 0.001
+    constant_expressions = '9.09  0.11  9.09 1.13e-4 9.09'
+    tol_values = 1e-6
     tol_names = cv
     third_derivatives = false
   [../]
@@ -152,23 +222,12 @@
     mob = '1.0 '
     kappa = 0.5
   [../]
-  [./Mobility]
-    type = Mobility
-    block = 0
-    Em = 1.0
-    c = cv
-    Ef = 1.0
-    surface_energy = 0.8
-    D0 = 1.0
-    int_width = 0.5
-    T = 800
-  [../]
   [./AC_mat]
     type = GenericConstantMaterial
     block = 0
-    prop_names = 'L kappa_op kappa_c M_cv'
-    prop_values = '1.0 2.0 1.0 1.0'
-[../]
+    prop_names = 'L kappa_op kappa_c D S'
+    prop_values = '1.0 1.0 0.5 1.0  1.0'
+  [../]
   [./Rand_mat]
     type = RandomVacancySourceTermMaterial
     block = 0
@@ -193,13 +252,6 @@
   [../]
 []
 
-[UserObjects]
-  [./noise]
-    type = ConservedUniformNoise
-    block = 0
-  [../]
-[]
-
 [Preconditioning]
   [./SMP]
     type = SMP
@@ -212,22 +264,29 @@
   scheme = bdf2
   solve_type = NEWTON
   end_time = 20
-  dt = 0.05
+  dt = 0.005
   l_max_its = 35
   petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
   petsc_options_value = 'asm         31   preonly   lu      1'
   l_tol = 1.0e-6
   nl_rel_tol = 1.0e-6
   nl_abs_tol = 1.0e-6
+  [./TimeStepper]
+    type = IterationAdaptiveDT
+    dt = 0.005
+  [../]
 []
 
 [Outputs]
   # print_linear_residuals = true
   exodus = true
   output_on = 'timestep_end initial'
-  tecplot = true
+  file_base = RandvoidsourceAnnihilation
+  csv = true
+  interval = 5
   [./console]
     type = Console
     additional_output_on = initial
   [../]
 []
+

@@ -1,8 +1,8 @@
-#include "MicroThermal.h"
+#include "ThermalVariation.h"
 #include "AddV.h"
 
 template<>
-InputParameters validParams<MicroThermal>()
+InputParameters validParams<ThermalVariation>()
 {
   InputParameters params = validParams<Material>();
   params.addCoupledVar("eta", 0.0, "Order Parameter");
@@ -16,7 +16,7 @@ InputParameters validParams<MicroThermal>()
   return params;
 }
 
-MicroThermal::MicroThermal(const std::string & name,
+ThermalVariation::ThermalVariation(const std::string & name,
                            InputParameters parameters) :
     Material(name, AddV(parameters)),
     _has_v(isCoupled("v")),
@@ -41,7 +41,7 @@ MicroThermal::MicroThermal(const std::string & name,
 }
 
 void
-MicroThermal::computeProperties()
+ThermalVariation::computeProperties()
 {
   for (_qp = 0; _qp < _qrule->n_points(); ++_qp)
   {
@@ -79,7 +79,8 @@ MicroThermal::computeProperties()
       if (p12 > 0.01)  local_cond = _GB_cond;
     }
 
-    if (bnds < 0.05)
+    Real e = _eta[_qp];
+    if (e > 0.1)
       local_cond = Gas_cond;
 
     if (local_cond <= 0.0)
@@ -91,7 +92,7 @@ MicroThermal::computeProperties()
 }
 
 Real
-MicroThermal::computeBulkThermalConductivity()
+ThermalVariation::computeBulkThermalConductivity()
 {
   return _ko;
 }

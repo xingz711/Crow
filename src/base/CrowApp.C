@@ -1,11 +1,11 @@
 #include "CrowApp.h"
 #include "Moose.h"
 #include "AppFactory.h"
-//#include "ModulesApp.h"
+//#include "CombinedApp.h"
 #include "PhaseFieldApp.h"
 #include "SolidMechanicsApp.h"
 #include "TensorMechanicsApp.h"
-//#include "HeatTransferApp.h"
+#include "HeatConductionApp.h"
 #include "MiscApp.h"
 
 
@@ -35,6 +35,8 @@
 #include "VacancyRecombinationTermKernel.h"
 #include "RigidBodyMotionKernel.h"
 #include "SinteringFreeEnergy.h"
+#include "ThermalVariation.h"
+#include "EffectiveKapitzaResistance.h"
 
 #include "PolycrystalSinteringKernelAction.h"
 #include "PolycrystalSinteringMaterialAction.h"
@@ -67,9 +69,9 @@ CrowApp::CrowApp(const std::string & name, InputParameters parameters) :
    PhaseFieldApp::registerObjects(_factory);
    SolidMechanicsApp::registerObjects(_factory);
    TensorMechanicsApp::registerObjects(_factory);
-//+  HeatTransferApp:: registerObjects(_factory);
+   HeatConductionApp:: registerObjects(_factory);
    MiscApp::registerObjects(_factory);
-//  CombinedApp::registerObjects(_factory);
+  // CombinedApp::registerObjects(_factory);
 //+  MooseTestApp::registerObjects(_factory);
    CrowApp::registerObjects(_factory);
 
@@ -78,9 +80,9 @@ CrowApp::CrowApp(const std::string & name, InputParameters parameters) :
    PhaseFieldApp::associateSyntax(_syntax, _action_factory);
    SolidMechanicsApp::associateSyntax(_syntax, _action_factory);
    TensorMechanicsApp::associateSyntax(_syntax, _action_factory);
-//+  HeatTransferApp::associateSyntax(_syntax, _action_factory);
+   HeatConductionApp::associateSyntax(_syntax, _action_factory);
    MiscApp::associateSyntax(_syntax, _action_factory);
-//  CombinedApp::associateSyntax(_syntax, _action_factory);
+  // CombinedApp::associateSyntax(_syntax, _action_factory);
 //+  MooseTestApp::associateSyntax(_syntax, _action_factory);
   CrowApp::associateSyntax(_syntax, _action_factory);
 }
@@ -126,6 +128,7 @@ CrowApp::registerObjects(Factory & factory)
   registerMaterial(Mobility);
   registerMaterial(RandomVacancySourceTermMaterial);
   registerMaterial(SinteringFreeEnergy);
+  registerMaterial(ThermalVariation);
 
   registerInitialCondition(TwoParticleGrainsIC);
   registerInitialCondition(TwoParticleDensityIC);
@@ -135,6 +138,8 @@ CrowApp::registerObjects(Factory & factory)
   registerAux(RandomVoidSourceAux);
 
   registerUserObject(ConservedUniformVoidSource);
+
+  registerPostprocessor(EffectiveKapitzaResistance);
 
 
 }

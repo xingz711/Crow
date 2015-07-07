@@ -4,10 +4,10 @@
 #include "Material.h"
 
 //Forward Declarations
-class MicroThermal;
+class ThermalVariation;
 
 template<>
-InputParameters validParams<MicroThermal>();
+InputParameters validParams<ThermalVariation>();
 
 /**
  * This kernel computes the thermophysical material properties of UO2 and determines the effect of porosity.  Reference found in:
@@ -15,10 +15,10 @@ InputParameters validParams<MicroThermal>();
  * Materials, Vol. 279 p. 1-18, 2000.
  * \see MesoUO2
  */
-class MicroThermal : public Material
+class ThermalVariation : public Material
 {
 public:
-  MicroThermal(const std::string & name,
+  ThermalVariation(const std::string & name,
           InputParameters parameters);
 
 protected:

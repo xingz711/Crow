@@ -292,7 +292,7 @@
 []
 
 [Postprocessors]
-  active = 'ElementInt_cv Element_int_eta thcond'
+  active = 'ElementInt_cv Element_int_eta thcond rprime'
   [./ElementInt_cv]
     type = ElementIntegralVariablePostprocessor
     variable = cv

@@ -35,8 +35,8 @@ private:
   /// Coupled variable value for the concentration \f$ \c \f$.
   VariableValue & _c;
   unsigned int _c_var;
-  Real _A;
-  Real _B;
+  const MaterialProperty<Real> & _A;
+  const MaterialProperty<Real> & _B;
 
   std::vector<VariableValue *> _vals;
   std::vector<unsigned int> _vals_var;

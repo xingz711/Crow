@@ -27,12 +27,12 @@ private:
   std::vector<VariableValue *> _vals;
   std::vector<unsigned int> _vals_var;
 
-  unsigned int _ncrys;
-
   VariableValue & _c;
   unsigned int _c_var;
   const MaterialProperty<Real> & _L;
-  Real _B;
+  const MaterialProperty<Real> & _B;
+
+  unsigned int _ncrys;
 
 };
 

@@ -14,14 +14,10 @@ private:
   unsigned int _op_num;
   std::string _var_name_base;
   VariableName _c;
-  bool _implicit;
-  VariableName _T;
 
-  std::vector<VariableName > _vals;
-  //std::vector<unsigned int> _vals_var;
-  Real _B;
+  MaterialPropertyName _mob_name;
+  MaterialPropertyName _kappa_name;
 
-  unsigned int _ncrys;
 };
 
 template<>

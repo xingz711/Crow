@@ -37,6 +37,8 @@
 #include "SinteringFreeEnergy.h"
 #include "ThermalVariation.h"
 #include "EffectiveKapitzaResistance.h"
+#include "PoreGBPurdueMaterial.h"
+#include "SplitCHWResMtrxMob.h"
 
 #include "PolycrystalSinteringKernelAction.h"
 #include "PolycrystalSinteringMaterialAction.h"
@@ -114,6 +116,7 @@ CrowApp::registerObjects(Factory & factory)
   registerKernel(LangevinNoiseVoid);
   registerKernel(VacancyRecombinationTermKernel);
   registerKernel(RigidBodyMotionKernel);
+  registerKernel(SplitCHWResMtrxMob);
   registerFunction(RandomNumberGeneration);
 
   registerMaterial(PFDiffusion);
@@ -129,6 +132,7 @@ CrowApp::registerObjects(Factory & factory)
   registerMaterial(RandomVacancySourceTermMaterial);
   registerMaterial(SinteringFreeEnergy);
   registerMaterial(ThermalVariation);
+  registerMaterial(PoreGBPurdueMaterial);
 
   registerInitialCondition(TwoParticleGrainsIC);
   registerInitialCondition(TwoParticleDensityIC);

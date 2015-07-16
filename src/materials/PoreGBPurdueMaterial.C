@@ -43,8 +43,8 @@ PoreGBPurdueMaterial::PoreGBPurdueMaterial(const std::string & name,
     _L(declareProperty<Real>("L")),
     _kappa_c(declareProperty<Real>("kappa_c")),
     _kappa_GB(declareProperty<Real>("kappa_op")),
+    _A(declareProperty<Real>("A")),
     _B(declareProperty<Real>("B")),
-    _C(declareProperty<Real>("C")),
     _time_scale(declareProperty<Real>("time_scale")),
     _energy_scale(declareProperty<Real>("energy_scale")),
     _detM(declareProperty<Real>("detM")),
@@ -105,8 +105,8 @@ PoreGBPurdueMaterial::computeProperties()
     // Energetic parameters
     _kappa_c[_qp] =  3.0/4.0 * (2.0 * surface_energy - GB_energy) * int_width_c;
     _kappa_GB[_qp] = 3.0/4.0* GB_energy * int_width_c;
-    _B[_qp] = (12.0 * surface_energy - 7.0 * GB_energy) / int_width_c;
-    _C[_qp] = GB_energy / int_width_c;
+    _A[_qp] = (12.0 * surface_energy - 7.0 * GB_energy) / int_width_c;
+    _B[_qp] = GB_energy / int_width_c;
 
     // Kinetic parameters
     Real GBmob;

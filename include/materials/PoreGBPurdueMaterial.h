@@ -34,8 +34,8 @@ private:
   MaterialProperty<Real> & _L;
   MaterialProperty<Real> & _kappa_c;
   MaterialProperty<Real> & _kappa_GB;
+  MaterialProperty<Real> & _A;
   MaterialProperty<Real> & _B;
-  MaterialProperty<Real> & _C;
   MaterialProperty<Real> & _time_scale;
   MaterialProperty<Real> & _energy_scale;
   MaterialProperty<Real> & _detM;

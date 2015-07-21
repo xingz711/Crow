@@ -13,7 +13,7 @@ InputParameters validParams<PFDiffusionGrowth1>()
   params.addParam<Real>("L", 1.0, "The Allen-cahn multiplier");
   params.addCoupledVar("eta",0.0,"sum of order parameters");
   params.addRequiredCoupledVar("c","phase field variable");
-  
+
 
   return params;
 }
@@ -28,7 +28,7 @@ PFDiffusionGrowth1::PFDiffusionGrowth1(const std::string & name,
     _beta(getParam<Real>("beta")),
     _kappa(getParam<Real>("kappa")),
     _l(getParam<Real>("L")),
-    
+
 
     _c(coupledValue("c")),
     _grad_c(coupledGradient("c")),
@@ -39,21 +39,21 @@ PFDiffusionGrowth1::PFDiffusionGrowth1(const std::string & name,
     _kappa_c(declareProperty<Real>("kappa_c")),
     _L(declareProperty<Real>("L")),
     _grad_D(declareProperty<RealGradient>("grad_D"))
-    
+
 {}
 
 void
 PFDiffusionGrowth1::computeQpProperties()
 {
-    
+
     Real phi = _c[_qp]*_c[_qp]*_c[_qp]*(10 - 15*_c[_qp] + 6*_c[_qp]*_c[_qp]);
-    _D[_qp] = _Dvol* phi + _Dvap*(1 - phi) + _Dsurf*_c[_qp]*(1-_c[_qp])+ _Dgb*_sumetaj[_qp]; 
-    
+    _D[_qp] = _Dvol* phi + _Dvap*(1 - phi) + _Dsurf*_c[_qp]*(1-_c[_qp])+ _Dgb*_sumetaj[_qp];
+
     RealGradient grad_phi =  30.0*_c[_qp]*_c[_qp]*(1 - 2*_c[_qp] + _c[_qp]*_c[_qp])*_grad_c[_qp];
     _grad_D[_qp] = _Dvol* grad_phi - _Dvap* grad_phi + _Dsurf*(1 - 2.0*_c[_qp])*_grad_c[_qp];
 
     _kappa_op[_qp] = _beta;
     _kappa_c[_qp] = _kappa;
     _L[_qp] = - _l;
-  
+
 }

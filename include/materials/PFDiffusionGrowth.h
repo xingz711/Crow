@@ -26,7 +26,7 @@ private:
   Real _Dvap;
   Real _Dsurf;
   Real _Dgb;
-  
+
   //Real _beta;
   Real _kappa;
   //Real _l;
@@ -40,14 +40,10 @@ private:
   MaterialProperty<Real> & _kappa_c;
   //MaterialProperty<Real> & _L;
   MaterialProperty<RealGradient> & _grad_D;
-  //MaterialProperty<Real> & _DD;
-  //MaterialProperty<RealGradient> & _Dgrad_Mnp;
-  //MaterialProperty<Real> & _Dgrad_Mngp;
+  MaterialProperty<Real> & _dDdc;
+
   unsigned int _ncrys;
 
 };
 
 #endif //PFDiffusionGrowth_H
-
-
-

@@ -19,12 +19,12 @@ protected:
   virtual void computeQpProperties();
 
 private:
-  
+
   Real _Dvol;
   Real _Dvap;
   Real _Dsurf;
   Real _Dgb;
-  
+
   Real _beta;
   Real _kappa;
   Real _l;
@@ -43,6 +43,3 @@ private:
 };
 
 #endif //PFDiffusionGrowth_H
-
-
-

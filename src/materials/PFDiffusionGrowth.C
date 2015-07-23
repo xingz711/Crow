@@ -9,9 +9,9 @@ InputParameters validParams<PFDiffusionGrowth>()
   params.addParam<Real>("Dvap", 0.001, "Vapor Diffusion ");
   params.addParam<Real>("Dsurf", 4, "surface diffusion");
   params.addParam<Real>("Dgb", 0.4, "Grain Boundary diffusion");
-  params.addParam<Real>("beta", 1.0, "The beta multiplier for the interfacial energy");
+  // params.addParam<Real>("beta", 1.0, "The beta multiplier for the interfacial energy");
   params.addParam<Real>("kappa", 1.0, "The kappa multiplier for the interfacial energy");
-  params.addParam<Real>("L", 1.0, "The Allen-cahn multiplier");
+  // params.addParam<Real>("L", 1.0, "The Allen-cahn multiplier");
   params.addRequiredCoupledVar("rho","phase field variable");
   params.addRequiredCoupledVar("v","array of order parameters");
   params.addRequiredParam<unsigned int>("op_num", "number of grains");

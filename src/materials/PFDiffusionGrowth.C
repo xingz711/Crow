@@ -14,8 +14,6 @@ InputParameters validParams<PFDiffusionGrowth>()
   // params.addParam<Real>("L", 1.0, "The Allen-cahn multiplier");
   params.addRequiredCoupledVar("rho","phase field variable");
   params.addRequiredCoupledVar("v","array of order parameters");
-  params.addRequiredParam<unsigned int>("op_num", "number of grains");
-  params.addRequiredParam<std::string>("var_name_base", "base for variable names");
 
   return params;
 }
@@ -72,10 +70,10 @@ PFDiffusionGrowth::computeQpProperties()
     _D[_qp] = _Dvol * phi + _Dvap * (1.0 - phi) + _Dsurf * c * (1-c)+ _Dgb * SumEtaj;// + _Dvap*(1 - phi) ;
 
     RealGradient grad_phi =  30.0*c*c*(1 - 2*c + c * c) * _grad_rho[_qp];
-    _grad_D[_qp] = _Dvol * grad_phi + _Dsurf * (1 - 2.0 * c) * grad_phi - _Dvap * grad_phi;
+    _grad_D[_qp] = _Dvol * grad_phi - _Dvap * grad_phi +  _Dsurf * (1 - 2.0 * c) * _grad_rho[_qp] ;
 
     Real dphidc =  30.0 * c * c * (1 - 2 * c + c * c);
-    _dDdc[_qp] = _Dvol * dphidc + _Dsurf*(1 - 2.0 * c) * dphidc - _Dvap * dphidc;
+    _dDdc[_qp] = _Dvol * dphidc - _Dvap * dphidc + _Dsurf * (1 - 2.0 * c);
 
     //_kappa_op[_qp] = _beta;
     _kappa_c[_qp] = _kappa;

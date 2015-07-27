@@ -1,0 +1,3 @@
+[submodule "marmot"]
+	path = marmot
+	url = git@hpcgitlab.inl.gov:bisws/marmot.git

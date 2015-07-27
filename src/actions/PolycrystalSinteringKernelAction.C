@@ -36,7 +36,7 @@ PolycrystalSinteringKernelAction::act()
   Moose::err << "var name base:" << _var_name_base;
 #endif
 
-  for (unsigned int op = 0; op < _op_num; op++)
+  for (unsigned int op = 0; op < _op_num; ++op)
   {
     //Create variable names
     std::string var_name = _var_name_base;
@@ -49,7 +49,7 @@ PolycrystalSinteringKernelAction::act()
 
     unsigned int ind = 0;
 
-    for (unsigned int j = 0; j < _op_num; j++)
+    for (unsigned int j = 0; j < _op_num; ++j)
     {
       if (j != op)
       {

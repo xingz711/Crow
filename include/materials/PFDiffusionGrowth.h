@@ -1,5 +1,5 @@
-#ifndef PFDiffusionGrowth_H
-#define PFDiffusionGrowth_H
+#ifndef PFDIFFUSIONGROWTH_H
+#define PFDIFFUSIONGROWTH_H
 
 #include "Material.h"
 
@@ -27,23 +27,18 @@ private:
   Real _Dsurf;
   Real _Dgb;
 
-  //Real _beta;
   Real _kappa;
-  //Real _l;
 
   VariableValue & _rho;
   VariableGradient & _grad_rho;
   VariableValue & _v;
 
   MaterialProperty<Real> & _D;
-  //MaterialProperty<Real> & _kappa_op;
   MaterialProperty<Real> & _kappa_c;
-  //MaterialProperty<Real> & _L;
   MaterialProperty<RealGradient> & _grad_D;
   MaterialProperty<Real> & _dDdc;
 
   unsigned int _ncrys;
-
 };
 
-#endif //PFDiffusionGrowth_H
+#endif //PFDIFFUSIONGROWTH_H

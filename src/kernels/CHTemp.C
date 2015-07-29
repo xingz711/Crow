@@ -9,8 +9,8 @@ InputParameters validParams<CHTemp>()
   return params;
 }
 
-CHTemp::CHTemp(const std::string & name, InputParameters parameters) :
-    CHBulk(name, parameters),
+CHTemp::CHTemp(const InputParameters & parameters) :
+    CHBulk(parameters),
     _temp(getParam<Real>("Temperature")),
     _r(getParam<Real>("R"))
 {

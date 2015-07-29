@@ -18,9 +18,8 @@ InputParameters validParams<BubblesBicrystalIC>()
   return params;
 }
 
-BubblesBicrystalIC::BubblesBicrystalIC(const std::string & name,
-                                       InputParameters parameters) :
-    InitialCondition(name, parameters),
+BubblesBicrystalIC::BubblesBicrystalIC(const InputParameters & parameters) :
+    InitialCondition(parameters),
     _mesh(_fe_problem.mesh()),
     _phase(getParam<unsigned int>("phase")),
     _nbub(getParam<unsigned int>("nbub")),

@@ -26,8 +26,7 @@ public:
    * @param parameters The parameters object holding data for the class to use.
    * @param var_name The variable this InitialCondtion is supposed to provide values for.
    */
-  TwoParticleDensityIC(const std::string & name,
-                InputParameters parameters);
+  TwoParticleDensityIC(const InputParameters & parameters);
 
   /**
    * The value of the variable at a point.
@@ -40,12 +39,12 @@ protected:
   MooseMesh & _mesh;
   /// A reference to the nonlinear system
   NonlinearSystem & _nl;
- 
+
   //Real _minvalue;
   //Real _maxvalue;
   //Real _rangevalue;
   Real _tol;
-  
+
   unsigned int _op_num;
   std::vector<Real> _radius;
 

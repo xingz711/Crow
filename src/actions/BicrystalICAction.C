@@ -36,14 +36,14 @@ InputParameters validParams<BicrystalICAction>()
   params.addRequiredParam<Real>("x2", "The x coordinate of the upper right-hand corner of the box");
   params.addRequiredParam<Real>("y2", "The y coordinate of the upper right-hand corner of the box");
   params.addParam<Real>("z2", 0.0, "The z coordinate of the upper right-hand corner of the box");
-  
+
   params.addParam<Real>("int_width",0.0, "Width of the interface");
 
   return params;
 }
 
-BicrystalICAction::BicrystalICAction(const std::string & name, InputParameters params) :
-    Action(name, params),
+BicrystalICAction::BicrystalICAction(const InputParameters & params) :
+    Action(params),
     _var_name_base(getParam<std::string>("var_name_base")),
     _op_num(getParam<unsigned int>("op_num")),
     _x1(getParam<Real>("x1")),

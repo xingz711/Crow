@@ -12,8 +12,7 @@ InputParameters validParams<PFDiffusionGrowth>();
 class PFDiffusionGrowth : public Material
 {
 public:
-  PFDiffusionGrowth(const std::string & name,
-             InputParameters parameters);
+  PFDiffusionGrowth(const InputParameters & parameters);
 
 protected:
   virtual void computeQpProperties();

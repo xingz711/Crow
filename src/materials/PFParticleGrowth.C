@@ -7,20 +7,19 @@ InputParameters validParams<PFParticleGrowth>()
   InputParameters params = validParams<Material>();
   params.addParam<Real>("beta", 1.0, "The beta multiplier for the interfacial energy");
   params.addParam<Real>("L", 1.0, "The Allen-cahn multiplier");
-  
+
   return params;
 }
 
-PFParticleGrowth::PFParticleGrowth(const std::string & name,
-                       InputParameters parameters) :
-    Material(name, parameters),
+PFParticleGrowth::PFParticleGrowth(const InputParameters & parameters) :
+    Material(parameters),
     _beta(getParam<Real>("beta")),
     _l(getParam<Real>("L")),
-      
+
     _kappa_op(declareProperty<Real>("kappa_op")),
     _L(declareProperty<Real>("L"))
-    
-    
+
+
 {}
 
 void

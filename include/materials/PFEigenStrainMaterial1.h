@@ -13,23 +13,23 @@
 class PFEigenStrainMaterial1 : public EigenStrainBaseMaterial
 {
 public:
-  PFEigenStrainMaterial1(const std:: string & name, InputParameters parameters);
+  PFEigenStrainMaterial1(const InputParameters & parameters);
 
 protected:
   virtual void computeEigenStrain();
   virtual void computeQpElasticityTensor();
-     
+
   std::vector<VariableValue *> _vals;
   std::vector<VariableName> _v_name;
   unsigned int _ncrys;
-  
+
   std::vector<MaterialProperty<RankTwoTensor> *> _delastic_strain_dv;
   std::vector<MaterialProperty<ElasticityTensorR4> *> _delasticity_tensor_dv;
   std::vector<std::vector<MaterialProperty<RankTwoTensor> *> > _d2elastic_strain_dv2;
   std::vector<std::vector<MaterialProperty<ElasticityTensorR4> *> > _d2elasticity_tensor_dv2;
-  
-   
-private: 
+
+
+private:
     Real _e_v;
     Real _epsilon0;
     Real _c0;

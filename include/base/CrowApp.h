@@ -11,7 +11,8 @@ InputParameters validParams<CrowApp>();
 class CrowApp : public MooseApp
 {
 public:
-  CrowApp(const std::string & name, InputParameters parameters);
+  CrowApp(const InputParameters & parameters);
+  CrowApp(const std::string & deprecated_name, InputParameters parameters); // DEPRECATED CONSTRUCTOR
   virtual ~CrowApp();
 
   static void registerApps();

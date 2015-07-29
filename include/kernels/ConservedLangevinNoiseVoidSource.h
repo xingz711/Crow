@@ -13,7 +13,7 @@ InputParameters validParams<LangevinNoise>();
 class ConservedLangevinNoiseVoidSource : public LangevinNoise
 {
 public:
-  ConservedLangevinNoiseVoidSource(const std::string & name, InputParameters parameters);
+  ConservedLangevinNoiseVoidSource(const InputParameters & parameters);
 
 protected:
   virtual void residualSetup() {};

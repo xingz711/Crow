@@ -13,8 +13,8 @@ InputParameters validParams<VacancyAnnihilationKernel>()
   return params;
 }
 
-VacancyAnnihilationKernel::VacancyAnnihilationKernel(const std::string & name, InputParameters parameters) :
-    Kernel(name,parameters),
+VacancyAnnihilationKernel::VacancyAnnihilationKernel(const InputParameters & parameters) :
+    Kernel(parameters),
     _Svgb_name(getParam<std::string>("Svgb")),
     _Svgb(getMaterialProperty<Real>(_Svgb_name)),
     _ceq(getParam<Real>("ceq"))

@@ -8,9 +8,8 @@ InputParameters validParams<ConservedLangevinNoiseVoidSource>()
   params.addRequiredCoupledVar("eta", "order parameter for void");
   return params;
 }
-ConservedLangevinNoiseVoidSource::ConservedLangevinNoiseVoidSource(const std::string & name,
-                             InputParameters parameters) :
-    LangevinNoise(name, parameters),
+ConservedLangevinNoiseVoidSource::ConservedLangevinNoiseVoidSource(const InputParameters & parameters) :
+    LangevinNoise(parameters),
     _noise(getUserObject<ConservedNoiseInterface>("noise")),
     _eta(coupledValue("eta"))
 {

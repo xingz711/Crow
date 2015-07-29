@@ -14,7 +14,7 @@
 class PFEigenStrainBaseMaterial : public DerivativeMaterialInterface<LinearElasticMaterial>
 {
 public:
-  PFEigenStrainBaseMaterial(const std:: string & name, InputParameters parameters);
+  PFEigenStrainBaseMaterial(const InputParameters & parameters);
 
 protected:
   virtual void computeEigenStrain() = 0;
@@ -22,7 +22,7 @@ protected:
 
   VariableValue & _c;
   VariableName _c_name;
-  
+
     std::string _eigenstrain_name;
   MaterialProperty<RankTwoTensor> & _eigenstrain;
 
@@ -31,11 +31,11 @@ protected:
 
   MaterialProperty<ElasticityTensorR4> & _delasticity_tensor_dc;
   MaterialProperty<ElasticityTensorR4> & _d2elasticity_tensor_dc2;
-  
+
   std::vector<VariableValue *> _vals;
   std::vector<VariableName> _v_name;
   unsigned int _ncrys;
-  
+
   std::vector<MaterialProperty<RankTwoTensor> *> _delastic_strain_dv;
   std::vector<MaterialProperty<ElasticityTensorR4> *> _delasticity_tensor_dv;
   std::vector<std::vector<MaterialProperty<RankTwoTensor> *> > _d2elastic_strain_dv2;

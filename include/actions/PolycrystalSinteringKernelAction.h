@@ -6,7 +6,7 @@
 class PolycrystalSinteringKernelAction: public Action
 {
 public:
-  PolycrystalSinteringKernelAction(const std::string & name, InputParameters params);
+  PolycrystalSinteringKernelAction(const InputParameters & params);
 
   virtual void act();
 

@@ -9,8 +9,8 @@ InputParameters validParams<ACParticleGrowth>()
   return params;
 }
 
-ACParticleGrowth::ACParticleGrowth(const std::string & name, InputParameters parameters) :
-    ACBulk(name,parameters),
+ACParticleGrowth::ACParticleGrowth(const InputParameters & parameters) :
+    ACBulk(parameters),
     _c(coupledValue("c")),
     _c_var(coupled("c")),
     _L(getMaterialProperty<Real>("L")),

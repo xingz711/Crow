@@ -24,9 +24,8 @@ InputParameters validParams<MultiSmoothParticleIC>()
   return params;
 }
 
-MultiSmoothParticleIC::MultiSmoothParticleIC(const std::string & name,
-                                         InputParameters parameters) :
-    SmoothCircleBaseIC(name, parameters),
+MultiSmoothParticleIC::MultiSmoothParticleIC(const InputParameters & parameters) :
+    SmoothCircleBaseIC(parameters),
     _numbub(getParam<unsigned int>("numbub")),
     _bubspac(getParam<Real>("bubspac")),
     _numtries(getParam<unsigned int>("numtries")),
@@ -122,7 +121,7 @@ MultiSmoothParticleIC::computeCircleCenters()
       }
 
       if (i == 0) rr = _range.size();
-      
+
       //Verify not out of bounds
         if (_avoid_bounds && newcenter(0) < _radii[i] + _int_width)
           newcenter(0) = _radii[i] + _int_width;
@@ -143,7 +142,7 @@ MultiSmoothParticleIC::computeCircleCenters()
 
     if (num_tries == _numtries)
       mooseError("Too many tries in MultiSmoothParticleIC");
-    
+
      _centers[i] = newcenter;
   }
 }

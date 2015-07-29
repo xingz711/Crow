@@ -16,7 +16,7 @@ InputParameters validParams<EffectiveKapitzaResistance>();
 class EffectiveKapitzaResistance : public GeneralPostprocessor
 {
 public:
-  EffectiveKapitzaResistance(const std::string & name, InputParameters parameters);
+  EffectiveKapitzaResistance(const InputParameters & parameters);
 
   virtual void initialize() {}
   virtual void execute() {}

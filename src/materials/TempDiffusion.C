@@ -12,32 +12,31 @@ InputParameters validParams<TempDiffusion>()
   return params;
 }
 
-TempDiffusion::TempDiffusion(const std::string & name,
-                       InputParameters parameters) :
-    Material(name, parameters),
+TempDiffusion::TempDiffusion(const InputParameters & parameters) :
+    Material(parameters),
     _Dv(getParam<Real>("Dv")),
     _kb(getParam<Real>("kb")),
     _T(getParam<Real>("T")),
     _kappa(getParam<Real>("kappa")),
-   
+
     _c(coupledValue("c")),
     _grad_c(coupledGradient("c")),
-    
+
     _D(declareProperty<Real>("D")),
     _grad_D(declareProperty<RealGradient>("grad_D")),
     _kappa_c(declareProperty<Real>("kappa_c"))
-    
+
 {
 }
 
 void
 TempDiffusion::computeQpProperties()
 {
- 
-    _D[_qp] = (_Dv* _c[_qp])/(_kb*_T); 
-    
-    _grad_D[_qp] = (_Dv)/(_kb*_T)*_grad_c[_qp];  
-    
+
+    _D[_qp] = (_Dv* _c[_qp])/(_kb*_T);
+
+    _grad_D[_qp] = (_Dv)/(_kb*_T)*_grad_c[_qp];
+
     _kappa_c[_qp] = _kappa;
-  
+
 }

@@ -23,8 +23,8 @@ InputParameters validParams<ConservedUniformVoidSource>()
 class ConservedUniformVoidSource : public ConservedUniformVoidSourceVeneer<ConservedNoiseBase>
 {
 public:
-  ConservedUniformVoidSource(const std::string & name, InputParameters parameters) :
-    ConservedUniformVoidSourceVeneer<ConservedNoiseBase>(name, parameters) {}
+  ConservedUniformVoidSource(const InputParameters & parameters) :
+    ConservedUniformVoidSourceVeneer<ConservedNoiseBase>(parameters) {}
 };
 
 #endif //CONSERVEDUNIFORMVOIDSOURCE_H

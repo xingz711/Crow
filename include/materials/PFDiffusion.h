@@ -12,8 +12,7 @@ InputParameters validParams<PFDiffusion>();
 class PFDiffusion : public Material
 {
 public:
-  PFDiffusion(const std::string & name,
-             InputParameters parameters);
+  PFDiffusion(const InputParameters & parameters);
 
 protected:
   virtual void computeQpProperties();
@@ -26,7 +25,7 @@ private:
   Real _Dvap;
   Real _Dsurf;
   Real _Dgb;
-  
+
   //Real _beta;
   Real _kappa;
   //Real _l;
@@ -46,6 +45,3 @@ private:
 };
 
 #endif //PFDIFFUSION_H
-
-
-

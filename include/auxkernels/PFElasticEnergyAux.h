@@ -14,7 +14,7 @@ InputParameters validParams<PFElasticEnergyAux>();
 class PFElasticEnergyAux : public AuxKernel
 {
 public:
-  PFElasticEnergyAux( const std::string & name, InputParameters parameters );
+  PFElasticEnergyAux( const InputParameters & parameters );
 
   virtual ~PFElasticEnergyAux() {}
 

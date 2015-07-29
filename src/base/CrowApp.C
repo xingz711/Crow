@@ -56,11 +56,13 @@ template<>
 InputParameters validParams<CrowApp>()
 {
   InputParameters params = validParams<MooseApp>();
+  params.set<bool>("use_legacy_uo_initialization") = false;
+  params.set<bool>("use_legacy_uo_aux_computation") = false;
   return params;
 }
 
-CrowApp::CrowApp(const std::string & name, InputParameters parameters) :
-    MooseApp(name, parameters)
+CrowApp::CrowApp(const InputParameters & parameters) :
+    MooseApp(parameters)
 {
   srand(processor_id());
 
@@ -96,12 +98,25 @@ extern "C" void CrowApp__registerApps() { CrowApp::registerApps(); }
 void
 CrowApp::registerApps()
 {
-  registerApp(CrowApp);
+  #undef  registerApp
+  #define registerApp(name) AppFactory::instance().reg<name>(#name)
+
+    registerApp(CrowApp);
+
+  #undef  registerApp
+  #define registerApp(name) AppFactory::instance().regLegacy<name>(#name)
 }
 
+extern "C" void CrowApp__registerObjects(Factory & factory) { CrowApp::registerObjects(factory); }
 void
 CrowApp::registerObjects(Factory & factory)
 {
+
+  #undef registerObject
+  #define registerObject(name) factory.reg<name>(stringifyName(name))
+  #undef registerDeprecatedObjectName
+  #define registerDeprecatedObjectName(obj, name, time) factory.regReplaced<obj>(stringifyName(obj), name, time)
+
   // Register any custom objects you have built on the MOOSE Framework
   registerKernel(CHChemPotential);  // <- registration
   registerKernel(CHTemp);
@@ -140,10 +155,13 @@ CrowApp::registerObjects(Factory & factory)
 
 }
 
-
+extern "C" void CrowApp__associateSyntax(Syntax & syntax, ActionFactory & action_factory) { CrowApp::associateSyntax(syntax, action_factory); }
 void
 CrowApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
+  #undef registerAction
+  #define registerAction(tplt, action) action_factory.reg<tplt>(stringifyName(tplt), action)
+
   syntax.registerActionSyntax("PolycrystalSinteringKernelAction", "Kernels/PolycrystalSinteringKernel");
   syntax.registerActionSyntax("PolycrystalSinteringMaterialAction", "Materials/PolycrystalSinteringMaterial");
   syntax.registerActionSyntax("TwoParticleGrainsICAction", "ICs/PolycrystalICs/TwoParticleGrainsIC");
@@ -155,4 +173,20 @@ CrowApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
   registerAction(TwoParticleGrainsICAction, "add_ic");
   registerAction(BicrystalICAction, "add_ic");
   registerAction(MultiSmoothParticleICAction, "add_ic");
+
+  #undef registerAction
+  #define registerAction(tplt, action) action_factory.regLegacy<tplt>(stringifyName(tplt), action)
+}
+
+// DEPRECATED CONSTRUCTOR
+CrowApp::CrowApp(const std::string & deprecated_name, InputParameters parameters) :
+    MooseApp(deprecated_name, parameters)
+{
+  srand(processor_id());
+
+  Moose::registerObjects(_factory);
+  CrowApp::registerObjects(_factory);
+
+  Moose::associateSyntax(_syntax, _action_factory);
+  CrowApp::associateSyntax(_syntax, _action_factory);
 }

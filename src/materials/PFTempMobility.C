@@ -16,16 +16,15 @@ InputParameters validParams<PFTempMobility>()
   return params;
 }
 
-PFTempMobility::PFTempMobility(const std::string & name,
-                       InputParameters parameters) :
-    Material(name, parameters),
+PFTempMobility::PFTempMobility(const InputParameters & parameters) :
+    Material(parameters),
     _Da(getParam<Real>("Da")),
     _Db(getParam<Real>("Db")),
     _R(getParam<Real>("R")),
     _Vm(getParam<Real>("Vm")),
     _kappa(getParam<Real>("kappa")),
    // _l(getParam<Real>("L")),
-    
+
 
     _c(coupledValue("c")),
     _grad_c(coupledGradient("c")),
@@ -36,7 +35,7 @@ PFTempMobility::PFTempMobility(const std::string & name,
     _kappa_c(declareProperty<Real>("kappa_c")),
     //_L(declareProperty<Real>("L")),
     _grad_M(declareProperty<RealGradient>("grad_M"))
-    
+
 {
 }
 
@@ -49,13 +48,13 @@ PFTempMobility::computeQpProperties()
   {
     Real Ma = (_Da*std::exp(-145.0/(_R*_T[_qp])))/(_R*_T[_qp]);
     Real Mb = (_Db*std::exp(-130.0/(_R*_T[_qp])))/(_R*_T[_qp]);
-       
+
     _M[_qp] = (_c[_qp]*(1.0-_c[_qp])*(_c[_qp]*Ma+(1.0-_c[_qp])*Mb))/_Vm;
     _grad_M[_qp] = ((1.0-2.0*_c[_qp])*(_c[_qp]*Ma+(1.0-_c[_qp])*Mb)+ _c[_qp]*(1.0-_c[_qp])*(Ma-Mb))*_grad_c[_qp]/_Vm;
-    
-        
+
+
     _kappa_c[_qp] = _kappa;
-    
-    
+
+
   }
 }

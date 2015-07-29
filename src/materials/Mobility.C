@@ -17,9 +17,8 @@ InputParameters validParams<Mobility>()
   return params;
 }
 
-Mobility::Mobility(const std::string & name,
-                                               InputParameters parameters) :
-    Material(name, parameters),
+Mobility::Mobility(const InputParameters & parameters) :
+    Material(parameters),
     _c(coupledValue("c")),
     _c_name(getVar("c", 0)->name()),
     _T(coupledValue("T")),

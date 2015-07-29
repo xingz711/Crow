@@ -12,9 +12,8 @@ InputParameters validParams<TwoParticleGrainsIC>()
   return params;
 }
 
-TwoParticleGrainsIC::TwoParticleGrainsIC(const std::string & name,
-                                                     InputParameters parameters) :
-    InitialCondition(name, parameters),
+TwoParticleGrainsIC::TwoParticleGrainsIC(const InputParameters & parameters) :
+    InitialCondition(parameters),
     _mesh(_fe_problem.mesh()),
     _nl(_fe_problem.getNonlinearSystem()),
     _op_num(getParam<unsigned int>("op_num")),
@@ -39,7 +38,7 @@ TwoParticleGrainsIC::value(const Point & p)
   //_redius.resize(2);
   Real radius_left = 5.0; //_radius[0];
   Real radius_right = 5.0; //_radius[1];
-  
+
   Point grain_center_left;
   grain_center_left(0) = _bottom_left(0) + _rangedomain(0)/2.0 - radius_left;
   grain_center_left(1) = _bottom_left(1) + _rangedomain(1)/2.0;
@@ -49,7 +48,7 @@ TwoParticleGrainsIC::value(const Point & p)
   grain_center_right(0) = _bottom_left(0) + _rangedomain(0)/2.0 + radius_right;
   grain_center_right(1) = _bottom_left(1) + _rangedomain(1)/2.0;
   grain_center_right(2) = _bottom_left(2) + _rangedomain(2)/2.0;
-  
+
   Real dist_left = (p - grain_center_left).size();
   Real dist_right = (p - grain_center_right).size();
 

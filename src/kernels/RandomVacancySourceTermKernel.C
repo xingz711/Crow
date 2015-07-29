@@ -14,8 +14,8 @@ InputParameters validParams<RandomVacancySourceTermKernel>()
   return params;
 }
 
-RandomVacancySourceTermKernel::RandomVacancySourceTermKernel(const std::string & name, InputParameters parameters) :
-    Kernel(name, parameters),
+RandomVacancySourceTermKernel::RandomVacancySourceTermKernel(const InputParameters & parameters) :
+    Kernel(parameters),
     _eta(coupledValue("eta")),
     _min(getParam<Real>("min")),
     _max(getParam<Real>("max")),

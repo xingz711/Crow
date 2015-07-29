@@ -13,9 +13,8 @@ InputParameters validParams<LangevinNoiseVoid>()
   params.addParam<Real>("max", 1.0, "Upper bound of the randomly generated values");
   return params;
 }
-LangevinNoiseVoid::LangevinNoiseVoid(const std::string & name,
-                             InputParameters parameters) :
-    Kernel(name, parameters),
+LangevinNoiseVoid::LangevinNoiseVoid(const InputParameters & parameters) :
+    Kernel(parameters),
     _amplitude(getParam<Real>("amplitude")),
     _Pcasc(getParam<Real>("Pcasc")),
     _multiplier_prop(parameters.isParamValid("multiplier") ? &getMaterialProperty<Real>(getParam<std::string>("multiplier")) : NULL),
@@ -23,7 +22,7 @@ LangevinNoiseVoid::LangevinNoiseVoid(const std::string & name,
     _min(getParam<Real>("min")),
     _max(getParam<Real>("max")),
     _range(_max - _min)
-    
+
 {
 }
 
@@ -37,23 +36,23 @@ LangevinNoiseVoid::residualSetup()
 Real
 LangevinNoiseVoid::computeQpResidual()
 {
-  
+
   Real R2 = MooseRandom::rand();
   //Between 0 and range
   R2*= _range;
   //Between min and max
   R2 += _min;
-  
+
   Real R1 = MooseRandom::rand();
   //Between 0 and range
   R1*= _range;
   //Between min and max
   R1 += _min;
-  
+
   Real e = _eta[_qp];
-  
+
   if ( e < 0.8 && R1<= _Pcasc)
   return -_test[_i][_qp] * R2 * _amplitude * (_multiplier_prop == NULL ? 1.0 : (*_multiplier_prop)[_qp]);
-  
+
   return 0.0;
 }

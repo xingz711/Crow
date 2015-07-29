@@ -17,9 +17,8 @@ InputParameters validParams<PFDiffusion>()
   return params;
 }
 
-PFDiffusion::PFDiffusion(const std::string & name,
-                       InputParameters parameters) :
-    Material(name, parameters),
+PFDiffusion::PFDiffusion(const InputParameters & parameters) :
+    Material(parameters),
     _Dvol(getParam<Real>("Dvol")),
     _Dvap(getParam<Real>("Dvap")),
     _Dsurf(getParam<Real>("Dsurf")),
@@ -27,7 +26,7 @@ PFDiffusion::PFDiffusion(const std::string & name,
     //_beta(getParam<Real>("beta")),
     _kappa(getParam<Real>("kappa")),
    // _l(getParam<Real>("L")),
-    
+
 
     _rho(coupledValue("rho")),
     _grad_rho(coupledGradient("rho")),
@@ -38,13 +37,13 @@ PFDiffusion::PFDiffusion(const std::string & name,
     _kappa_c(declareProperty<Real>("kappa_c")),
     //_L(declareProperty<Real>("L")),
     _grad_D(declareProperty<RealGradient>("grad_D"))
-    
+
 {
   // Array of coupled variables is created in the constructor
   //_ncrys = coupledComponents("eta"); //determine number of grains from the number of names passed in.  Note this is the actual number -1
   //_vals.resize(_ncrys); //Size variable arrays
   //_vals_var.resize(_ncrys);
-  
+
   // _gamma = 1.5;
 
   //Loop through grains and load coupled variables into the arrays
@@ -63,16 +62,16 @@ PFDiffusion::computeQpProperties()
       //SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp]; //Sum all other order parameters
   {
     Real phi = _rho[_qp]*_rho[_qp]*_rho[_qp]*(10 - 15*_rho[_qp] + 6*_rho[_qp]*_rho[_qp]);
-    _D[_qp] = _Dvol* phi + _Dvap*(1 - phi) + _Dsurf*_rho[_qp]*(1-_rho[_qp]); 
-    
+    _D[_qp] = _Dvol* phi + _Dvap*(1 - phi) + _Dsurf*_rho[_qp]*(1-_rho[_qp]);
+
     RealGradient grad_phi =  30.0*_rho[_qp]*_rho[_qp]*(1 - 2*_rho[_qp] + _rho[_qp]*_rho[_qp])*_grad_rho[_qp];
     _grad_D[_qp] = _Dvol* grad_phi - _Dvap* grad_phi + _Dsurf*(1 - 2.0*_rho[_qp])*_grad_rho[_qp];
-    
+
     //+ _Dgb*SumEtaj;
 
     //_kappa_op[_qp] = _beta;
     _kappa_c[_qp] = _kappa;
     //_L[_qp] = - _l;
-    
+
   }
 }

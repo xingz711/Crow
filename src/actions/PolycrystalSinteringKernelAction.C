@@ -18,8 +18,8 @@ InputParameters validParams<PolycrystalSinteringKernelAction>()
   return params;
 }
 
-PolycrystalSinteringKernelAction::PolycrystalSinteringKernelAction(const std::string & name, InputParameters params) :
-    Action(name, params),
+PolycrystalSinteringKernelAction::PolycrystalSinteringKernelAction(const InputParameters & params) :
+    Action(params),
     _op_num(getParam<unsigned int>("op_num")),
     _var_name_base(getParam<std::string>("var_name_base")),
     _c(getParam<VariableName>("c")),

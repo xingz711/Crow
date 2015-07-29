@@ -17,7 +17,7 @@ InputParameters validParams<RigidBodyMotionKernel>();
 class RigidBodyMotionKernel : public KernelGrad
 {
 public:
-  RigidBodyMotionKernel(const std::string & name, InputParameters parameters);
+  RigidBodyMotionKernel(const InputParameters & parameters);
 
 protected:
   virtual RealGradient precomputeQpResidual();

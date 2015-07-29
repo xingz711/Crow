@@ -13,8 +13,8 @@ InputParameters validParams<ACSinteringGrowth>()
   return params;
 }
 
-ACSinteringGrowth::ACSinteringGrowth(const std::string & name, InputParameters parameters) :
-    ACBulk(name,parameters),
+ACSinteringGrowth::ACSinteringGrowth(const InputParameters & parameters) :
+    ACBulk(parameters),
     //_mu(getMaterialProperty<Real>("mu")),
     //_gamma(getMaterialProperty<Real>("gamma_asymm")),
     _tgrad_corr_mult(getMaterialProperty<Real>("tgrad_corr_mult")),

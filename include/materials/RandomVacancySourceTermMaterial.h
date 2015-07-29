@@ -13,7 +13,7 @@ InputParameters validParams<RandomVacancySourceTermMaterial>();
 class RandomVacancySourceTermMaterial : public Material
 {
 public:
-  RandomVacancySourceTermMaterial(const std::string & name, InputParameters parameters);
+  RandomVacancySourceTermMaterial(const InputParameters & parameters);
 
 protected:
   virtual void computeQpProperties();

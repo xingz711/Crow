@@ -1,5 +1,5 @@
 #include "ThermalVariation.h"
-#include "AddV.h"
+// #include "AddV.h"
 
 template<>
 InputParameters validParams<ThermalVariation>()
@@ -16,9 +16,8 @@ InputParameters validParams<ThermalVariation>()
   return params;
 }
 
-ThermalVariation::ThermalVariation(const std::string & name,
-                           InputParameters parameters) :
-    Material(name, AddV(parameters)),
+ThermalVariation::ThermalVariation(const InputParameters & parameters) :
+    Material(parameters),
     _has_v(isCoupled("v")),
     _length_scale(getParam<Real>("length_scale")),
     _Gas_conductivity(getParam<Real>("Gas_conductivity")),

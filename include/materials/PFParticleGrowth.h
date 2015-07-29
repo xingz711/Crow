@@ -12,23 +12,19 @@ InputParameters validParams<PFParticleGrowth>();
 class PFParticleGrowth : public Material
 {
 public:
-  PFParticleGrowth(const std::string & name,
-             InputParameters parameters);
+  PFParticleGrowth(const InputParameters & parameters);
 
 protected:
   virtual void computeQpProperties();
 
 private:
-    
+
   Real _beta;
   Real _l;
 
   MaterialProperty<Real> & _kappa_op;
   MaterialProperty<Real> & _L;
-  
+
 };
 
 #endif //PFPARTICLEGROWTH_H
-
-
-

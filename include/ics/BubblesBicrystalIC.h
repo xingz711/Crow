@@ -15,8 +15,7 @@ InputParameters validParams<BubblesBicrystalIC>();
 class BubblesBicrystalIC : public InitialCondition
 {
 public:
-  BubblesBicrystalIC(const std::string & name,
-                     InputParameters parameters);
+  BubblesBicrystalIC(const InputParameters & parameters);
 
   virtual Real value(const Point & p);
 

@@ -15,8 +15,7 @@ InputParameters validParams<Mobility>();
 class Mobility : public Material
 {
 public:
-  Mobility(const std::string & name,
-                         InputParameters parameters);
+  Mobility(const InputParameters & parameters);
 
 protected:
   virtual void computeQpProperties();

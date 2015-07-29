@@ -16,7 +16,7 @@
 class BicrystalICAction: public Action
 {
 public:
-  BicrystalICAction(const std::string & name, InputParameters params);
+  BicrystalICAction(const InputParameters & params);
 
   virtual void act();
 

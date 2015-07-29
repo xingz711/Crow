@@ -7,7 +7,7 @@
 class PolycrystalSinteringMaterialAction: public Action //, public Material
 {
 public:
-  PolycrystalSinteringMaterialAction(const std::string & name, InputParameters params);
+  PolycrystalSinteringMaterialAction(const InputParameters & params);
 
   virtual void act();
 

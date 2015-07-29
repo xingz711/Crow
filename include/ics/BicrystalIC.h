@@ -47,8 +47,7 @@ public:
    * @param name The name given to the initial condition in the input file.
    * @param parameters The parameters object holding data for the class to use.
    */
-  BicrystalIC(const std::string & name,
-                InputParameters parameters);
+  BicrystalIC(const InputParameters & parameters);
 
   /**
    * The value of the variable at a point.
@@ -69,16 +68,16 @@ protected:
 
   Point _bottom_left;
   Point _top_right;
-  
+
   Real _int;
-  
+
 private:
   MooseEnum _grain_side;
   //{
     //left,
     //right
   //};
-  
+
 };
 
 

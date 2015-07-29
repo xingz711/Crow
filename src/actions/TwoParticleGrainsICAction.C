@@ -26,8 +26,8 @@ InputParameters validParams<TwoParticleGrainsICAction>()
   return params;
 }
 
-TwoParticleGrainsICAction::TwoParticleGrainsICAction(const std::string & name, InputParameters params) :
-    Action(name, params),
+TwoParticleGrainsICAction::TwoParticleGrainsICAction(const InputParameters & params) :
+    Action(params),
     _var_name_base(getParam<std::string>("var_name_base")),
     _op_num(getParam<unsigned int>("op_num"))
 {}

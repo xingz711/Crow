@@ -15,9 +15,8 @@ InputParameters validParams<TwoParticleDensityIC>()
   return params;
 }
 
-TwoParticleDensityIC::TwoParticleDensityIC(const std::string & name,
-                                                     InputParameters parameters) :
-    InitialCondition(name, parameters),
+TwoParticleDensityIC::TwoParticleDensityIC(const InputParameters & parameters) :
+    InitialCondition(parameters),
     _mesh(_fe_problem.mesh()),
     _nl(_fe_problem.getNonlinearSystem()),
     //_minvalue(getParam<Real>("min")),
@@ -26,7 +25,7 @@ TwoParticleDensityIC::TwoParticleDensityIC(const std::string & name,
     _tol(getParam<Real>("tol")),
     _op_num(getParam<unsigned int>("op_num")),
     _radius(getParam<std::vector<Real> >("radius"))
-    
+
 
 {
   if (_op_num != 2)
@@ -39,7 +38,7 @@ TwoParticleDensityIC::TwoParticleDensityIC(const std::string & name,
     _top_right(i) = _mesh.getMaxInDimension(i);
   }
     _rangedomain = _top_right - _bottom_left;
-    
+
    // MooseRandom::seed(getParam<unsigned int>("seed"));
 }
 
@@ -53,12 +52,12 @@ TwoParticleDensityIC::value(const Point & p)
 
   //Between min and max
   //rand_num += _minvalue;
-  
+
   ////////////////////////////////////////
-  
+
   Real radius_left = _radius[0];
   Real radius_right = _radius[1];
-  
+
   Point grain_center_left;
   grain_center_left(0) = _bottom_left(0) + _rangedomain(0)/2.0 - radius_left;
   grain_center_left(1) = _bottom_left(1) + _rangedomain(1)/2.0;
@@ -72,8 +71,8 @@ TwoParticleDensityIC::value(const Point & p)
   //Real radius = _range(0)/5.0;
   Real dist_left = (p - grain_center_left).size();
   Real dist_right = (p - grain_center_right).size();
-  
-  for ( unsigned int _op_index = 0.0; _op_index < _op_num; _op_index++) 
+
+  for ( unsigned int _op_index = 0.0; _op_index < _op_num; _op_index++)
  {
   if ((dist_left <= radius_left && _op_index == 0) || (dist_right <= radius_right && _op_index == 1))
     return 1.0 - _tol;

@@ -19,8 +19,8 @@ InputParameters validParams<PolycrystalSinteringMaterialAction>()
   return params;
 }
 
-PolycrystalSinteringMaterialAction::PolycrystalSinteringMaterialAction(const std::string & name, InputParameters params) :
-    Action(name, params),
+PolycrystalSinteringMaterialAction::PolycrystalSinteringMaterialAction(const InputParameters & params) :
+    Action(params),
     //Material(name, params),
     _op_num(getParam<unsigned int>("op_num")),
     _var_name_base(getParam<std::string>("var_name_base")),
@@ -80,7 +80,7 @@ PolycrystalSinteringMaterialAction::act()
 
     /************/
     if (_disp == true)
-    {      
+    {
     poly_params = _factory.getValidParams("PFEigenStrainMaterial1");
     }
     poly_params.set<NonlinearVariableName>("variable") = var_name;

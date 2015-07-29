@@ -18,8 +18,7 @@ InputParameters validParams<ThermalVariation>();
 class ThermalVariation : public Material
 {
 public:
-  ThermalVariation(const std::string & name,
-          InputParameters parameters);
+  ThermalVariation(const InputParameters & parameters);
 
 protected:
   virtual void computeProperties();

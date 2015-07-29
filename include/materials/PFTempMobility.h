@@ -12,8 +12,7 @@ InputParameters validParams<PFTempMobility>();
 class PFTempMobility : public Material
 {
 public:
-  PFTempMobility(const std::string & name,
-             InputParameters parameters);
+  PFTempMobility(const InputParameters & parameters);
 
 protected:
   virtual void computeQpProperties();
@@ -26,7 +25,7 @@ private:
   Real _Db;
   Real _R;
   Real _Vm;
-  
+
   //Real _beta;
   Real _kappa;
   //Real _l;
@@ -45,6 +44,3 @@ private:
 };
 
 #endif //PFDIFFUSION_H
-
-
-

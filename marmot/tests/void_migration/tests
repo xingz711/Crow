@@ -1,0 +1,28 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = 'void_migration_test.i'
+    exodiff = 'out.e-s002'
+    group = 'adaptive'
+  [../]
+
+  [./void_gb_test]
+    type = 'Exodiff'
+    input = 'void_GB_migration_test.i'
+    exodiff = 'void_GB_migration_test_out.e'
+    group = 'adaptive'
+  [../]
+
+  [./void_gb_temp_test]
+    type = 'Exodiff'
+    input = 'void_GB_migration_temp_test.i'
+    exodiff = 'void_GB_migration_temp_test_out.e-s002'
+    group = 'adaptive'
+  [../]
+
+  [./void_temp_test]
+    type = 'Exodiff'
+    input = 'void_migration_temp_test.i'
+    exodiff = 'void_migration_temp_test_out.e'
+  [../]
+[]

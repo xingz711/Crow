@@ -1,0 +1,15 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = 'CH_test.i'
+    exodiff = 'circle_oversample.e'
+    exodiff_opts = '-x 1'
+  [../]
+
+  [./phys_test]
+    type = 'Exodiff'
+    input = 'CHPhys_test.i'
+    exodiff = 'chphys.e'
+    group = 'adaptive'
+  [../]
+[]

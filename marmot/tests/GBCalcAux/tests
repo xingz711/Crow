@@ -1,0 +1,7 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = 'GBCalcAux_test.i'
+    exodiff = 'out.e'
+  [../]
+[]

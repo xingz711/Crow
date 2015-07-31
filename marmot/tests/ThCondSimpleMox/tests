@@ -1,0 +1,7 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = 'ThCondSimpleMOX_test.i'
+    exodiff = 'ThCondSimpleMOX_test_out.e'
+  [../]
+[]

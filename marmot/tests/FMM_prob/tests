@@ -1,0 +1,12 @@
+[Tests]
+  [./vac_test]
+    type = 'Exodiff'
+    input = 'fmm_prob_vac_test.i'
+    exodiff = 'fmm_vac_oversample.e'
+  [../]
+  [./test]
+    type = 'Exodiff'
+    input = 'fmm_prob_test.i'
+    exodiff = 'fmm_prob_oversample.e'
+  [../]
+[]

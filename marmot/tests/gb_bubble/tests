@@ -1,0 +1,26 @@
+[Tests]
+  [./void_test]
+    type = 'Exodiff'
+    input = 'VacGB_test.i'
+    exodiff = 'vac.e'
+  [../]
+
+  [./bubsplit__test]
+    type = 'Exodiff'
+    input = 'GrBu_split_test.i'
+    exodiff = 'GrBu_split.e'
+  [../]
+
+  [./split_test]
+    type = 'Exodiff'
+    input = 'VacGB_split_test.i'
+    exodiff = 'split.e'
+  [../]
+
+  [./bub_test]
+    type = 'Exodiff'
+    input = 'GrBu_test.i'
+    exodiff = 'out.e'
+    use_old_floor = True 
+  [../]
+[]

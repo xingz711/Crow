@@ -1,0 +1,44 @@
+[Tests]
+  [./genirrad_0]
+    type = 'Exodiff'
+    input = 'genirrad.i'
+    cli_args = 'Outputs/file_base=genirrad_0 Materials/genirrad/free_energy_form=PHYSICAL'
+    exodiff = 'genirrad_0.e'
+  [../]
+  [./genirrad_4]
+    type = 'Exodiff'
+    input = 'genirrad.i'
+    cli_args = 'Outputs/file_base=genirrad_4 Materials/genirrad/free_energy_form=4THORDER'
+    exodiff = 'genirrad_4.e'
+  [../]
+  [./genirrad_6]
+    type = 'Exodiff'
+    input = 'genirrad.i'
+    cli_args = 'Outputs/file_base=genirrad_6 Materials/genirrad/free_energy_form=6THORDER'
+    exodiff = 'genirrad_6.e'
+  [../]
+  [./genirrad_8]
+    type = 'Exodiff'
+    input = 'genirrad.i'
+    cli_args = 'Outputs/file_base=genirrad_8 Materials/genirrad/free_energy_form=8THORDER'
+    exodiff = 'genirrad_8.e'
+  [../]
+
+  [./vartempirrad]
+    type = 'Exodiff'
+    input = 'vartempirrad.i'
+    exodiff = 'vartempirrad_out.e'
+  [../]
+
+  [./voidtempgrad]
+    type = 'Exodiff'
+    input = 'voidtempgrad.i'
+    exodiff = 'voidtempgrad_out.e'
+  [../]
+
+  [./genericmaterialmaterial]
+    type = 'Exodiff'
+    input = 'genericmaterialmaterial.i'
+    exodiff = 'genericmaterialmaterial_out.e'
+  [../]
+[]

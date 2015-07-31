@@ -1,0 +1,19 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = 'test.i'
+    exodiff = 'test_out.e-s012'
+  [../]
+
+  [./stpore]
+    type = 'Exodiff'
+    input = 'stpore.i'
+    exodiff = 'stpore_out.e'
+  [../]
+
+  [./pores]
+    type = 'Exodiff'
+    input = 'pores.i'
+    exodiff = 'pores_out.e'
+  [../]
+[]

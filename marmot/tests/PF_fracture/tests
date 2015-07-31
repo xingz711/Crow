@@ -1,0 +1,26 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = 'crack-prob-2d.i'
+    exodiff = 'crack-prob-2d_out.e'
+    compiler = 'CLANG GCC'  # Diffs on Intel, please investigate
+  [../]
+  [./teststressdivpff]
+    type = 'Exodiff'
+    input = 'crack-prob-2d-stressdivpff.i'
+    exodiff = 'crack-prob-2d-stressdivpff_out.e'
+    compiler = 'CLANG GCC'
+  [../]
+  [./testplatehole]
+    type = 'Exodiff'
+    input = 'plate_hole_gbcrack.i'
+    exodiff = 'plate_hole_gbcrack_out.e'
+    compiler = 'CLANG GCC'
+  [../]
+  [./testporosity]
+    type = 'Exodiff'
+    input = 'porosity.i'
+    exodiff = 'porosity_out.e'
+    compiler = 'CLANG GCC'
+  [../]
+[]

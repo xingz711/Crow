@@ -1,0 +1,59 @@
+[Tests]
+  [./gr_gr]
+    type = 'Exodiff'
+    input = 'gr_gr.i'
+    exodiff = 'gr_gr_out.e-s005'
+    group = 'adpative'
+  [../]
+
+  [./temp]
+    type = 'Exodiff'
+    input = 'temp.i'
+    exodiff = 'temp_out.e-s005'
+    group = 'adaptive'
+  [../]
+
+  [./thumb]
+    type = 'Exodiff'
+    input = 'thumb.i'
+    exodiff = 'thumb_out.e-s006'
+    group = 'adaptive'
+  [../]
+
+  [./hex]
+    type = 'Exodiff'
+    input = 'hex.i'
+    exodiff = 'hex_out.e'
+  [../]
+
+  [./voronoi]
+    type = 'Exodiff'
+    input = 'voronoi.i'
+    exodiff = 'voronoi_out.e'
+  [../]
+
+  [./evolution]
+    type = 'Exodiff'
+    input = 'evolution.i'
+    exodiff = 'evolution_out.e'
+  [../]
+
+  [./off_diag]
+    type = 'Exodiff'
+    input = 'off_diag.i'
+    exodiff = 'off_diag_out.e-s002'
+    group = 'adaptive'
+  [../]
+
+  [./evolution_mob]
+    type = 'Exodiff'
+    input = 'evolution_mob.i'
+    exodiff = 'evolution_mob_out.e'
+  [../]
+
+  [./explicit]
+    type = 'Exodiff'
+    input = 'explicit.i'
+    exodiff = 'explicit_out.e'
+  [../]
+[]

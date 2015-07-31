@@ -1,0 +1,813 @@
+\documentclass[letter,12pt,fleqn]{article}
+
+\usepackage{wrapfig}
+\usepackage{amsmath,amsthm}
+\usepackage[usenames,dvipsnames]{color}
+
+%\usepackage{draftwatermark}
+%\SetWatermarkScale{4}
+%\SetWatermarkLightness{0.9}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage[round]{natbib}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,%
+    citecolor=black,%
+    filecolor=black,%
+    linkcolor=black,%
+    urlcolor=blue
+}
+
+
+
+\begin{document}
+
+\begin{titlepage}
+
+\begin{center}
+
+ \includegraphics[width=4in]{figures/marmot_logo.png}
+ 
+ \vspace{20pt}
+
+\textsc{\huge Users Manual}
+
+ \vspace{20pt}
+
+
+Authors: Aaron S. Butterfield, Michael R. Tonks Ph.D
+
+\date{}
+
+\end{center}
+
+\vfill	
+\begin{center}
+\copyright 2012 by Battelle Energy Alliance, LLC\\
+All Rights Reserved.
+\end{center}
+
+\thispagestyle{empty}
+
+\end{titlepage}
+
+\pagenumbering{roman}
+
+\tableofcontents
+
+\newpage
+
+\section{Welcome to MARMOT!}
+
+Welcome to the MARMOT phase field code; we look forward to collaborating with you.  MARMOT is a development code to model the coevolution of microstructure evolution and property changes using the phase field method fully coupled with computational mechanics and heat transfer.  It is based on the MOOSE FEM framework, and therefore we use FEM to solve the defining residual equations.  
+
+Before you begin working with the code, we have several suggestions that will help you have a better experience as you begin to use the code.  Once you have downloaded the MOOSE, ELK and MARMOT repositories, read through this manual from the start and follow all of the instructions, especially those listed in the Getting Started section.  This includes running the tests to ensure the code was installed correctly.  Also, step through all of the examples (found in trunk/marmot/examples).
+
+As you begin to write your own code for MARMOT, we encourage you to create tests as you debug your code.  Tests are small test problems that run very quickly (one or two seconds) on one processor.  Tests provide a simple means of debugging the code and, once your are satisfied with the performance of your code, you can add the new test to MARMOT's suite of tests.  Thus, you will always know that your code is performing correctly.
+
+Finally, we encourage you to check your code back into the MARMOT repository, including all of your tests.  One reason for this is to help the overall community of MARMOT users, such that we all work together to add capability to the code.  The other reason is much more practical.  MOOSE, the FEM framework that MARMOT is based on, is also actively under development.  The MOOSE development team is careful to ensure that any changes they make to the code does not hurt any of the applications built using MOOSE.  Thus, if they make a change that makes your code not compile or causes one of your tests to fail, it is their responsibility to fix the problem.  If you have not checked in your code or your tests, it is your responsibility to find and fix the problem.
+
+Feel free to ask questions to the MARMOT development team, the MARMOT users gropu, and to the MOOSE users group.  The MOOSE and MARMOT users groups are powerful tools for new users. Email the MARMOT users group for specific questions about MARMOT, phase field model, or mesoscale mechanics (email: \href{mailto:marmot-users@lists.inl.gov}{marmot-users@inl.gov}); email the MOOSE users group for more general MOOSE questions ((email: \href{mailto:moose-users@inl.gov}{moose-users@inl.gov}).
+
+\vspace{20pt}
+
+\noindent MARMOT development team:
+
+\begin{itemize}
+\item Michael Tonks (\href{mailto:michael.tonks@inl.gov}{michael.tonks@inl.gov})
+\item Paul Millett (\href{mailto:paul.millett@inl.gov}{paul.millett@inl.gov})
+\item Weifeng Rao (\href{mailto:weifeng.rao@inl.gov}{weifeng.rao@inl.gov})
+\item Pritam  Chakraborty (\href{mailto:pritam.chakraborty@inl.gov}{pritam.chakraborty@inl.gov})
+\item Bulent Biner (\href{mailto:bulent.biner@inl.gov}{bulent.biner@inl.gov})
+\end{itemize}
+
+
+\pagenumbering{arabic}
+
+
+
+\section{Getting Started}
+
+\subsection{Overview}
+
+In recent history, computational materials science has proven to be a powerful tool; however, a significant amount of time is spent writing and debugging code. Many materials scientists have written their own codes, but due to the difficulty in using codes that were not created with multiple users in mind, most write their own codes from scratch. The goal of the MARMOT code is to provide a user-friendly, modular framework for implementing mesoscale materials models. MARMOT is able to use a modular approach because of its object-oriented foundation. This allows users to handpick specific physics they want to include in there simulation. Though MARMOT is extremely flexible, it is important to understand MARMOT was primarily written to explore the physical processes occurring on the micrometer scale, not the macroscale. MARMOT uses the phase field modeling approach to predict microstructure evolution, solid mechanics models to represent the effects of deformation and heat conduction equations to describe the heat transfer. All of the equations used in MARMOT to describe the mesoscale physics are solved with the finite element method (FEM) using the Multiphysics Object-Oriented Simulation Environment (MOOSE). MARMOT is based at Idaho National Laboratory (INL), but has users at various Labs and Universities across the country.
+
+MARMOT is fully parallel, as are all MOOSE-based applications.  This capability is provided without requiring MPI calls or any other parallel considerations.  The parallel scalability is near ideal.
+
+MARMOT also provides the ability to adapt the mesh and the time step in order to reduce the computational cost of the solution.  These capabilities do not require any development by the user, but already exist in MOOSE and are easily accessed through the input file.  By adapting the time step, the evolving time scale of the problem can be followed as the microstructure evolves.  The time step adaptivity algorithms available in MOOSE are discussed in the theory manual.
+
+Mesh adaptivity changes the mesh after each time step to concentrate the degrees of freedom of the system where they are needed to better capture the solution.  This is especially applicable to the phase field technique due to the diffuse interface representation \citep{provatas1999,takaki2005,feng2006}.  Typically, a fine resolution is required to capture the evolution at the interface, but a much coarser resolution can be used to resolve the bulk material.   The mesh adaptivity is based on an error indicator, many of which exist in the literature.  The mesh adaptivity algorithm used in MOOSE is described in \citet{stogner2008}.  Both mesh and time step adaptivity are powerful tools for the phase field technique since they allow for the description of multiple scales throughout a single simulation.     
+
+\subsection{Muliphysics Object-Oriented Simulation Environment}
+\label{sec:moose}
+The MARMOT code is focused only on the solution of mesoscale models described by a series of partial differential equations (PDEs). Other models, such as molecular dynamics or Monte Carlo simulation, do not fall within the scope of the MARMOT code. MARMOT is built on the MOOSE framework, also developed at INL. MOOSE was created to simplify the code development process to facilitate the creation of advanced simulation tools \citep{gaston08}.
+
+The Multi-physics Object Oriented Simulation Environment (MOOSE) is the INL development and runtime environment for the solution of multi-physics systems that involve multiple physical models or multiple simultaneous physical phenomena. The systems are generally represented (modeled) as a system of fully coupled nonlinear partial differential equation systems (an example of a multi-physics system is the thermal feedback effect upon neutronics cross-sections where the cross-sections are a function of the heat transfer). Inside MOOSE, the Jacobian-Free Newton Krylov (JFNK) method is implemented as a parallel nonlinear solver that naturally supports effective coupling between physics equation systems (or Kernels). The physics Kernels are designed to contribute to the nonlinear residual, which is then minimized inside of MOOSE. MOOSE provides a comprehensive set of finite element support capabilities (LibMesh) and provides for mesh adaptation and parallel execution. The framework heavily leverages software libraries from DOE SC and NNSA, such as the nonlinear solver capabilities in either the Portable, Extensible Toolkit for Scientific Computation (PETSc) project or the Trilinos project. Argonne�s PETSc group has recently joined with the MOOSE team in a strong collaboration where they are customizing PETSc for our needs. This collaboration is strong enough that we view Argonne as a joint developer of MOOSE.
+
+\subsection{Phase-Field Model}
+\label{sec:phasefield}
+Though MARMOT is not only a phase field code, the phase field model does play a large part in many of the capabilities of MARMOT. Therefore, we briefly summarize the method. More information is given in the theory manual or in \citet{chen2002}. 
+
+Over the past 20 years, the phase field approach has become a popular and powerful tool to model microstructure evolution. Due to its simple concept and large range of applicability, it has been used to model various physical phenomena including grain boundary migration, martinsitic transformation, dislocation motion and two phase flow. In the phase field approach, microstructural features are represented with continuous variables that smoothly transition from one value to another, thus all material interfaces are treated as diffuse. This description of the interfaces eliminates the need to explicitly discretize a boundary or interface. In addition, the phase field model is deterministic, with PDEs defining the evolution of the continuous variables that describe the microstructure.
+
+The continuous variables used in the phase field method take two forms: conserved variables representing physical properties such as atom concentration or material density ($c_i$), and nonconserved order parameters describing the microstructure of the material ($\eta_j$), including grains and different phases.  The evolution of these continuous variables is a function of the Gibbs free energy and can be defined as a system of PDEs.  For example, in a 1D  model of a periodic bicrystal, two order parameters are employed, one per grain, where a value of one represents the interior of the corresponding grain.  The order parameter varies continuously from 0 to 1 over the GB.  Figure \ref{fig:one} shows the values of the two order parameters, including the continuous variation over the two GBs. 
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/2-1DGrains-Line.png}
+  \caption{One-Dimensional Phase-Field Domain} \label{fig:one}
+\end{figure}
+
+The phase field method describes the evolution needed by the various order parameters in term of the minimization of a free energy function $F(c_i,\eta_j)$. This free energy functional describes the Gibbs free energy of the system as a function of the continuous variables. It can be defined qualitatively, or it can be quantitatively derived from density-functional theory calculations or experimental data. Examples of phase field free energy functionals can be found in the theory manual or in the literature \citep{chen2002}.
+
+The partial differential equation defining the evolution of conserved phase field variables is expressed as a modified Cahn-Hilliard equation, i.e.
+\begin{eqnarray}
+	\frac{\partial c_i}{\partial t} = \nabla \cdot M_i \nabla \frac{\partial F}{\partial c_i}, \label{eq:CH}
+\end{eqnarray} 
+where $M_i$ is the associated mobility.  The evolution of nonconserved order parameters is represented with an Allen-Cahn equation, according to
+\begin{eqnarray}
+	\frac{\partial \eta_j}{\partial t} = - L_j \frac{\partial F}{\partial \eta_j}, \label{eq:AC}
+\end{eqnarray}
+where $\eta_j$ is an order parameter and $L_j$ is the order parameter mobility.  The manner in which these equations are discretized with FEM is described in the theory manual.
+
+\subsection{Modular Code Architecture}
+
+Due to its use of the MOOSE framework, MARMOT has a modular structure that allows the problem to be easily modified from the user interface without recompiling the code. MARMOT also is object-oriented, meaning that new physics kernels can be created by inheriting from existing code and only overriding the sections that have changed. This approach drastically speeds up the development process, reduces the amount of necessary code and decreases the potential for bugs.
+
+Understanding these concepts allows you to understand the foundation that MARMOT is built upon. MARMOT has base conceptual classes for each of the common equations used in phase field modeling, solid mechanics and heat conduction. Each class is a little piece of physics or a numerical method of some kind. Therefore, creating a new phase field kernel is accomplished by inheriting from these base classes and overriding functions to provide the specific free energy terms and model parameters. See the theory manual for more detail.
+
+Due to the modular nature of MARMOT, a problem can be drastically changed from the user interface. For example, an input file that describes a simple 2-D problem can be modified by adding a new variable and new kernels describing the corresponding PDE. Then, a new material class is added to define the necessary material parameters. Boundary conditions are also added. The mesh can then be changed to provide a finer resolution of the new physics. The mesh can be altered even more by making it 3D. Each change occurs in the user interface and does not require any changes to the code or even recompiling. The process used to modify a problem is shown in more detail later in this manual (IS IT REALLY?). 
+
+\section{Installation}
+
+\subsection{Prerequisites}
+
+Before you install the software, we must consider some prerequisites for installation. MARMOT can only be installed on LINUX, UNIX or Mac OS computer systems. MARMOT has the scalability to run on systems with one processor or massively parallel systems. For this tutorial, we assume that you are familiar with how to navigate through a file system with shell commands. 
+
+In order to continue with the installation, you must have:
+\begin{enumerate}
+\item Taken the MOOSE or MARMOT training class
+\item Signed the license agreement 
+\item Obtained an HPC account
+\item Received an RSA Security Token and set up the PIN
+\item Access to a Linux box or a Mac
+\end{enumerate}
+
+This tutorial will be focused on implementing MARMOT on a stand-alone system. If you need help with different architectures, please contact the MARMOT development team at INL. More troubleshooting information and reference material can also be found on the MOOSE Wiki. Because the process does occasionally change, but the MOOSE wiki is kept up to date, these instructions reference the MOOSE Wiki on each step.
+
+\begin{description}
+\item[ Repository Checkout]  
+The first step to installing MARMOT is to check out the code from the SVN repository. Follow the instructions found on the MOOSE Wiki by clicking on the MARMOT link in the left menu under the {\bf Projects} heading. External users will first need to follow the instructions at the "Off-site users" link from the left menu under {\bf Developer Info}.
+
+\item[Installation of MOOSE Binaries] 
+Several software packages are required to run MARMOT, including PETSc, MPI and others. While these can be compiled individually, recompiled packages have been created for OS X Lion, OS X Mountain Lion, Ubuntu and OpenSuse. They can be found near the bottom of the main MOOSE Wiki page.
+
+\item[libMesh Compilation]
+Another required software package is libMesh. libMesh changes more frequently than the other required software packages, thus it is compiled individually. Instructions for compiling libMesh can be found by clicking on the "libMesh" link on the left menu under the {\bf Libraries} heading.
+
+\item[MARMOT Compliation]
+To compile MARMOT, type on the command line:
+
+\texttt{make -j<number of processors>}
+
+The code can be compiled in parallel, so we recommend you use as many processors as are available on your machine. Once it is complete, Look at the output and ensure the code compiled without any errors. 
+
+\item[Running Tests]
+For quality assurance purposes, MARMOT has a number of tests that ensure the code is performing as expected. Each time a new piece of code is added to MARMOT, a corresponding test is added as well. If you expect to write code for MARMOT, it will also be important to create tests for your new code.
+
+If everything looks good we can now test MARMOT to see if it is working as expected on your machine. Type the following and look to see if everything passes:
+
+\vspace{5mm}
+
+\texttt{./run\_tests -j<number of processors>}
+
+\vspace{5mm}
+
+If all of the tests pass, MARMOT is ready to use. If not, contact the MARMOT team for assistance.
+
+\end{description} 
+
+\section{Using MARMOT}
+In this section, we will explain the various components that can be used in a MARMOT simulation and we will discuss how to set up and run a simulation.
+\subsection{MARMOT Simulation Structure}
+
+MARMOT is a MOOSE-based code, and therefore its general format follows the same pattern as all MOOSE based codes. To run a simulation in MARMOT, seven basic components are required. These components are:
+
+\begin{enumerate}
+  \item{Mesh}
+  \item{Variables}
+  \item{Kernels}
+  \item{Boundary Conditions}
+  \item{Materials}
+  \item{Executioner}
+  \item{Output}
+\end{enumerate}
+
+Additional components can be used to output critical information, to simplify the input file, or to simplify the code. Some of these components are:
+\begin{enumerate}
+  \setcounter{enumi}{7}
+  \item{Global Parameters}
+  \item{Aux Variables and Aux Kernels}
+  \item{User Objects}
+  \item{Postprocessors}
+  \item{Preconditioners}
+\end{enumerate}
+
+We will summarize each of these components below. More detailed information is provided in the theory manual.
+
+\subsubsection{Mesh}
+
+A finite element mesh is the central component of a system in MARMOT. The mesh is like the canvas where the simulation is created.  In MARMOT, meshes can be read from a file or uniform meshes can be generated. Because all code in MARMOT is dimension agnostic, the mesh also determines the dimensionality of the simulation. 
+
+MARMOT takes all of the mesh capability straight from MOOSE. MOOSE takes the element types from LibMesh. Thus, MARMOT can use all the element types supported by LibMesh. These are shown in Table \ref{table:elements}.
+\begin{table}[tb]
+\begin{tabular} {ccccc}
+\hline
+& & 1D & & \\
+\hline
+EDGE2 & EDGE3 & EDGE4 & INFEDGE2 & \\
+\hline
+& & 2D & &\\
+\hline
+TRI3 & TRI6 & QUAD4 & QUAD8 & QUAD9 \\
+INFQUAD4 & INFQUAD6 & & & \\
+\hline
+& & 3D & &\\
+\hline
+TET4 & TET10 & HEX8 & HEX20 & HEX27 \\
+PRISM6 & PRISM15 & PRISM18 & PYRAMID5 & INFHEX8 \\
+INFHEX16  & INFHEX18  & INFPRISM6 & INFPRISM12 & \\
+\end{tabular}
+\caption{Element types available in MARMOT. For more information, see the LibMesh website.}
+\label{table:elements}
+\end{table}
+
+To read a mesh from the input file, use the MooseMesh option in the user interface. Two inputs are required: the dimensionality of the simulation and the mesh file name. These requirements are shown in the MARMOT user interface. The mesh file types that are supported are
+\begin{verbatim}
+*.e    -- Sandia's ExodusII format
+*.exd  -- Sandia's ExodusII format
+*.gmv  -- LANL's General Mesh Viewer format
+*.mat  -- Matlab triangular ASCII file
+*.n    -- Sandia's Nemesis format
+*.nem  -- Sandia's Nemesis format
+*.off  -- OOGL OFF surface format
+*.ucd  -- AVS's ASCII UCD format
+*.unv  -- I-deas Universal format
+*.vtu  -- Paraview VTK format
+*.inp  -- Abaqus .inp format
+*.xda  -- libMesh ASCII format
+*.xdr  -- libMesh binary format
+*.gz   -- any above format gzipped
+*.bz2  -- any above format bzip2'ed
+*.xz   -- any above format xzipped
+\end{verbatim}
+
+MARMOT can also generate simple meshes in 1D, 2D or 3D using the GeneratedMesh option. These meshes must be either rectangles or squares in 2D or cubes or cuboids in 3D.  Finally, 2D meshes can be extruded using the MeshExtruder option. 
+
+\subsubsection{Variables}
+
+This section declares the variables that will be solved for during the simulation. MARMOT uses FEM to approximate each variable as
+\begin{equation}
+x(\mathbf{r}) = \sum_i x_i \phi_i
+\end{equation}
+where $x_i$ is the value of the variable stored at each node in the mesh and $\phi_i$ is the FEM shape function. Thus, for each variable it is necessary to declare the type of shape function to be used. In MARMOT, this entails declaring the order of the shape function and the family. Note that for certain shape functions, only certain element types can be used, e.g. for second-order Lagrange elements, only EDGE3, QUAD9 or HEX27 elements can be used.
+
+The variable initial conditions also play an important role in the solution of the PDEs. Thus, the initial condition of each variable can also be set. For some problems, the entire domain will have the same initial condition value. However, in some simulations, especially phase field simulations, the variable initial condition can be much more complex. Various options for variable initial conditions exist in MARMOT.
+
+\subsubsection{Kernels}
+
+The residual equation corresponding to each variable is defined by the kernels. Rather than define the entire residual equation in one kernel, MARMOT divides the residual into pieces, to allow a more modular approach. For example, the time derivative is defined in the TimeDerivative kernel, while the diffusion operator is defined in the Diffusion kernel. However, to fully define the residual for the diffusion equation, both the TimeDerivative and the Diffusion kernels must be included. Note that for this reason, multiple kernels are often defined for each variable. Also note that at least one kernel must be defined for each variable included in the simulation.  
+
+\subsubsection{Boundary Conditions}
+
+To fully define the solution of a partial differential equation, you must also know the variable behavior at the domain boundaries. These are defined by the boundary conditions. Various boundary condition options exist in MARMOT, including Dirichlet, Neumann and Periodic boundary conditions. If no boundary condition is included, the spatial gradients defined for the variable type are assumed to be equal to zero, i.e. for first-order Lagrange elements the variable gradients are assumed to be zero if no boundary condition is provided.  
+
+\subsubsection{Materials}
+
+Many of the kernels within MARMOT require various properties that vary from material to material. In order for the same kernels to be applied to various materials, such properties are defined by a material object. Multiple materials can be used in each simulation, to supply all of the necessary properties, or they can all be defined in a single material. The units of the simulation are typically set by the material properties.
+
+\subsubsection{Executioner}
+
+When running a simulation there are important aspects that effect all parts of your simulation. The executioner section deals with all of those pieces. Though we use PETSc to solve the partial differential equations, it is important to note that you still have to tell PETSc how to run. The Executioner also defines what type of simulation it will be. Is your simulation time dependent? If so, what will the time step be? You may also define a simulation as steady state, and not step through time. There are also time adaptive solvers. As you look to settings in the PETSc area, refer to your MOOSE Workshop manual to understand the different PETSc options. 
+
+\subsubsection{Output}
+
+The output section defines how the data will be outputted for post processing. In the user interface, some output is automatic. However, various options exist to define how your data will be formatted to be post processed after the simulation. 
+
+\subsubsection{GlobalParams}
+
+At times, multiple components require the same inputs. When they are defined individually, they may be changed in one component but not in the other, invalidating the simulation. Therefore, it is valuable to define a single global value that is used in every component that needs a specific input. This is done in the GlobalParams section. When a value for a specific parameter is not provided in the corresponding block, MARMOT then looks in the GlobalParams section for the value. Therefore, values given to the individual components take precedence over values in the Global Params section.
+
+\subsubsection{Aux Variables and Aux Kernels}
+
+At times it is valuable to define a dependent variable, whether to simplify calculations or for output. This is accomplished with auxiliary variables. Aux variables can be element-averaged (order = constant, family = monomial) or nodal (order = first, family = Lagrange). The value of the aux variables as a function of the various independent variables is defined in the corresponding aux kernels. Unlike the independent variables, only one aux kernel is defined for each aux variable. If no aux kernel is defined, they keep their initial condition throughout the simulation.
+
+When coupling to aux variables in other kernels, they are treated just like normal variables. All initial conditions available to normal variables are also available for aux variables.
+
+\subsubsection{User Objects}
+
+Sometimes it is convenient to define global data objects that are available to kernels, materials etc. This is accomplished with user objects. These are a more advanced component and only used when writing your own code to provide advanced capabilities
+
+\subsubsection{Preconditioning}
+
+MARMOT uses either Newton's method or the Jacobian-Free Newton-Krylov (JFNK) method to solve partial differential equations. When using Newton's method with multiple variables, the entire Jacobian is needed to determine the variable values for each nonlinear iteration. This is not the default in MOOSE, and therefore special options must be provided. This is done in the preconditioning section. Two options exist to create the full Jacobian; the single matrix preconditioned (SMP) constructs the full Jacobian as defined in the kernels. The finite difference preconditioned (FDP) compute the Jacobian using finite difference, even when no Jacobian information is provided in the kernels. 
+
+JFNK numerically estimates the Jacobian, but uses the provided Jacobian from the kernels for preconditioning, to improve the efficiency of the solve. Thus, the full Jacobian is not needed. The default in MOOSE is to only provide the diagonal blocks of the Jacobian and ignore the off-diagonal blocks. When this approach is not sufficient, the SMP and FDP options discussed above can also be used. Finally, the physics-based preconditioned (PBP) provides freedom to provide a better approximation of the Jacobian than the default but that is more efficient than SMP.  
+
+\subsubsection{Post-Processing}
+
+For many simulations you may want to find scalar values calculated for the system as a whole. This may be as simple as an output of the number of nodes, or it may be an integral value calculated over the domain. Postprocessors are especially useful when making quantitative analyses of your simulation results. There are four general categories of post processors:
+\begin{itemize}
+\item General
+\item Element
+\item Nodal
+\item Side
+\end{itemize}
+Each postprocessor acts on different information. General inherits information from the general postprocessor class. This would allow you the ability to create any postprocessor you want. The other three are daughter classes of the general class. Element postprocessors act on elements, nodal postprocessors act on nodes, and side postprocessors act on boundaries. 
+
+\subsection{Running a MARMOT simulation}
+MARMOT can be run from a graphic user interface named PEACOCK, or from the command line in batch mode. We summarize both approaches in this section.
+\subsubsection{PEACOCK Graphic User Interface}
+PEACOCK is the graphic user interface used for all MOOSE-based applications. It is automatically checked out when you check out trunk, and it is located at ``trunk$/$peacock.'' To simplify using PEACOCK, we recommend you add it to your path by adding
+\begin{verbatim}
+export PATH=~/projects/trunk/peacock:$PATH
+\end{verbatim}
+to your bash profile (or .cshrc, .bashrc, etc.).
+
+\begin{figure}[t!]
+  \centering
+  \includegraphics[width=0.99\textwidth]{figures/PEACOCK.png}
+  \caption{Screen shot of the graphic user interface, PEACOCK. This is showing the window once the simulation has been created.} \label{fig:peacock}
+\end{figure}
+To begin, we will show how to create a simulation from scratch using PEACOCK. We demonstrate it using a spinodal decomposition simulation that solves the Cahn-Hilliard equation. For more information about the kernels used here, see the theory manual. 
+
+First, change directory to``projects$/$problems$/$marmot." Start PEACOCK by typing``peacock" in the command line. This will open a peacock window, as shown in Fig.~\ref{fig:peacock}. If you wanted to launch peacock and open a specific input file, you would type:
+\begin{verbatim}
+peacock -i input_file.i
+\end{verbatim}
+On the top of the window you will see four tabs,``input file" (which is highlighted),``Execute," ``Postprocess'' and ``Visualize.'' We will discuss all four tabs, but for now we will stay in the ``Input File'' tab. Here, we will construct our simulation.
+
+On the left of the window is a list of components, many of which were discussed in the previous section. Each component has a tab box next to it, some have a down arrow, some are black and some are blue. For each component, you can make it active or inactive by checking the check box. The down arrow signifies that the component can be expanded to look at subcomponents. Blue components can be right-clicked, to add new subcomponents; black components can be double clicked, to access a window in which parameter values are set. In addition, on the right of the screen you will see a grey dot. If you drag this dot to the left, you can see the current input file (it will begin blank).
+
+We will begin by creating the mesh. First, double click on ``Mesh'' in the list on the right to open an input window. The input window is the manner in which values are set for the various parameters used for each component added to MARMOT. At the top of each input window there is a drop down box. This box contains all available options for the component. Some components, such as variables, have no types and therefore the drop box is empty. For the mesh, select ``GeneratedMesh'' in the drop down box. Several new parameter names will appear. Parameters highlighted in yellow are required and those in white are optional. To see a descriptions of each parameter, hold your mouse over the parameter name and the description will appear. Now, enter the following values: dim = 2, nx = 60, ny = 60, xmax = 100, ymax = 100 and elem\_type = QUAD4. Hit ``apply'' at the bottom of the window; the mesh will now appear in the window.
+
+We will now create a variable. Right click on ``Variables'' in the left menu, and another input window will appear. Enter the values: Name = c, family = HERMITE and order = THIRD, and hit ``add." Hit the down arrow next to your variable ``c'' and then double click on ``InitialCondition.'' Select ``RandomIC'' in the drop down box. Under ``max,'' change the value to 0.1 and under ``min'' change it to ``-0.1''. So, we now have a variable $c$ with a random initial condition that will vary between -0.1 and 0.1.
+
+To create the residual equation for our new variable, we will add three kernels. First, right click on ``kernels" and select ``add.'' Select ``CHMath'' in the drop down box. We must now give a unique name to our kernel, so under ``name'' put something like ``CHbulk.'' Note that these names in cannot have spaces. Now, under ``variable'' select our variable ``c.'' Then hit ``Add''. Now, add another kernel, name it something like ``CHinterface.''  Select ``CHInterface'' in the drop down box and set ``c'' as the variable. Enter the values: grad\_mob\_name = grad\_M, kappa\_name = kappa\_c and mob\_name = M. Finally, add a ``TimeDerivative'' kernel for the variable ``c.''
+
+Now we will create the boundary conditions for our simulation. Right click on BCs to open the input window. Click on the drop box to see the various options for boundary conditions. However, there are some special boundary conditions that are accessed in a different way. Cancel the input window and hit the down arrow to the left of BCs. Now, right click on Periodic and hit ``add.'' In the input window, name your BC something like ``all.'' Under ``auto-direction'' put ``x y'' to tell MARMOT to make the x- and y-directions periodic. Now, hit add.
+
+Our kernels require several material properties be defined. So, we will add a material that defines these values. Right click on ``Materials'' and add a material. Select ``PFMobility'' from the drop down menu. Name it whatever you would like. Now set the block to 0 and set the values: kappa = 0.5 and mob = 1.0. The mesh will turn red, showing that the selected material is active on the entire mesh (all of block 0, the only block in our simulation). This is a non-dimensional model, with no units.
+
+In order to quantify the output of the simulation, we will also add two postprocessors that will conduct integrals of our variable along the x and y boundaries. Right click on Postprocessors and add a new one. In the drop down menu, select ``SideIntegralVariablePostprocessor.'' For the name, enter ``c\_left'' and select ``left'' for the boundary. For the variable, select ``c.'' Create another postprocessor in the same way, but name it ''c\_top'' and select ``top'' for the boundary. When you select each postprocessor in the left menu, it will be highlighted on the mesh in the center of the window.
+
+Now, we will set the Executioner properties. Double click on Executioner and select the executioner type in the drop down menu. This simulation will march through time with a constant time step, so we will select ``Transient.'' Other options would be a single step steady state simulation (``Steady'') or transient simulations with an adaptive time step (``AdaptiveTransient'', ``SolutionTimeAdaptive'', ``DT2Transient''). Now, we will set various parameters defining the simulation. To set the time options, make dt = 2.0 and end\_time = 80.0. For the nonlinear solve options, we will set three values: petsc\_options, petsc\_options\_iname and petsc\_options\_value. First, we will use a Newton iteration to solve and we wish to see the linear iterations, so ``petsc\_options = -snes -ksp\_monitor.'' For the linear iterations, we will use Hypre with an algebraic multigrid method, so ``petsc\_options\_iname = -pc\_type -pc\_hypre\_type -ksp\_gmres\_restart'' and ``petsc\_options\_value = hypre boomeramg 31.'' Now, under scheme, choose ``bdf2.''
+
+The executioner system has many options, therefore they have been divided into multiple tabs, listed at the top of the input window. Now, click on the ``Solver'' tab. Set the values l\_tol = 1.0e-4, l\_max\_its = 20, nl\_rel\_tol = 1.0e-9, nl\_max\_its = 15.
+
+For the last step, we will set the Output properties. Double click on Output. We will leave most of these options alone, but change ``output\_initial'' and ``exodus'' to ``true.'' Then, click on the ``Logging'' tab and set ''perf\_log'' to true.
+
+Now, save the input file you have created by pressing ``Save'' at the bottom of the left menu.
+
+We will now run the simulation that we have set up. At the top of the PEACOCK window, click on the ``Execute'' tab. At the top of the window, you will set the options for how you wish to run the simulation on your computer. For now, leave everything blank and hit ``run'' on the far right. The simulation will begin to run, with the output showed in the window. The simulation should converge at each time step in 6 or 7 nonlinear iterations. If you have multiple processors available, put 2 in the MPI box and hit run again (the currently running simulation will automatically be killed and the new simulation will begin). You can check your input file by comparing to the one stored in ``marmot/examples/CHMath.i.''
+
+Click on the Visualize tab at the top of the PEACOCK window to watch the simulation. There are various options on the left, where you can change the variable that is being visualized, change the limits of the variable, view the mesh, and save image files of what you are seeing. On the bottom of the window are commands to change the current time step being viewed and to run the full animation. The visualization seems rough at some of the interfaces, due to the use of linear shape functions to visualize our variable that was represented with a third-order element. To eliminate this roughness, go back to the ``Input File'' tab. Hit the down arrow next to ``Output'' and double click on OverSampling. Set ``exodus'' to true and ensure that ``refinements'' is set to one. Now, click on the ``Execute'' tab and rerun the simulation. Click on the ``Visualize'' tab and the roughness will be gone. We are now outputting another exodus file in which the solution was interpolated onto a mesh that was uniformly refined once.
+
+To look at the behavior of our postprocessors, select the Postprocess tab in the PEACOCK menu. Check the box next to the names of the two postprocessors and two plots will appear, showing the value of each postprocessor with time. 
+
+\subsubsection{Running MARMOT from the command line}
+To run MARMOT from the command line, you must first have a complete input file. It could be created using PEACOCK and then saved, copied from another input file and then edited, or created by hand from scratch. To run the simulation on a single processor, you enter the command
+\begin{verbatim}
+MARMOT_EXECUTABLE_PATH -i input_file.i
+\end{verbatim}
+where MARMOT\_EXECUTABLE\_PATH is the path to the MARMOT executable and input\_file.i is the input file you wish to run. You would enter this commend in the directory in which the input file is stored. So, for example, on my machine I would enter the command
+\begin{verbatim}
+~/projects/trunk/marmot/marmot-opt -i input_file.i.
+\end{verbatim}
+To run the simulation in parallel, you would use MPI, for example
+\begin{verbatim}
+mpirun -np 12 ~/projects/trunk/marmot/marmot-opt -i input_file.i
+\end{verbatim}
+would run the simulation on 12 processors. 
+
+When you run in bash mode, the output is printed to the screen and all output files are saved in the directory where you are running the input file. To run a bash mode simulation on INL's supercomputers, see the HPC website.
+
+There are several options that can be used when running MARMOT in bash mode that modify the manner in which the simulation is run. These are summarized in the MOOSE manual.  
+
+\section{Writing New Code}
+While a significant amount of code has been written for MARMOT, most users will still need to create their own code to accurately describe the problems they are trying to model. For this in mind, efforts have been made to minimize the amount of coding that is needed. Details on how to create new phase field kernels can be found in the theory manual. Here, we summarize what kind of objects would need to be created to accomplish several general tasks. More guidance on creating the various objects can be found in the MOOSE manual.
+
+\begin{description}
+\item[Creating a new phase field model:] To create a new phase field model could require the solution of conserved or non conserved variables, or both. However, in all cases, the PDEs defining the variable evolution are functions of derivatives of a free energy. The first step of coding a new model would be to analytically compute all of the required derivatives for each PDE (see the theory manual for more information). Once these derivatives are complete, you must create new kernel objects for each piece of physics in each PDE. Cahn-Hilliard equations are used for conserved variables and Allen-Cahn equations for non-conserved. 
+
+\item[Defining Values for Material Properties:] If you wish to define property values that are required for your PDEs, you will create a new material object. Materials properties can be functions of both variables and aux variables. They can also be stateful (where the values from the previous two time steps are stored), if necessary. Note that if you need to define scalar material properties that are constant with time or defined by a simple function, you may be able to use GenericConstantMaterial or GenericFunctionMaterial.
+
+\item[Outputting Scalar Fields on the Mesh:] Once your simulation is complete, it is common to wish to visualize various fields on the mesh. All variables and aux variables are outputted, but material properties are not. If you wish to output the value of a material property, aux kernels exist that will take a material value and store it as an aux variable (see MaterialRealAux, MaterialTensorAux, MaterialVectorAux, RankTwoAux, etc.). However, if you wish to output some function of existing variables and material properties, you will need to create a new aux kernel. Note that any aux variable that needs to have access to material properties must be a constant monomial variable, as material properties are stored at the quadrature points.
+
+\item[Outputting Scalar Values:] If you wish to output a single scalar value, you will use a postprocessor. Many postprocessors exist in MOOSE, ELK and MARMOT that may meet your needs. If not, you must decide if you need an element postprocessor or a nodal postprocessor.
+
+\end{description}
+
+\section{Conclusion}
+MARMOT is a powerful tool for mesoscale simulations. This manual provides a general overview of the capabilities of MARMOT, but it is far from comprehensive. For more information, see the MARMOT theory manual. In addition, the MOOSE manual will be an invaluable reference. Other sources of help can be found on the MOOSE-wiki. You can also use the moose-users mailing group to ask questions. Other possible sources would be the LibMesh and Petsc websites. 
+
+For additional resources, an introduction to Paraview as well as two MARMOT tutorials can be found in the Appendix.
+
+If you think of any additional information you would like to be added to this document, please let us know.
+
+
+\bibliographystyle{unsrtnat} 
+\bibliography{Microstructure}
+
+\appendix
+\section{Appendix: Introduction to Paraview}
+
+Although PEACOCK allows some visualization of your simulation results, you will often need more advanced capabilities. In such cases, we suggest ParaView as a possible choice. ParaView is a free visualization tool provided by Sandia and Los Alamos National Laboratories. It has recently been given to a company called Kitware, but Kitware is still distributing the software for free. Download ParaView from the Internet at \url{http://www.paraview.org/}. When the ParaView window opens onto your screen it may seem overwhelming, don't be, though this tutorial isn`t meant to be a comprehensive manual about the ParaView software, by the time you are through with this tutorial you will feel comfortable with how to navigate ParaView, open data, and apply filters to highlight the data you are interested in.
+
+Before we begin, it is helpful to understand the main function of ParaView. ParaView was created to provide economical access to the functions of scientific visualization. Scientific visualization is a way for scientists and engineers to view a representation of their data that is easy to understand. ParaView allows a person to view 3D representations of data. For example, if one was trying to numerically find the displacement over a complex shape, it is hard to find meaning in a file full of numbers. The figure to the right represents this idea. The color on each ring represents the displacement of each ring. The table to the left also shows a representation of the same data, but the table takes up sixteen pages. Truly a picture is worth a thousand words.
+  
+  \begin{figure}[h!]
+  \begin{subfigure}{0.50\textwidth}
+                \centering
+                \includegraphics[width=0.85\textwidth]{figures/table.png}
+                \caption{Raw Data}
+                \label{fig:Visualization}
+        \end{subfigure}
+ \begin{subfigure}{0.50\textwidth}
+                \centering
+                \includegraphics[width=0.8\textwidth]{figures/Hoops.png}
+                \caption{Scientific Visualization}
+                \label{fig:Visualization}
+        \end{subfigure}
+    \caption{Scientific visualization is necessary to understand data}
+\end{figure}
+  
+After downloading and installing ParaView, open the program. If you have worked with any 3D design programs, this interface will seem familiar to you. The majority of the window is occupied by a 3D viewport. This viewport will be where you view your data. Scientific data usually reflects the real world; as a result, scientific data can easily be understood in a 3D environment. Up at the top of the window there are several toolbars at the top of the screen. These toolbars are very handy and will aid you in highlighting the specific data set that you wish to visualize. The window to the panel to your upper left is the pipeline browser. To understand the pipeline browser, you must understand a little about the Visual Tool Kit (VTK) that ParaView was built upon. The VTK was built to take your data through a logical assembly line called a pipeline. 
+ \begin{figure}[h!]
+     \centering
+     \includegraphics[width=\textwidth]{figures/Pipeline.png}
+    \caption{Visual Tool Kit Pipline}
+\end{figure}
+The pipeline browser shows the flow of data sources, filters applied, and so on. Below the pipeline browser allows you to see this logical data flow. The Object Inspector allows you to see every setting for every component in your pipeline browser. If you will notice the object inspector has three tabs: properties, display, and information. I won't cover what is in each of these three tabs; however, if you explore, you will get a pretty good idea how to get around.
+
+ \begin{figure}[h!]
+     \centering
+     \includegraphics[width=\textwidth]{figures/paraviewWindow.png}
+    \caption{ParaView Graphical User Interface}
+\end{figure}
+
+
+ParaView supports many file formats; however, MARMOT mainly deals with the Exodus file format with a \texttt{.e} extension. The Exodus file is designed to contain data from a finite element mesh. Note that there are several programs for scientific visualization; however, we will use ParaView because it is free. Once it is downloaded and installed, run the software and go to the file menu and click open. Navigate to the doc folder in the marmot folder. Open the tutorials directory. In it you will find the hoops.e file. Open the hoops.e file. 
+
+Now that you have the file opened, you must tell ParaView what data you would like to import. In the object inspector window, select all of the variables, and click apply.  You should now see the three rings. To view the displacements you must click on the Active Variable Toolbar 
+\begin{wrapfigure}{l}{0.45\textwidth}
+  \vspace{-10pt}
+  \begin{center}
+    \includegraphics[width=0.44\textwidth]{figures/activevariable.png}
+  \end{center}
+  \vspace{-5pt}
+  \caption{Active Variable Toolbar}
+  \vspace{-5pt}
+\end{wrapfigure}
+and activate the variable disp\_ variable. Now that you have activated the variable it will display the data on the hoops in the viewport. Notice that the hoops are just blue. In order for you to see the hoops after the stress has been supplied press the play button. Oh happy day! This VCR toolbar will be very helpful when you have data that is time dependent.
+
+After your data is in ParaView, you can apply filters to your data to help understand you visualization more easily. Select your data in the pipeline browser, go to the filters menu, scroll down to the temporal menu, and click Annotate Time Filter. Then click apply in the object browser. This will place a timer in your 3D viewport to annotate the time while you watch the simulation. There are many filters that you may choose from to manipulate your data to suit your needs. An explanation of each filter can be found on the ParaView website.
+
+\begin{wrapfigure}{r}{0.50\textwidth}
+  \vspace{-20pt}
+  \begin{center}
+    \includegraphics[width=0.50\textwidth]{figures/movie.png}
+  \end{center}
+  \vspace{-20pt}
+  \caption{ParaView Save Animation Dialog}
+\end{wrapfigure}
+
+Once you have a simulation that is ready for a presentation, you may go to the file menu and select save animation. This will save your visualization to a movie that can be viewed by others.
+
+ParaView is a powerful application that is made available for free. I must stress that ParaView is open source; as such, it is bound to have some bugs. This has been a brief introduction to ParaView. Many other materials exist considering ParaView. I would suggest the ParaView Wiki if you would like further help.
+
+
+%\section{Appendix: Tutorials}
+%To help in gaining familiarity with MARMOT, we have included to tutorials. Note that the tutorials are written for a user running MARMOT from the command line and using Paraview to visualize the results. However, PEACOCK can be used instead, without significant changes to the tutorial descriptions.
+%
+%\subsection{Grain Growth}
+%
+%MARMOT uses a Phase Field model to understand behavior that occurs at the mesoscale. In this tutorial we will explore MARMOT's ability to understand the behavior of grains of copper at the mesoscale. This tutorial will first examine a simple two-dimensional case and then we will build the tutorial to include multiple grains in three-dimensions. In order to complete this tutorial you must have already installed and compiled MARMOT. 
+%
+%In the MARMOT folder you will find a folder labeled doc with a subfolder named, tutorials. Open the tutorials folder. Inside the tutorials folder you will find a file named \texttt{grain\_growth\_tutorial.i}. Open the file in a text editor and save a copy within the same folder called \texttt{grain\_growth.i} with the following command.
+%
+%\begin{verbatim}
+%cp grain_growth_tutorial.i grain_growth.i
+%\end{verbatim}
+%
+%Creating a copy of a file will allow us to always reference the original in case something goes wrong. In order for you to become familiar with the process of using the software, we will run this file and view the results in ParaView. This tutorial will not include instructions on how to use ParaView. If you've never used ParaView, see the Introduction to ParaView section of this documentation.
+%
+%\begin{wrapfigure}{r}{0.50\textwidth}
+%  \vspace{-20pt}
+%  \begin{center}
+%    \includegraphics[width=0.50\textwidth]{figures/TwoGrains.png}
+%  \vspace{-20pt}
+%    \includegraphics[width=0.50\textwidth]{figures/grains2.png}
+%  \end{center}
+%  \vspace{-20pt}
+%  \caption{Two Grains Simulations with Different Initial Conditions}
+%  \vspace{-20pt}
+%\end{wrapfigure}
+%
+%Before we get too far on the simulation, it is helpful to look at what an input file looks like. In terminal, open up  \texttt{grain\_growth.i} in your favorite text editor. Look through each of the sections of the input file. If you have any questions about a section of the input file, refer to the input file section of the documentation. The input file is very easy to read. Brackets with the section name start a section and brackets with nothing or some periods and slashes close a section. 
+%
+%To run any program from the command line you have to list the path to the program. In this case marmot-opt is just two directories up. As a note, if you don't understand basic navigation in the command line, I would encourage you to learn that first. While in the folder with  \texttt{grain\_growth.i} , run the following command.
+%
+%\begin{verbatim}
+%../../marmot-opt -i grain_growth.i
+%\end{verbatim}
+%
+%This command will run the simulation. This simulation will create two grains next to one another. Though this first part is very simple it contains concepts and procedures that are necessary to understand the larger more complex ones. Once the simulation completes its calculations it will put the resulting output file in the same folder entitled output.e. Open output.e in ParaView. Select all of the variables in the Object Inspector, then click apply. Now click the bnds variable from the drop down menu located in the Active Variable Toolbar at the top of the window. Make sure that you play the simulation to the end. The initial conditions don't show the grain boundaries. Notice there are two grains that are stacked side by side. When using the PolycrystalVariable parameter, ICType 1 will set up a bi-crystal. Polycrystals have several options for initial conditions. These options can be divided up into two categories: two crystal and multi-crystal. Multi-crystal initial conditions all work on the same principle. Certain points are created and a difference algorithm is used to create boundaries between those points. The bi-crystal initial conditions are very specific and are listed in the comments of the PolycrystalIC.C file in the source code. In our simulation, if you have two grains and change the ICType from 1 to 0 and run the simulation again, we see that the simulation has created one grain as a circle inside the other grain instead of the bi-crystal configuration.
+%
+%In ParaView, click the other drop down menu on the Active Variable Toolbar. Select the Surface with Edges option. This option shows our grid structure with the surface. Notice that the entire grid is uniform and is 40 elements long. If you look in the Mesh section of the input file, you will notice that we define the number of elements in the x and y directions to be 10 each. Why then is it such a fine mesh? Notice also in the mesh section the parameter entitled uniform\_refine. The uniform\_refine parameter will subdivide the mesh n number of times. Why not just set the mesh to be that fine in the first place? Our input file hasn't yet configured mesh refinement; however, the original mesh will limit the ability MARMOT has to coarsen the mesh in areas without much activity. Using uniform\_refine allows us to initially start with a refined mesh and allow MARMOT to coarsen the mesh as needed.
+%
+%One of the attractive options of MARMOT is its ability to adapt its mesh to decrease the numerical cost of a simulation. This feature is very easy to implement. If you notice there is a mesh Adaptivity parameter in the Executioner section; however, this parameter is inactive. At the top of the Executioner section you will see the active parameter. If you don't have this parameter in a section, by default, every parameter section inside a main section is active. However when it is specified only the parameters contained in the apostrophes are active. You can use this to turn on and turn off certain parameters. 
+%
+%\begin{verbatim}
+%
+%  [./Adaptivity]
+%   initial_adaptivity = 2
+%    refine_fraction = 0.3
+%    coarsen_fraction = 0.2
+%    max_h_level = 2
+%  [../]
+%  
+%\end{verbatim}
+%
+%Go ahead and comment out the \texttt{active = ` '} line in the Executioner section, by putting a \# in front of the line, and then run it again. Notice when you reload the data in ParaView, MARMOT has adapted the mesh to concentrate the fine mesh around the grain boundries.
+%
+%Though it is quite interesting with just two grains. Let us expand our simulation too multiple grains. In order to accomplish this task we will use the PolycrystalVariables parameter. Although the syntax for the PolycrystalVariable looks like the syntax for one variable, we are actually creating multiple variables. When looking at multiple grains it is quite monotonous to create every variable and its initial conditions. The PolycrystalVariable code creates multiple variables and gives them all complimentary initial conditions in a few lines in the input file.
+%
+%\begin{verbatim}
+%
+%[GlobalParams]
+%  op_num = 6
+%  var_name_base = gr
+%  v = 'gr0 gr1'
+%  en_ratio = 1.0
+%[]
+%
+%[Variables]
+%
+%  [./PolycrystalVariables]
+%    order = FIRST
+%    family = LAGRANGE
+%    x1 = 0.0	
+%    y1 = 0.0
+%    x2 = 1000.0
+%    y2 = 1000.0
+%    periodic = `1 1'
+%    ICType = 0
+%  [../]
+%[]
+%
+%\end{verbatim}
+%
+%I have listed both the Variables and GlobalParams sections. Though are necessary to run the PolycrystalVariables code, it is also necessary for some code in the Kernels section as well. In order to have only one place that they are defined, rather than writing it twice, we include it in the GlobalParams section.
+%
+%In the GlobalParams section, add gr2, gr3, and gr4 to the v section, and change the number of grains to five. Run the simulation again. You should now have results similar to what is shown in the figure. One of the nice things about MARMOT is its ability to expand from a simple problem to a complex one with trivial amount of work. This trait allows you to make less typing mistakes and spend more time interpreting results. It also allows you to compartmentalize your work by expanding your simulation one step at a time.
+%
+%Let us now expand the simulation for a two-dimensional model to a three-dimensional one. In order to do this we will have to alter three sections. The first is the Mesh section. First let us change the dim from 2 to 3. Now that our simulation is three-dimensional, we will need to set parameters to accomplish this. Note, that we will also have to decrease the element size in the x and y directions as well. Set the nx and ny as 7 and nz to 1. Then change the mesh type to HEX8 instead of QUAD4. Then change the zmax to 333. 
+%
+%\begin{verbatim}
+%
+%[Mesh]
+%  Type = GeneratedMesh
+%  dim = 3
+%  nx = 7
+%  ny = 7
+%  nz = 1
+%  xmin = 0
+%  xmax = 1000
+%  ymin = 0
+%  ymax = 1000
+%  zmin = 0
+%  zmax = 333
+%  elem_type = HEX8
+%
+%   uniform_refine = 2
+%[]
+%
+%\end{verbatim}
+%
+%Now that the Mesh section is taken care of, let us adjust our variables initial conditions to work on a three-dimensional level. In the variables section change the periodic = `1 1' to periodic = `1 1 1'. This will allow the initial conditions to have periodic boundary conditions in all three dimensions. Make sure the ICType is set to 2. 
+%
+%Then change the BCs section from
+%
+%\begin{verbatim}
+%
+%[BCs]
+%  active = 'Periodic'
+%
+%  [./Periodic]
+%    [./left_right]
+%      primary = 0
+%      secondary = 2
+%      translation = `0 1000 0'
+%    [../]
+%
+%    [./top_bottom]
+%      primary = 1
+%      secondary = 3
+%      translation = `-1000 0 0'
+%    [../]
+%  [../]
+%
+%[]
+%
+%\end{verbatim}
+%
+%to look like
+%
+%\begin{verbatim}
+%
+%[BCs]
+%
+%  [./Periodic]
+%    [./all]
+%      auto_direction = `x y z'
+%    [../]
+%
+%[]
+%
+%\end{verbatim}
+%
+%This is a new feature in moose that was created because of the regular periodic boundary conditions in every direction.
+%
+%Run this simulation. Note that this simulation is considerably more expensive to run than the others. It is very doable with one processor; however, I suggest you use more that one processor to do it. If you have any more processors in your computer use the following command to run the simulation.
+%
+%\begin{verbatim}
+%mpirun -np [number of processors] ../../marmot-opt -i grain_growth.i
+%\end{verbatim}
+%
+%
+%After this simulation is complete, view it in ParaView. It should look like the figure shown. Use your mouse to explore around and apply different filters to bring out data that you would feel is important.
+%
+%\subsection{Void Migration}
+%
+%One area where MARMOT really excels is void migration. Using the phase field model connected with the finite element method, it allows a user to create complex simulations rather simply. This is accomplished through the use of the Cahn-Hilliard and Allen-Cahn equations. This tutorial will help you take your ability to use MARMOT to the next level. If you have not already completed tutorial B.1, go back and complete that tutorial before starting this one. Tutorial B.1 gives you an overview of the basic use of MARMOT and how to take advantage of MARMOT's existing functionality by adjusting parameters in the input file. Principally, this tutorial will start where tutorial B.1 left off. 
+%
+%Navigate into the tutorials folder of MARMOT you will see an input file called void\_migration\_tutorial.i. Create a copy of this file by using the following command.
+%
+%\begin{verbatim}
+%cp void_migration_tutorial.i void_migration.i
+%\end{verbatim}
+%
+%Open the void\_migration.i file in your favorite text editor. The format of this file is just like the format of the input file in tutorial B.1; however, it contains different parameters. In order to understand MARMOT at a deeper level, it is important to understand the distinction between the purpose of the input file and the actual code. The input file really doesn't define the actual physical laws themselves. The input file sets the physics for a simulation that has already been defined in C++ code. This is an important distinction to make. We will refer to this distinction more later when we define more physics that is not defined already.
+%
+%The input file contains several sections I will highlight for the purpose of this tutorial. If you look in the mesh section you will see the domain of the simulation is a two-dimensional plane that is one unit long on both sides. It turns out that we have defined our units to be nanometers. Units are actually not defined in the input file; instead, the units are defined in the C++ code based on the constants you choose to use. Our one-nanometer square is originally represented by 25 elements with 5 elements on each side. Now, look in the variables section. Notice that we have two variables cv and cg defined. Each variable is continuous across the entire domain. This is accomplished by using shape functions to define the solution across all the elements of the domain.
+%
+%In this tutorial we will look at void migration in a lattice structure with gas in the interstitial spaces. We will see how gas fills voids in the interstitial spaces. The two variables represent the concentration of the gas, cg, and the concentration of the vacancy, cv. The simulation is set to be time dependent and to run for two time steps with a time step of 0.1. 
+%
+%Now that we have analyzed the input file, navigate to the location of the input file in a terminal window. Run the following command to execute the simulation.	
+%
+%\begin{verbatim}
+%../../marmot-opt -i void_migration.i
+%\end{verbatim}
+%
+%Open up the output file in ParaView. The name of the output file should be void\_output\_oversample.e. Select all of the variables and view the results. View the cg variable first. Remember, cg is the concentration of the gas. Notice that the gas is located in the interstitial spaces outside of a center circle. The center circle is where the void is. Click on the cv variable in ParaView and notice that this variable is of value 1 in the center and value 0 everywhere else. Remember in phase field methods a value of 1 represents existence of something and zero represents the lack of the existence. 
+%
+%The length of the current simulation doesn't provide very interesting results. Now that we have a good understanding about what the simulation represents . let us see how we can gain better results. Lets run a new simulation that runs for 40 time steps and has a time step of 10. Edit the input file for the simulation by changing the num\_steps and dt parameters to 40 and 10 respectively. The figure illustrates the results by the initial and final conditions of the simulation shown in the figure. We see that the gas leaks into the void because of the void's lower energy state.
+%
+%Allowing the simulation to last for a longer time produces a simulation with more interesting results; however, all of the physics illustrated by the results has been previously defined by someone else code. What if you wanted to show physics that hasn't already been defined in a C++ file? In this tutorial we will walk you though how to create a new material model based on some existing material model. The current material model is unable to calculate mobility constants based on a temperature gradient. In this tutorial we will create a new material model based on an already existing material model that uses a temperature gradient instead of a constant variable to calculate the mobility constant for the Cahn-Hillard equation. 
+%
+%In order to do this we must first look at how the current material model works. In the input file look under the materials section, look at the type parameter. This parameter identifies which material model the simulation is using. The value of the type parameter is also the filename of the .h and .C files for the material model. 
+%
+%In the terminal window navigate to the marmot directory. In the marmot directory there are two subdirectories entitled include and src. The include directory is where the header files are located. The src directory is where the .C files are located.  Navigate into the src directory and into the materials directory. Inside this directory you should find the UO2VacGas.C file. Using the following command create a copy of the file with the new name of UO2VacGasTempGrad.C. 
+%
+%\begin{verbatim}
+%cp UO2VacGas.C UO2VacGasTempGrad.C
+%\end{verbatim}
+%
+%Do the same in the include directory; except, the file that will be copied is UO2VacGas.h and the new file created will be UO2VacGasTempGrad.h. These two files explain how the UO2VacGas material model works. By creating copies of these files, it allows us now expand the model to support temperature gradients.
+%
+%Open the UO2VacGasTempGrad.C file. You should have already covered the format of the .h and .C files in the MOOSE class; however, I will cover the basic sections it contains. Let us first go through the .h file. Remember that this is where our class, variables, and member functions are declared. At the top of the header file you will see
+%
+%\begin{verbatim}
+%#ifndef UO2VACGAS_H
+%#define UO2VACGAS_H 
+%\end{verbatim}
+%
+%These statements protect our class from any others that may have then same name. It basically says that if UO2VACGAS\_H has not already been declared, then declare it. This is a precautionary measure to make sure we don't have two classes of the same name declared. Notice that UO2VACGAS\_H matches the name of our old filename, with the exception of the substitution of an underscore instead of a period. The first thing we need to do in our header file is make all of the references to the name UO2VACGAS and UO2VacGas and change them to UO2VACGASTEMPGRAD and UO2VacGasTempGrad respectively. Open the .C file and make these changes to that file as well. 
+%
+%Lets now shift our attention to the .C file. The .C file has three main sections. First, the parser section is designed to define what parameters will be read from the input file.  Second is the class constructor section. Third is the compute functions section. If you look at the code in the computeProperties function, you will see which values the material function is calculating and making available for use. The primary parameters we will concern ourselves with are only those to do with temperature. This will be good practice for the future.
+%
+%Look now for how the temperature is handled in this file. Notice in the parser section there are three parameters read from the input file. First, temp is a Real value. This alone confines the temperature to be the same throughout the domain. The other two have to do with coupling a variable from a different program called BISON.
+%
+%The first step to creating this functionality is determining how we will represent our temperature. In order for our simulation to be fully adaptable we must have a temperature defined for every point in the domain. In other words, we need a continuous variable. An auxiliary variable is ideal for this type of a situation. We can define an auxiliary variable for any function we wish. We also want to make it available to use a constant temperature as well. 
+%
+%In the header file, define the two variables as follows underneath the declaration of the \_temp variable.
+%
+%\begin{verbatim}
+%bool _has_T;
+%VariableValue * _T;
+%\end{verbatim}
+%
+%Notice that the second is a pointer. We do this so that the large amount of data doesn't have to be copied into a new variable. 
+%
+%It is possible to define everything in the C++ files; however, sometimes it can be helpful to create a way to change constants without recompiling everything. In order to do this we go to the .C file in the parser section. In this section type the following line of code to read the name of the variable we want set as \_T. Place this line of code right under where the temp parameter is read.
+%
+%\begin{verbatim}
+%params.addCoupledVar("T", "Temperature variable in Kelvin");
+%\end{verbatim}
+%
+%Now that we have expanded the parameters in the input file we need to assign values to our variables. In the constructor section add the following lines under where the \_temp variable is given a value. 
+%
+%\begin{verbatim}
+%_has_T(isCoupled("T")),
+%_T(_has_T ? &coupledValue("T") : NULL),
+%\end{verbatim}
+%
+%What this does is set \_has\_T with a true or false value whether there is a continuous variable to look to. If there is the second line will set that value to the pointer \_T. If there is no variable to look to \_T will be set to NULL. 
+%
+%Now that both \_temp and \_T are set, which one will the computeProperties use to compute our properties. Well right now it will always use the \_temp because we haven't programed it to look for anything different. Create an if statement that will use \_T if it exists. You can do this by going down to the computeProperties function. In this function you will find two lines. 
+%
+%\begin{verbatim}
+%_kT[_qp] = _kb[_qp]*_temp;
+%_RT[_qp] = _kb[_qp]*_temp;
+%\end{verbatim}
+%Replace these two lines with the following if statement.
+%
+%\begin{verbatim}
+%if (_has_T)
+%  {
+%    _kT[_qp] = _kb[_qp]*(*_T)[_qp];
+%    _RT[_qp] = _kb[_qp]*(*_T)[_qp];
+%  }
+%else
+% {
+%     _kT[_qp] = _kb[_qp]*_temp;
+%     _RT[_qp] = _kb[_qp]*_temp;
+%}
+%\end{verbatim}
+%
+%Now for our changes to be complete, we must register our new material model with the factory. We do this by adding a couple of lines to Marmot.C file in the base directory. This file will build the functionality as an option. There are two things that need to happen. First we need to include the header file so that the program has the declaration of the class. Open the Marmot.C file. At the top of the file, you will see the include statements divided into sections. Find the materials section of the include statements. Insert the following code into that section.
+%
+%\begin{verbatim}
+%#include "UO2VacGasTempGrad.h"
+%\end{verbatim}
+%
+%After including the class declarations, we must register the material with the factory. MOOSE makes this very easy. All you have to do is input the following line for a material using the name of the new class as the parameter in the function call.
+%
+%\begin{verbatim}
+%registerMaterial(UO2VacGasTempGrad);
+%\end{verbatim}
+%
+%If you are adding any other module to the MARMOT toolbox, you would use the name of whatever kind of piece you are adding; for instance, if you were adding a kernel, you would use registerKernel instead of registerMaterial.
+%
+%Now that our material model is registered, rebuild MARMOT. If you have any compile errors fix them and recompile. There shouldn't be any need for this if you have followed the tutorial to the letter; however, anyone can have typos. One hint I would give you is not to copy and paste your changes. This will allow you to be more exposed to the programing syntax of the MOOSE framework.
+%
+%Now in the input file change the type of material to UO2VacGasTempGrad instead of UO2VacGas. Erase or comment out the temp parameter.  Now put in the T parameter and have it equal a variable of your choice. For this tutorial we will use a function to compute our auxiliary variable of temp and use that variable for our material model.
+%
+%In my case I chose the variable called temp. Using the following lines in the input file I have implemented the new material model.
+%
+%\begin{verbatim}
+%[AuxVariables]
+%  [./temp]
+%    order = FIRST
+%    family = LAGRANGE
+%  [../]
+%[]
+%
+%[AuxKernels]
+%  [./calctemp]
+%    type = FunctionAux
+%    function = tempgrad
+%    variable = temp
+%  [../]
+%[]
+%
+%[Functions]
+%  [./tempgrad]
+%    type = ParsedFunction
+%    value = 1000.0+1000.0*x
+%  [../]
+%[]
+%
+%[Materials]
+%
+%  [./vacgas]
+%    type = UO2VacGasVarTemp
+%    block = 0
+%    cv = cv
+%    cg = cg
+%    T = temp
+%    int_width = 0.01
+%    length_scale = 1.0e-8
+%    time_scale = 1.0e-6
+%    Efgas = 3.0
+%  [../]
+%[]
+%\end{verbatim}
+%
+%Now that this is set, run the simulation and view the results in ParaView. Though, we didn't see as much of a change in our results, the skills taught about creating new material models carries over into creating new kernels, initial conditions, boundary conditions, etc. Understanding these principles will open up new avenues for you to deepen your understanding of how to use MARMOT.
+
+
+\end{document}

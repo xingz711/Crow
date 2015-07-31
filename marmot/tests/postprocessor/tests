@@ -1,0 +1,12 @@
+[tests]
+  [./diffusivitybox]
+    type = 'CSVDiff'
+    input = 'diffusivitybox.i'
+    csvdiff = 'diffusivitybox_out.csv'
+  [../]
+  [./onebubblegbc]
+    type = 'CSVDiff'
+    input = 'onebubblegbc.i'
+    csvdiff = 'onebubblegbc_out.csv'
+  [../]
+[]

@@ -1,0 +1,17 @@
+[Tests]
+  [./twoComp]
+    type = Exodiff
+    input = twoComp.i
+    exodiff = twoComp_out.e
+  [../]
+  [./comp1Phase]
+    type = Exodiff
+    input = comp1Phase.i
+    exodiff = comp1Phase_out.e
+  [../]
+  [./comp2Phase]
+    type = Exodiff
+    input = comp2Phase.i
+    exodiff = comp2Phase_out.e
+  [../]
+[]

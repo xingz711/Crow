@@ -1,0 +1,19 @@
+[Tests]
+  [./testbicrystal]
+    type = 'Exodiff'
+    input = 'gb_ics_bicrystal_test.i'
+    exodiff = 'void_gb_bi.e'
+  [../]
+
+  [./testcircle]
+    type = 'Exodiff'
+    input = 'gb_ics_circle_test.i'
+    exodiff = 'void_gb_circle.e'
+  [../]
+
+  [./testpoly]
+    type = 'Exodiff'
+    input = 'gb_ics_poly_test.i'
+    exodiff = 'void_gb_poly.e'
+  [../]
+[]

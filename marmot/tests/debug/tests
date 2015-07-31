@@ -1,0 +1,7 @@
+[Tests]
+  [./algebradebug]
+    type = 'Exodiff'
+    input = './algebradebug.i'
+    exodiff = './algebradebug_out.e'
+  [../]
+[]

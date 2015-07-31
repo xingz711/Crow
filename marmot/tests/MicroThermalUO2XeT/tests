@@ -1,0 +1,7 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = 'MicroThermalUO2XeT_test.i'
+    exodiff = 'MicroThermalUO2XeT_test_out.e'
+  [../]
+[]

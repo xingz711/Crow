@@ -1,0 +1,19 @@
+[Tests]
+  [./eigenstrain_test]
+    type = 'Exodiff'
+    input = 'eigenstrain_test.i'
+    exodiff = 'eigenstrain_test_out.e'
+  [../]
+
+  [./iso_eigenstrain_test]
+    type = 'Exodiff'
+    input = 'iso_eigenstrain_test.i'
+    exodiff = 'iso_eigenstrain_test_out.e'
+  [../]
+
+  [./aniso_eigenstrain_test]
+    type = 'Exodiff'
+    input = 'aniso_eigenstrain_test.i'
+    exodiff = 'aniso_eigenstrain_test_out.e'
+  [../]
+[]

@@ -1,0 +1,7 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = 'inter_gr_frac.i'
+    exodiff = 'inter_gr_frac_out.e'
+  [../]
+[]

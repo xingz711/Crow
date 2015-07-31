@@ -1,0 +1,12 @@
+[Tests]
+  [./material]
+    type = 'Exodiff'
+    input = 'calphad.i'
+    exodiff = 'calphad_out.e'
+  [../]
+  [./phasefield]
+    type = 'Exodiff'
+    input = 'calphad_pf_zr-h.i'
+    exodiff = 'calphad_pf_zr-h_out.e'
+  [../]
+[]

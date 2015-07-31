@@ -1,0 +1,314 @@
+\documentclass[]{article}
+\usepackage{graphicx,color}
+\usepackage{amssymb}
+\usepackage{amsmath,amsthm}
+
+\begin{document}
+
+\tableofcontents 
+\section{KKS Model Definitions}
+
+\[
+F = [1-h(\eta)]F_a + h(\eta)F_b+wg(\eta) 
+\]
+
+\[
+c =  [1-h(\eta)]c_a + h(\eta)c_b
+\]
+
+\[
+\frac{dF_a}{dc_a} = \frac{dF_b}{dc_b}
+\]
+
+\section{Materials}
+The KKS system uses multiple MOOSE materials to provide values for free energy functions, the switching function $h(\eta)$, and the double well function $g(\eta)$.
+Providing these as materials allows the functions to be bundled in a single place, while being used by multiple kernels. Furthermore the automatic differentiation feature 
+used in the parsed function materials provides the necessary derivatives at no cost to the developer. The derivatives are stored in material properties and follow a naming scheme 
+that is defined in \texttt{KKSBaseMaterial.C}.
+
+\section{Cahn-Hilliard Kernels}
+
+\subsection{\texttt{KKSSplitCHCRes}}
+This is the split version. The non-linear variable for this Kernel is the concentration $c$.
+
+\subsubsection{Residual}
+
+In the residual routine we need to calculate the term $R= \frac{dF}{dc}$. We exploit the KKS identity $\frac{dF}{dc}=\frac{dF_a}{dc_a}=\frac{dF_b}{dc_b}$ and arbitrarily use the a-phase instead.
+\[
+R = \frac{dF_a}{dc_a}
+\]
+
+\subsubsection{Jacobian}
+Starting from the original residual with $\frac{dF}{dc}$. Then
+\begin{eqnarray*}
+J &=& \phi_j \frac{d}{dc} \frac{dF}{dc}\\
+  &=& \phi_j  \frac{d^2F}{dc^2} \quad,\quad \text{with (29) from \cite{KKS}}\\
+  &=& \phi_j  \frac{\frac{d^2F_b}{dc_b^2}\frac{d^2F_a}{dc_a^2}}{  [1-h(\eta)]\frac{d^2F_b}{dc_b^2}+h(\eta)\frac{d^2F_a}{dc_a^2} }\\
+\end{eqnarray*}
+
+
+\subsection{\texttt{KKSCHBulk}}
+This is the non-split version, which is not fully implemented. The non-linear variable for this Kernel is the concentration $c$.
+
+
+\subsubsection{Residual}
+
+In the residual routine we need to calculate the term $R=\nabla \frac{dF}{dc}$. We exploit the KKS identity $\frac{dF}{dc}=\frac{dF_a}{dc_a}=\frac{dF_b}{dc_b}$ and arbitrarily use the a-phase instead.
+The gradient can be calculated through the chain rule (note that $F_a(c_a, p_1,p_2,\dots,p_n)$ is potentially a function of many variables)
+\[
+R = \nabla \frac{dF_a}{dc_a} = \frac{d^2F_a}{dc_a^2}\nabla c_a + \sum_i \frac{d^2F_a}{dc_adp_i}\nabla p_i 
+\] 
+
+With $a = \{c_a, p_1,p_2,\dots,p_n\}$ being the vector of all arguments to $F_a$ this simplifies to 
+\[
+R=\sum_i \frac{d^2F_a}{dc_ada_i}\nabla a_i  = \sum_i R_i \nabla a_i
+\]
+
+using $R_i$ as a shorthand for the term $\frac{d^2F_a}{dc_ada_i}$ (and represented in the code as the array \texttt{\_second\_derivatives[i]}). We do have access to the gradients of $a_i$ through MOOSE (stored in \texttt{\_grad\_args[i]}).
+
+\subsubsection{Jacobian}
+
+The calculation of the Jacobian involves the derivative of the Residual term $R$ w.r.t. the individual coefficients $u_j$ of all parameters of $F_a$. Here $u$ can stand for 
+any variable $a_i$.
+\[
+\frac{dR}{du_j} = \sum_i \left[ \frac d{du_j} R_i\nabla a_i \right] = \sum_i \left[  R_i\frac{d\nabla a_i}{du_j} + \nabla a_i \sum_k \frac {dR_i}{da_k}\frac{da_k}{du_j} \right] 
+\]
+
+In the code $u$ is given by \texttt{jvar} for the off diagonal case, and $c$ (not $c_a$ or $c_b$!) in the on diagonal case. 
+
+\paragraph{Off-diagonal}
+
+Let's focus on off diagonal first. Here $\frac{da_k}{du_j}$ is zero, if \texttt{jvar} is not equal $k$. Allowing us to remove the sum over k and replace it with the single non-zero summand
+\[
+\frac{dR}{du_j} = \sum_i \left[  R_i\frac{d\nabla a_i}{du_j} + \nabla a_i \frac {dR_i}{da_\text{jvar}}\frac{da_\text{jvar}}{du_j} \right] 
+\]
+
+In the first term in the square brackets the derivative $\frac{d\nabla a_i}{du_j}$ is only non-zero if $i$ is \texttt{jvar}. We can therefore pull this term out of the sum.
+\[
+\frac{dR}{du_j} = R_\text{jvar}\frac{d\nabla a_\text{jvar}}{du_j} + \sum_i  \nabla a_i \frac {dR_i}{da_\text{jvar}}\frac{da_\text{jvar}}{du_j} 
+\]
+
+With the rules for $\frac d{du_j}$ derivatives we get
+\[
+ R_\text{jvar} \nabla \phi_j + \sum_i \nabla a_i \frac {dR_i}{da_\text{jvar}} \phi_j 
+\]
+
+where $j$ is \texttt{\_j} in the code.
+
+\paragraph{On-diagonal}
+
+For the on diagonal terms we look at the derivative w.r.t. the components of the non-linear variable $c$ of this kernel. Note, that $F_a$ is only indirectly a function of $c$. We assume the dependence is given through $c(c_a)$. The chain rule will thus yield terms of this form  
+\[
+\frac{dc_a}{dc} = \frac{\frac{d^2F_b}{dc_b^2}}{[1-h(\eta)]\frac{d^2F_b}{dc_b^2}+h(\eta)\frac{d^2F_a}{dc_a^2}},
+\]
+%\[
+%\frac{\partial c_b}{c\partial c} = \frac{\frac{d^2F_a}{dc_b^2}}{[1-h(\eta)]\frac{d^2F_b}{dc_b^2}+h(\eta)\frac{d^2F_a}{dc_a^2}}.
+%\]
+
+which is given as equation (23) in \cite{KKS}. Following the off-diagonal  derivation we get
+\[
+\frac{d^2F_a}{dc_a^2}\frac{dc_a}{dc} \nabla \phi_j + \sum_i \nabla a_i \frac {dR_i}{dc_a} \frac{dc_a}{dc} \phi_j 
+\]
+
+\paragraph{On-diagonal second approach}
+Let's get back to the original residual with $\frac{dF}{dc}$. Then
+\begin{eqnarray*}
+J &=& \phi_j \frac{d}{dc} \nabla \frac{dF}{dc}\\
+  &=& \phi_j  \nabla \frac{d^2F}{dc^2} \quad,\quad \text{with (29) from \cite{KKS}}\\
+  &=& \phi_j  \nabla \frac{\frac{d^2F_b}{dc_b^2}\frac{d^2F_a}{dc_a^2}}{  [1-h(\eta)]\frac{d^2F_b}{dc_b^2}+h(\eta)\frac{d^2F_a}{dc_a^2} }\\
+\end{eqnarray*}
+
+\section{Allen-Cahn  Kernels}
+
+For the bulk Allen-Cahn residual we need to calculate the term 
+\begin{eqnarray*}
+R=\frac{dF}{d\eta}&=&\frac{d}{d\eta}\left([1-h(\eta)]F_a + h(\eta)F_b+wg(\eta) \right)\\
+&=& \frac{dF_a}{d\eta}+\frac{d}{d\eta}\left(h(\eta)F_b-h(\eta)F_a + wg(\eta)\right)\\
+&=& \frac{dF_a}{d\eta}+F_b\frac{dh}{d\eta}-F_a\frac{dh}{d\eta}+h(\eta)\frac{dF_b}{d\eta}-h(\eta)\frac{dF_a}{d\eta} +w\frac{dg}{d\eta}\\
+&=& \frac{dF_a}{d\eta}+\frac{dh}{d\eta}(F_b-F_a)+h(\eta)\left(\frac{dF_b}{d\eta}-\frac{dF_a}{d\eta}\right) +w\frac{dg}{d\eta}\\
+&=& \frac{dh}{d\eta}(F_b-F_a) + \underbrace{[1-h(\eta)]\frac{dF_a}{d\eta} + h(\eta)\frac{dF_b}{d\eta}}_{\text{chain rule term}} +w\frac{dg}{d\eta}\\
+&=& \frac{dh}{d\eta}(F_b-F_a) + [1-h(\eta)]\frac{dF_a}{dc_a}\frac{dc_a}{d\eta} + h(\eta)\frac{dF_b}{dc_b}\frac{dc_b}{d\eta} +w\frac{dg}{d\eta}\\
+&=& \frac{dh}{d\eta}(F_b-F_a) + \frac{dF_a}{dc_a}\left([1-h(\eta)]\frac{dc_a}{d\eta} + h(\eta)\frac{dc_b}{d\eta}\right) +w\frac{dg}{d\eta}
+\end{eqnarray*}
+
+The \emph{chain rule term} results from the fact that $c_a$ and $c_b$ are dependent on $\eta$ (see eqs. (25) and (26) in \cite{KKS}).
+Setting $\lambda = [1-h(\eta)]\frac{d^2F_b}{dc_b^2}+h(\eta)\frac{d^2F_a}{dc_a^2}$ we get
+\begin{eqnarray*}
+\frac{dc_a}{d\eta} &=& \frac1\lambda \frac{dh}{d\eta}(c_a-c_b)\frac{d^2F_b}{dc_b^2}\\
+\frac{dc_b}{d\eta} &=& \frac1\lambda \frac{dh}{d\eta}(c_a-c_b)\frac{d^2F_a}{dc_a^2}
+\end{eqnarray*}
+
+Substituting this in we get
+\begin{eqnarray*}
+R &=& \frac{dh}{d\eta}(F_b-F_a) + \frac{dh}{d\eta}\frac{dF_a}{dc_a}(c_a-c_b)\frac1\lambda\underbrace{\left([1-h(\eta)] \frac{d^2F_b}{dc_b^2} + h(\eta)\frac{d^2F_a}{dc_a^2}\right)}_{=\lambda} +w\frac{dg}{d\eta}
+\end{eqnarray*}
+
+This simplifies to
+\[
+R=-\frac{dh}{d\eta} \left(F_a-F_b-\frac{dF_a}{dc_a}(c_a-c_b)\right) + w\frac{dg}{d\eta}.
+\]
+
+We split this residual into two kernels to allow for multiple phase concentrations in a multi component system:
+
+\subsection{\texttt{KKSACBulkF}}
+
+\subsubsection{Residual}
+\[
+R=-\frac{dh}{d\eta}(F_a-F_b)+w\frac{dg}{d\eta}.
+\]
+
+\subsubsection{Jacobian}
+
+\paragraph{On-diagonal}
+We are looking for the $\frac d{du_j}$ derivative of R, where $u\equiv\eta$. We need to apply the chain rule and will again only keep terms with the $\frac{d}{d\eta}\frac{d\eta}{du_j}=\frac{d}{d\eta}\phi_j$ derivative. Note that $F_a$ and $F_b$ indirectly are functions of $\eta$.
+\[
+-\frac{d^2h}{d\eta^2}\phi_j(F_a-F_b) \underbrace{-\frac{dh}{d\eta}\left(\frac{dF_a}{d\eta}-\frac{dF_b}{d\eta}\right)\phi_j}_{\text{handled in \texttt{KKSACBulkC}}} + w\frac{d^2g}{d\eta^2}\phi_j.
+\]
+
+Part of this Jacobian is handled in \texttt{KKSACBulkC}, as the $\frac F{d\eta}$ derivatives require knowledge of the phase concentration variables (via chain rule).
+
+\subsection{\texttt{KKSACBulkC}}
+
+\subsubsection{Residual}
+\begin{eqnarray*}
+R&=&-\frac{dh}{d\eta}\left(-\frac{dF_a}{dc_a}(c_a-c_b)\right)\\
+  &=&\frac{dh}{d\eta}\frac{dF_a}{dc_a}(c_a-c_b)
+\end{eqnarray*}
+
+\subsubsection{Jacobian}
+
+\paragraph{On-diagonal}
+We are looking for the $\frac d{du_j}$ derivative of R, where $u\equiv\eta$. We need to apply the chain rule and will again only keep terms with the $\frac{d}{d\eta}\frac{d\eta}{du_j}=\frac{d}{d\eta}\phi_j$ derivative. Note that $F_a$ and $F_b$ indirectly are functions of $\eta$.
+\begin{eqnarray*}
+J_1 &=& \frac{d^2h}{d\eta^2}\phi_j\frac{dF_a}{dc_a}(c_a-c_b) + \frac{dh}{d\eta}\left(\frac{d}{d\eta}\left[ \frac{dF_a}{dc_a}(c_a-c_b)\right]\right)\phi_j\\
+&=& \frac{d^2h}{d\eta^2}\phi_j\frac{dF_a}{dc_a}(c_a-c_b) + \frac{dh}{d\eta}\left( (c_a-c_b)\frac{d}{d\eta}\frac{dF_a}{dc_a} + \frac{dF_a}{dc_a}\frac{d}{d\eta}(c_a-c_b) \right)\phi_j\\
+&=& \frac{d^2h}{d\eta^2}\phi_j\frac{dF_a}{dc_a}(c_a-c_b) + \frac{dh}{d\eta}\left( (c_a-c_b)\frac{d^2F_a}{dc_a^2}\frac{dc_a}{d\eta} + \frac{dF_a}{dc_a}\left[\frac{dc_a}{d\eta}-\frac{dc_b}{d\eta}\right] \right)\phi_j\\
+&=& \frac{d^2h}{d\eta^2}\phi_j\frac{dF_a}{dc_a}(c_a-c_b) + \frac{dh}{d\eta}\left( (c_a-c_b)\frac{d^2F_a}{dc_a^2}\frac{dc_a}{d\eta}\right)\phi_j + \frac{dh}{d\eta}\left(\frac{dF_a}{dc_a}\frac{dc_a}{d\eta}-\frac{dF_b}{dc_b}\frac{dc_b}{d\eta} \right)\phi_j
+\end{eqnarray*}
+
+Onto this we have to add the term we pick up from \texttt{KKSACBulkF}
+\begin{eqnarray*}
+J_2 &=& -\frac{dh}{d\eta}\left(\frac{dF_a}{d\eta}-\frac{dF_b}{d\eta}\right)\phi_j\\
+&=&-\frac{dh}{d\eta}\left(\frac{dF_a}{dc_a}\frac{dc_a}{d\eta}-\frac{dF_b}{dc_b}\frac{dc_b}{d\eta}\right)\phi_j
+\end{eqnarray*}
+
+Which cancels the last term in $J_1$ (note the chemical potential equality is used), leaving the Jacobian 
+\[
+J=\frac{d^2h}{d\eta^2}\phi_j\frac{dF_a}{dc_a}(c_a-c_b) + \frac{dh}{d\eta}\left( (c_a-c_b)\frac{d^2F_a}{dc_a^2}\frac{dc_a}{d\eta}\right)\phi_j 
+\]
+
+TODO: investigate if we are missing cross terms in case of multi-component systems ($\eta$ derivative of $F_a$ may have more chain rule terms)!
+
+\paragraph{Off-diagonal}
+%This simplifies greatly, as neither $g$ nor $h$ are functions of any variable besides $\eta$. The only term that remains is
+%\[
+%\frac{dh}{d\eta}\left(\frac{dF_a}{du_\text{jvar}}-\frac{dF_b}{du_\text{jvar}}\right)\phi_j
+%\] 
+
+\section{Constraint Kernels}
+
+\subsection{\texttt{KKSPhaseChemicalPotential}}
+
+This Kernel enforces the point wise equality of the phase chemical potentials
+\[
+\frac{dF_a}{dc_a}=\frac{dF_b}{dc_b}
+\]
+The non-linear variable of this Kernel is $c_a$.
+
+\subsubsection{Residual}
+\[
+R=\frac{dF_a}{dc_a} - \frac{dF_b}{dc_b}
+\]
+
+\subsubsection{Jacobian}
+
+For the Jacobian we need to calculate 
+\[
+J=\frac d{du_j}\left( \frac{dF_a}{dc_a} - \frac{dF_b}{dc_b} \right).
+\]
+
+With $q$ the union of the argument vectors of $F_a$ and $F_b$ (represented in the code by \texttt{\_coupled\_moose\_vars[]}) we get
+\[
+\sum_i \left( \frac{d^2F_a}{dc_aq_i}\frac{dq_i}{du_j} + \frac{d^2F_b}{dc_bq_i}\frac{dq_i}{du_j} \right).
+\]
+
+Again the $\frac{dq_i}{du_j}$ is non-zero only if $u\equiv q_i$, which is the case if $q_i$ is the argument selected through \texttt{jvar}.
+\[
+\frac{d^2F_a}{dc_aq_\text{jvar}}\phi_j + \frac{d^2F_b}{dc_bq_\text{jvar}}\phi_j.
+\]
+
+Note that in the code \texttt{jvar} is not an index into \texttt{\_coupled\_moose\_vars[]} but has to be resolved through the \texttt{\_jvar\_map}.
+
+\subsection{\texttt{KKSPhaseConcentrations}}
+This Kernel enforces the split of the concentration into the phase concentrations, weighted by the switching function. The non-linear variable of this Kernel is $c_b$.
+\[
+c = [1-h(\eta)]c_a+h(\eta)c_b
+\]
+
+\subsubsection{Residual}
+\[
+R=[1-h(\eta)]c_a + h(\eta)c_b - c
+\]
+
+\subsubsection{Jacobian}
+\[
+J=
+\]
+
+
+
+
+
+
+\subsection{\texttt{KKSACBulk}}
+
+\subsubsection{Residual}
+
+In the residual routine we need to calculate the term 
+\begin{eqnarray*}
+R=\frac{dF}{d\eta}&=&\frac{d}{d\eta}\left([1-h(\eta)]F_a + h(\eta)F_b+wg(\eta) \right)\\
+&=& \frac{dF_a}{d\eta}+\frac{d}{d\eta}\left(h(\eta)F_b-h(\eta)F_a + wg(\eta)\right)\\
+&=& \frac{dF_a}{d\eta}+F_b\frac{dh}{d\eta}-F_a\frac{dh}{d\eta}+h(\eta)\frac{dF_b}{d\eta}-h(\eta)\frac{dF_a}{d\eta} +w\frac{dg}{d\eta}\\
+&=& \frac{dF_a}{d\eta}+\frac{dh}{d\eta}(F_b-F_a)+h(\eta)\left(\frac{dF_b}{d\eta}-\frac{dF_a}{d\eta}\right) +w\frac{dg}{d\eta}\\
+&=& \frac{dh}{d\eta}(F_b-F_a) + \underbrace{[1-h(\eta)]\frac{dF_a}{d\eta} + h(\eta)\frac{dF_b}{d\eta}}_{\text{chain rule term}} +w\frac{dg}{d\eta}\\
+&=& \frac{dh}{d\eta}(F_b-F_a) + [1-h(\eta)]\frac{dF_a}{dc_a}\frac{dc_a}{d\eta} + h(\eta)\frac{dF_b}{dc_b}\frac{dc_b}{d\eta} +w\frac{dg}{d\eta}\\
+&=& \frac{dh}{d\eta}(F_b-F_a) + \frac{dF_a}{dc_a}\left([1-h(\eta)]\frac{dc_a}{d\eta} + h(\eta)\frac{dc_b}{d\eta}\right) +w\frac{dg}{d\eta}
+\end{eqnarray*}
+
+The \emph{chain rule term} results from the fact that $c_a$ and $c_b$ are dependent on $\eta$ (see eqs. (25) and (26) in \cite{KKS}).
+Setting $\lambda = [1-h(\eta)]\frac{d^2F_b}{dc_b^2}+h(\eta)\frac{d^2F_a}{dc_a^2}$ we get
+\begin{eqnarray*}
+\frac{dc_a}{d\eta} &=& \frac1\lambda \frac{dh}{d\eta}(c_a-c_b)\frac{d^2F_b}{dc_b^2}\\
+\frac{dc_b}{d\eta} &=& \frac1\lambda \frac{dh}{d\eta}(c_a-c_b)\frac{d^2F_a}{dc_a^2}
+\end{eqnarray*}
+
+Substituting this in we get
+\begin{eqnarray*}
+R &=& \frac{dh}{d\eta}(F_b-F_a) + \frac{dh}{d\eta}\frac{dF_a}{dc_a}(c_a-c_b)\frac1\lambda\underbrace{\left([1-h(\eta)] \frac{d^2F_b}{dc_b^2} + h(\eta)\frac{d^2F_a}{dc_a^2}\right)}_{=\lambda} +w\frac{dg}{d\eta}
+\end{eqnarray*}
+
+This simplifies to
+\[
+R=-\frac{dh}{d\eta}\underbrace{\left(F_a-F_b-\frac{dF_a}{dc_a}(c_a-c_b)\right)}_{\text{\texttt{A1} in the code}}+w\frac{dg}{d\eta}.
+\]
+
+\subsubsection{Jacobian}
+
+\paragraph{On-diagonal}
+We are looking for the $\frac d{du_j}$ derivative of R, where $u\equiv\eta$. We need to apply the chain rule and will again only keep terms with the $\frac{d}{d\eta}\frac{d\eta}{du_j}=\frac{d}{d\eta}\phi_j$ derivative. Note that $F_a$ and $F_b$ indirectly are functions of $\eta$.
+\[
+\frac{d^2h}{d\eta^2}\phi_j(F_a-F_b-\frac{dF_a}{dc_a}(c_a-c_b)) + \frac{dh}{d\eta}\left(\frac{dF_a}{d\eta}-\frac{dF_b}{d\eta}-\frac{d}{d\eta}\left[ \frac{dF_a}{dc_a}(c_a-c_b)\right]\right)\phi_j + w\frac{d^2g}{d\eta^2}\phi_j.
+\]
+
+\paragraph{Off-diagonal}
+This simplifies greatly, as neither $g$ nor $h$ are functions of any variable besides $\eta$. The only term that remains is
+\[
+\frac{dh}{d\eta}\left(\frac{dF_a}{du_\text{jvar}}-\frac{dF_b}{du_\text{jvar}}\right)\phi_j
+\] 
+
+
+\begin{thebibliography}{9}
+\bibitem{KKS} S.G. Kim, W.T. Kim, and T. Suzuki, Phys. Rev. E 60 (1999) 7186
+\end{thebibliography}
+
+\end{document}

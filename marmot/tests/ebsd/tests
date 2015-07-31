@@ -1,0 +1,13 @@
+[Tests]
+  [./ebsd_2D]
+    type = 'Exodiff'
+    input = 'ebsd_2D.i'
+    exodiff = 'ebsd_2D_out.e'
+  [../]
+
+  [./ebsd_3D]
+    type = 'Exodiff'
+    input = 'ebsd_3D.i'
+    exodiff = 'ebsd_3D_out.e'
+  [../]
+[]

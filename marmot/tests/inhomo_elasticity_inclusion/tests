@@ -1,0 +1,12 @@
+[Tests]
+  [./test_strong]
+    type = 'Exodiff'
+    input = 'circular_inclusion_lamda_c_strong_inclusion.i'
+    exodiff = 'circular_inclusion_lamda_c_strong_inclusion_out.e'
+  [../]
+  [./test_weak]
+    type = 'Exodiff'
+    input = 'circular_inclusion_lamda_c_weak_inclusion.i'
+    exodiff = 'circular_inclusion_lamda_c_weak_inclusion_out.e'
+  [../]
+[]

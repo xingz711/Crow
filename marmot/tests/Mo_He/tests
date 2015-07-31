@@ -1,0 +1,7 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = 'Mo_He_test.i'
+    exodiff = 'mo_he.e'
+  [../]
+[]

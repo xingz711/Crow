@@ -1,0 +1,7 @@
+[Tests]
+  [./bubble_count_test]
+    type = 'Exodiff'
+    input = 'bubble_counter_test.i'
+    exodiff = 'bubble_counter_test_out.e'
+  [../]
+[]

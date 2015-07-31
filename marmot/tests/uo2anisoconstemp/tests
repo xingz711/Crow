@@ -1,0 +1,12 @@
+[Tests]
+  [./uo2anisoconstemp]
+    type = 'Exodiff'
+    input = './uo2anisoconstemp.i'
+    exodiff = './uo2anisoconstemp_out.e'
+  [../]
+  [./uo2anisoconstempxe]
+    type = 'Exodiff'
+    input = './uo2anisoconstempxe.i'
+    exodiff = './uo2anisoconstempxe_out.e'
+  [../]
+[]

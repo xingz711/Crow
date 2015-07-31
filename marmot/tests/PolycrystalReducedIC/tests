@@ -1,0 +1,13 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = 'PolycrystalReducedIC_test.i'
+    exodiff = 'out.e'
+  [../]
+
+  [./test_multi]
+    type = 'Exodiff'
+    input = 'PolycrystalReducedIC_multi_test.i'
+    exodiff = 'PolycrystalReducedIC_multi_test_out.e'
+  [../]
+[]

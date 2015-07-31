@@ -1,0 +1,14 @@
+[Tests]
+  [./MidPlaneBubbleCoverage]
+    type = 'Exodiff'
+    input = 'MidPlaneBubbleCoverage_test.i'
+    exodiff = 'MidPlaneBubbleCoverage_out.e'
+    abs_zero = 6e-08
+    group = 'adaptive'
+  [../]
+  [./GrainBoundaryBubbleCoverage]
+    type = 'Exodiff'
+    input = 'GrainBoundaryBubbleCoverage_test.i'
+    exodiff = 'GrainBoundaryBubbleCoverage_out.e-s003'
+  [../]
+[]

@@ -1,0 +1,27 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = 'alt_split_math_test.i'
+    exodiff = 'out.e'
+  [../]
+  [./poly_test]
+    type = 'Exodiff'
+    input = 'poly_split_cu_test.i'
+    exodiff = 'cu.e'
+  [../]
+  [./phys_test]
+    type = 'Exodiff'
+    input = 'CHLog_split_test.i'
+    exodiff = 'phys.e-s002'
+  [../]
+  [./mo_he_poly_test]
+    type = 'Exodiff'
+    input = 'Mo_He_new_test.i'
+    exodiff = 'mo_he.e-s002'
+  [../]
+  [./mo_he_phys_test]
+    type = 'Exodiff'
+    input = 'Mo_He_new_phys_test.i'
+    exodiff = 'mo_he_phys.e-s002'
+  [../]
+[]

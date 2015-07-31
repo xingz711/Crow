@@ -1,0 +1,19 @@
+[Tests]
+  [./Lagrange_1st]
+    type = 'Exodiff'
+    input = 'Lagrange_1st.i'
+    exodiff = 'Lagrange_1st_out.e'
+  [../]
+
+  [./Lagrange_2nd]
+    type = 'Exodiff'
+    input = 'Lagrange_2nd.i'
+    exodiff = 'Lagrange_2nd_out.e'
+  [../]
+
+  [./Hermite]
+    type = 'Exodiff'
+    input = 'Hermite.i'
+    exodiff = 'Hermite_out.e'
+  [../]
+[]

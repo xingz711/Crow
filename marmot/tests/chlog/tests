@@ -1,0 +1,8 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = 'CHLog_test.i'
+    exodiff = 'out_oversample.e'
+    group = 'adaptive'
+  [../]
+[]

@@ -1,0 +1,19 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = 'PlanarSmoothCircleIC_test.i'
+    exodiff = 'out.e'
+    skip = '#84'
+  [../]
+  [./uniform_test]
+    type = 'Exodiff'
+    input = 'PlanarSmoothCircleIC_uniform_test.i'
+    exodiff = 'uniform.e'
+    skip = '#84'
+  [../]
+  [./normal_test]
+    type = 'Exodiff'
+    input = 'PlanarSmoothCircleIC_normal_test.i'
+    exodiff = 'normal.e'
+  [../]
+[]

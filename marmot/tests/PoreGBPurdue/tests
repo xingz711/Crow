@@ -1,0 +1,17 @@
+[Tests]
+  [./PoreGBPurde]
+    type = 'Exodiff'
+    input = 'PoreGBPurdue.i'
+    exodiff = 'PoreGBPurdue_out.e'
+  [../]
+  [./SinusoidalSurfaceIC]
+    type = 'Exodiff'
+    input = 'SinusoidalSurfaceIC.i'
+    exodiff = 'SinusoidalSurfaceIC_out.e'
+  [../]
+  [./PerturbedCylinderIC]
+    type = 'Exodiff'
+    input = 'PerturbedCylinderIC.i'
+    exodiff = 'PerturbedCylinderIC_out.e'
+  [../]
+[]

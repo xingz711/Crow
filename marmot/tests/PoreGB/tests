@@ -1,0 +1,17 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = 'PoreGB_test.i'
+    exodiff = 'PoreGB_test_out.e-s002'
+  [../]
+  [./surfdiff_test]
+    type = 'Exodiff'
+    input = 'PoreGB_surfdiff_test.i'
+    exodiff = 'PoreGB_surfdiff_test_out.e'
+  [../]
+  [./mtrxmob_test]
+    type = 'Exodiff'
+    input = 'PoreGBMtrxMob_test.i'
+    exodiff = 'PoreGBMtrxMob_test_out.e'
+  [../]
+[]

@@ -1,0 +1,494 @@
+\documentclass[letter,12pt,fleqn]{article}
+
+\usepackage{wrapfig}
+\usepackage{amsmath,amsthm}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage[titletoc]{appendix}
+
+%\usepackage{draftwatermark}
+%\SetWatermarkScale{4}
+%\SetWatermarkLightness{0.9}
+\usepackage{caption}
+%\usepackage{subcaption}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amstext}
+\usepackage{amsbsy}
+\usepackage[round]{natbib}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,%
+    citecolor=black,%
+    filecolor=black,%
+    linkcolor=black,%
+    urlcolor=blue
+}
+
+
+
+\begin{document}
+
+\begin{titlepage}
+
+\begin{center}
+
+ \includegraphics[width=4in]{figures/marmot_logo.png}
+ 
+ \vspace{20pt}
+
+\textsc{\huge Theory Manual}
+
+ \vspace{20pt}
+
+
+Michael R. Tonks Ph.D
+
+\date{}
+
+\end{center}
+
+\vfill	
+\begin{center}
+\copyright 2012 by Battelle Energy Alliance, LLC\\
+All Rights Reserved.
+\end{center}
+
+\thispagestyle{empty}
+
+\end{titlepage}
+
+\pagenumbering{roman}
+
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+
+MARMOT is a multiphyiscs simulation tool focused on the mesoscale. It predicts the coevolution of microstructure and properties by coupling the phase field model with solid mechanics and heat conduction. Though MARMOT has a significant physics implemented in the code, it has also been developed to allow for the easy implementation of new models.
+
+MARMOT is implemented using the Multiphysics Object-Oriented Simulation Environment (MOOSE) framework from INL. Thus, the partial differential equations (PDEs) defining the coupled mesoscale physics are solved with the finite element method (FEM). Because of its connection to MOOSE, MARMOT is massively parallel (it can run on one processor but also on thousands of processors) and has access to mesh and time step adaptivity.
+
+MARMOT has two parts, generic models that can be used as the building blocks of a new mesoscale modeling tool and the application-specific models developed at INL that are primarily focused on nuclear applications. The generic models are located within the MOOSE modules library and come with the MOOSE framework. The application-specific models are in the MARMOT directory and require special permission for access. However, such access is easily obtained by contacting Michael Tonks at INL.
+
+Basic information on how to install and run MARMOT can be found in the general MARMOT manual. This manual is focused on the actual physics implemented in MARMOT, both the generic and application-specific models. We start with an overview of the phase field model and how it is implemented in MARMOT. We then step through a series of more specific sections, discussing individual families of models. Finally, we end by discussing how to couple the various physics. In each section, we provide references for all the models and discuss analytical models that are used to verify the code. Note that this manual is a work in progress and will continue to grow with time.
+
+If you have additional questions about MARMOT after reading the this and the general manual, feel free to contact the MARMOT development team:
+
+\vspace{20pt}
+
+\noindent MARMOT development team:
+
+\begin{itemize}
+\item Michael Tonks (\href{mailto:michael.tonks@inl.gov}{michael.tonks@inl.gov})
+\item Paul Millett (\href{mailto:paul.millett@inl.gov}{paul.millett@inl.gov})
+\item Weifeng Rao (\href{mailto:weifeng.rao@inl.gov}{weifeng.rao@inl.gov})
+\item Pritam  Chakraborty (\href{mailto:pritam.chakraborty@inl.gov}{pritam.chakraborty@inl.gov})
+\item Bulent Biner (\href{mailto:bulent.biner@inl.gov}{bulent.biner@inl.gov})
+\end{itemize}
+
+
+\pagenumbering{arabic}
+
+
+
+\section{Phase Field Summary}
+
+\subsection{Overview}
+
+In its essence, the phase field model is a deterministic model of microstructure evolution based on PDEs. It is a quantitative model that evolves the microstructure in order to minimize the free energy of the system. The phase field model is simple to implement because it uses a diffuse interface description, such that the microstructure evolves through the mesh rather than the mesh having to move with the microstructure. 
+
+In this section we summarize the basic idea of the phase field method and review how it is implemented in MARMOT. We also discuss how the generic models in MARMOT have been created to simplify the development of new models. Much of this information is taken from the initial MARMOT paper \cite{tonks2011marmot}
+
+\subsection{Phase-Field Basics}
+\label{sec:phasefield}
+
+In the phase field approach, microstructural features are described using continuous variables.  These variables take two forms: conserved variables representing physical properties such as atom concentration or material density, and nonconserved order parameters describing the microstructure of the material, including grains and different phases.  The evolution of these continuous variables is a function of the Gibbs free energy and can be defined as a system of PDEs. Thus, to define the kinetics of the system, the free energy must be described as a function of the continuous variables representing the microstructure. 
+ 
+In \citet{chen2002}, a general form of the phase field PDEs is defined.  We present this general form here, and then show how it can be solved via FEM.  The PDE's are evolution equations for the various variables and are functions of the free energy functional $F$.  The evolution of all conserved variables is defined using modified Cahn-Hilliard equations, i.e.
+\begin{eqnarray}
+	\frac{\partial c_i}{\partial t} = \nabla \cdot M_i \nabla \frac{\delta F}{\delta c_i}, \label{eq:CH}
+\end{eqnarray} 
+where $c_i$ is a conserved variable and $M_i$ is the associated mobility.  The evolution of nonconserved order parameters is represented with an Allen-Cahn equation, according to
+\begin{eqnarray}
+	\frac{\partial \eta_j}{\partial t} = - L_j \frac{\delta F}{\delta \eta_j}, \label{eq:AC}
+\end{eqnarray}
+where $\eta_j$ is an order parameter and $L_j$ is the order parameter mobility.   
+
+Note that $\delta$ denotes a \emph{functional derivative}. Which is taken according to the fundamental lemma of calculus of variations (Eq.~\eqref{eq:vlemma}).
+
+The free energy functional, for a phase field model using $N$ conserved variables $c_i$ and $M$ order parameters $\eta_j$, is described by
+\begin{eqnarray}
+	F = \int_V \big[ f_{loc}(c_1, \ldots,c_N, \eta_1, \ldots, \eta_M) + f_{gr}(c_1, \ldots,c_N, \eta_1,  \ldots, \eta_M) + E_{d} \big] \, dV,
+\end{eqnarray}
+where $f_{loc}$ defines the local free energy density as a function of all concentrations and order parameters, and varies from model to model.  The gradient energy density
+\begin{eqnarray}
+	f_{gr} &=& \sum_i^N \frac{\kappa_i}{2} |\nabla c_i|^2 + \sum^M_j \frac{\kappa_j}{2} |\nabla \eta_j|^2,\label{eq:free_energy}
+\end{eqnarray} 
+where $\kappa_i$ and $\kappa_j$ are gradient energy coefficients.  Finally, $E_d$ describes any additional sources of energy in the system, such as deformation or electrostatic energy.  By substituting Eq.~\eqref{eq:free_energy} into Eqs.~\eqref{eq:CH} and \eqref{eq:AC}, the evolution of the variables is described as
+\begin{eqnarray}
+	\frac{\partial c_i}{\partial t} = &\nabla \cdot M_i \nabla \left( \frac{\partial f_{loc}}{\partial c_i} - \kappa_i \nabla^2 c_i + \frac{\partial E_{d}}{\partial c_i} \right) \label{eq:cons_residual_strong}\\
+	\frac{\partial \eta_j}{\partial t} = & - L \left( \frac{\partial f_{loc}}{\partial \eta_j} - \kappa_j \nabla^2 \eta_j +  \frac{\partial E_{d}}{\partial \eta_j} \right).  \label{eq:op_residual_strong}
+\end{eqnarray}
+
+To prepare for the FEM discretization of Eqs.~\eqref{eq:cons_residual_strong} and \eqref{eq:op_residual_strong}, we construct a weak form in a similar manner to that used by \citet{stogner2008}.  First, the weighted integral residual projection of Eqs.~\eqref{eq:cons_residual_strong} and \eqref{eq:op_residual_strong} is constructed using test function $\psi_m$ and applying the product rule (Eqs.~\eqref{eq:prodrule1} and \eqref{eq:prodrule2}) and divergence theorem (Eq.~\eqref{eq:divtheo}) to the second-order terms once and to the fourth order term twice.  Thus, Eq.~\eqref{eq:cons_residual_strong} yields
+\begin{eqnarray}
+	\left(  \frac{\partial c_i}{\partial t}, \psi_m \right) =  -\left( \kappa_i \nabla^2 c_i, \nabla \cdot (M_i \nabla \psi_m ) \right) \nonumber \\ 
+	-\left( M_i  \nabla \left( \frac{\partial f_{loc} }{\partial c_i} + \frac{\partial E_d}{\partial c_i} \right), \nabla \psi_m \right)  \nonumber \\
+	- \left< M_i \nabla \left(  \kappa_i \nabla^2 c_i  \right)  \cdot \vec{n}, \psi_m \right> \nonumber \\
+	+ \left< M_i \nabla \left( \frac{\partial f_{loc}}{\partial c_i} + \frac{\partial E_{d}}{\partial c_i } \right)  \cdot \vec{n}, \psi_m \right> \nonumber \\ 
+	+  \left< \kappa_i \nabla^2 c_i, M_i \nabla \psi_m \cdot \vec{n} \right>  \label{eq:cons_residual_weak}, 
+\end{eqnarray}
+where the usual inner product notation is used for the respective interior and boundary integrals.  Equation \eqref{eq:op_residual_strong} yields
+\begin{eqnarray}
+	\left(  \frac{\partial \eta_j}{\partial t}, \psi_m \right) &=& - L \left( \kappa_j \nabla \eta_j, \nabla \psi_m \right) \nonumber \\
+	&-& L \left( \frac{\partial f_{loc}}{\partial \eta_j} + \frac{\partial E_d}{\partial \eta_j}, \psi_m \right) \nonumber \\
+	&+& L\left<  \kappa_j \nabla \eta_j \cdot \vec{n}, \psi_m \right> \label{eq:op_residual_weak}.
+\end{eqnarray}
+The weak statement is completed with an initial condition and boundary conditions.  For the Cahn-Hilliard equation, natural boundary conditions can be applied via the penalty method discussed in \citet{stogner2008}.
+
+There is an alternative means of solving Eq.~\eqref{eq:cons_residual_strong}, in which the one fourth-order equation is separated into two second-order equations through the introduction of a substitutional variable \citep{Elliott1989}, which leads to
+%
+\begin{align}
+  \nonumber
+  \frac{\partial c}{\partial t} &=\nabla \cdot (M_i \nabla \mu_i) \\
+  \label{split}
+  \mu_i &=  \frac{\partial f_{loc}}{\partial c_i} - \kappa_i \nabla^2 c_i + \frac{\partial E_{d}}{\partial c_i},
+\end{align}
+%
+where $\mu$ is known as the chemical potential~\citep{Elliott1989}. The weak form in this case is
+%
+\begin{align}
+  \left(\frac{\partial c_i}{\partial t}, \psi\right) &=-(M_i\nabla\mu_i,\nabla\psi)+ \left\langle M_i\nabla\mu_i\cdot\vec{n},\psi \right\rangle \label{eq:mures}
+  \\
+  \left(\mu_i,\psi'\right) &= \left( \frac{\partial f_{loc}}{\partial c_i},\psi'\right) + \left( \kappa_i \nabla c_i,\nabla\psi'\right) - \left\langle  \kappa_i \nabla c \cdot\vec{n},\psi' \right\rangle +  \left( \frac{\partial E_d}{\partial c_i},\psi'\right), \label{eq:cres}
+\end{align}
+%
+for all admissible $(\psi, \psi')$.  Note that while Eq.~\eqref{eq:cres} defines the chemical potential, we actual use it as the residual to solve for $c$, while Eq.~\eqref{eq:mures} is used as the residual to solve for $\mu$. This is done in order to place more of the important Jacobian information on the diagonal, rather than the off-diagonal, during the Newton solve of the coupled system of equations.
+
+When additional physics are coupled to the phase field equations, additional residual equations are solved, e.g.\ coupling to a solid mechanics solution would require the residual equation
+\begin{eqnarray}
+	\left( \rho \frac{\partial^2 \mathbf{u}}{\partial t^2},\psi_m \right) &=& \left(\boldsymbol{\sigma}(\mathbf{u}),\nabla \psi_m)\right) \nonumber \\ 
+	&&- \left< \sigma(\mathbf{u}) \cdot \vec{n},\psi_m \right> , \label{eq:solmech_wk}
+\end{eqnarray} 
+where the stress tensor $\boldsymbol{\sigma}$ is a function of the displacements $\mathbf{u}$ and $\rho$ is the density.  Coupling to heat conduction to determine the temperature $T$ would require the equation
+\begin{eqnarray}
+	\left(\rho c_p \frac{\partial T}{\partial t}, \psi_m \right) &=& \left(k \nabla T, \nabla \psi_m \right) \nonumber \\ 
+	&&- \left<k \nabla T\cdot \vec{n}, \psi_m \right>, \label{eq:htcond_wk}
+\end{eqnarray}
+where $c_p$ is the specific heat and $k$ is the thermal conductivity.
+
+Each equation is discretized in the typical FEM manner, and all of the required FEM objects and architecture are provided by MOOSE.  Cubic $C^1$ Hermite elements are used to discretize the conserved variables when using Eq.~\eqref{eq:cons_residual_weak}. When splitting the equation into two parts, with Eqs.~\eqref{eq:mures} and \eqref{eq:cres}, linear Lagrange elements can be used. Linear Lagrange elements are also used for the order parameters and any coupled variables such as displacements or temperature.  The transient system of PDEs is integrated over time implicitly. The system of coupled PDEs is solved with JFNK in the manner described in \citet{gaston08}.  We have found that diagonal block preconditioning is sufficient for most systems, therefore only an approximation of the diagonal blocks of the Jacobian of each residual with its corresponding variable need be determined. However, when solving for conserved variables with the split residual equations, the off-diagonal Jacobian terms are needed.
+
+
+\subsection{Simplified Development Model Development}
+
+The goal of the MARMOT framework is to facilitate the development of advanced phase field models by taking advantage of their common structure, i.e.\ their usage of Eqs.~\eqref{eq:cons_residual_weak} (or \eqref{splitweak_c}) and \eqref{eq:op_residual_weak}.  Thus, only certain terms and parameters vary between models. By employing object-oriented design principles, the development of a new phase field model using MARMOT only requires that the behavior of these varying terms be defined.  In this way, even complex phase field models can be created with only a small amount of effort.  This small amount of required effort is accomplished by dividing up the residual equations into several separate terms.  Each of these terms has been created as a C++ base class, with interfaces for the required terms.  Therefore, creating a new phase field model is accomplished by inheriting from these base classes and overriding functions to provide the specific free energy terms and model parameters.
+
+
+\begin{table}[!h]
+\centering
+\footnotesize
+{\bf Residual Equation} \\
+$\textcolor{NavyBlue}{\left( \frac{ \partial c_i}{\partial t}, \psi_m \right) }+\textcolor{Red}{\left( \kappa_i \nabla^2 c_i, \nabla \cdot (M_i \nabla \psi_m ) \right)}+ \textcolor{OliveGreen}{\left( M_i  \nabla \frac{\partial f_{loc} }{\partial c_i}, \nabla \psi_m \right)} + \textcolor{Bittersweet}{\left( M_i  \nabla \frac{\partial E_d}{\partial c_i}, \nabla \psi_m \right)} $
+\begin{center}
+  \begin{tabular}{@{} ccccc @{}}
+    \hline
+    Class & Term & Param. & Function &Kernel\\
+    \hline
+    \color{NavyBlue} Time deriv. &     \color{NavyBlue}$\left(  \frac{\partial c_i}{\partial t}, \psi_m \right)$ &  & & \emph{TimeDerivative} \\ 
+    \color{Red} Gradient & \color{Red} $\left( \kappa_i \nabla^2 c_i, \nabla \cdot M_i \nabla \psi_m \right)$ & \color{Red} $\kappa_i,\ M_i$ & & \emph{CHInterface} \\ 
+    \color{OliveGreen} Local & \color{OliveGreen} $\left( M_i  \nabla \frac{\partial f_{loc} }{\partial c_i} , \nabla \psi_m \right)  $ &\color{OliveGreen}  $M_i$ & $ \color{OliveGreen} \nabla \frac{\partial f_{loc} }{\partial c_i}$ & \emph{CHBulk} \\ 
+    \color{Bittersweet} Additional & \color{Bittersweet} $\left( M_i  \nabla \frac{\partial E_d }{\partial c_i} , \nabla \psi_m \right)  $ & \color{Bittersweet} $M_i$ & \color{Bittersweet} $ \nabla \frac{\partial E_d }{\partial c_i}$ & \emph{CHBulk}\\ 
+  \end{tabular}
+\end{center}
+\caption{Marmot\ object-oriented architecture for the Cahn-Hilliard equation.  Each term in the residual equation is separated and created as a base class.  New objects inherit from these base classes and the necessary functions are overridden to provide the specific free energy terms. All required parameters must be defined in a material object.  \label{tab:CH}}
+\end{table}
+For example, the interior terms of Eq.~\eqref{eq:cons_residual_weak} can be divided into four pieces, the time derivative, the gradient term, the local energy term and the additional energy term, as shown in Table~\ref{tab:CH}.  A base class has been created for each of these four terms.  The gradient energy class requires the parameters $k_i$ and $M_i$ to be defined but has no functions to be overridden.  The local energy class requires $M_i$ be defined and the function $\nabla \partial f_{loc} / \partial c_i$ be overridden; the additional energy class requires $M_i$ and that $\nabla  \partial E_d / \partial c_i$ be overridden.  Thus, to define the residual for a conserved variable, a material object is created supplying $\kappa_i$ and $M_i$, as are objects inheriting from the local energy and additional energy classes, overriding the necessary functions. This process is repeated for all of the conserved variables required by the model, though often their forms are similar and code can be reused.  Commonly used terms, such as the time derivative or a scalar forcing function already exist in MOOSE and can be used without additional coding. 
+
+\begin{table}[!h]
+\centering
+\footnotesize
+{\bf Residual Equation} \\
+$\textcolor{NavyBlue}{\left( \frac{ \partial c_i}{\partial t}, \psi_m \right) }+\textcolor{Red}{\left(M_i \nabla \mu_i, \nabla \psi_m \right)}$ \\
+$\textcolor{OliveGreen}{\left( \kappa_i \nabla^2 c_i +  \frac{\partial f_{loc}}{\partial c_i} - \mu_i, \psi_m \right)} + \textcolor{Bittersweet}{\left( \frac{\partial E_d}{\partial c_i},\psi_m \right)} $ \\
+\begin{center}
+  \begin{tabular}{@{} ccccc @{}}
+    \hline
+    Class & Term & Param. & Function &Kernel\\
+    \hline
+    \color{NavyBlue} Time deriv. &     \color{NavyBlue}$\left(  \frac{\partial c_i}{\partial t}, \psi_m \right)$ &  & & \emph{CoupledImplicitEuler} \\ 
+    \color{Red} $\mu$ residual & \color{Red} $\left(M_i \nabla \mu_i, \nabla \psi_m \right)$ & \color{Red} $M_i$ & & \emph{SplitCHWRes} \\ 
+    \color{OliveGreen} $c_i$ residual & \color{OliveGreen} $\left( \kappa_i \nabla^2 c_i +  \frac{\partial f_{loc}}{\partial c_i} - \mu_i, \psi_m \right)$ &\color{OliveGreen}  $\kappa_i$ & $ \color{OliveGreen} \frac{\partial f_{loc} }{\partial c_i}$ & \emph{SplitCHCRes} \\ 
+    \color{Bittersweet} Additional & \color{Bittersweet} $\left( \frac{\partial E_d }{\partial c_i} , \psi_m \right)  $ & & \color{Bittersweet} $\frac{\partial E_d }{\partial c_i}$ & \emph{SplitCHBase}\\ 
+  \end{tabular}
+\end{center}
+\caption{Marmot\ object-oriented architecture for the split Cahn-Hilliard equation.  Each term in the residual equation is separated and created as a base class.  New objects inherit from these base classes and the necessary functions are overridden to provide the specific free energy terms. All required parameters must be defined in a material object.  \label{tab:splitCH}}
+\end{table}
+For Eqs.~\eqref{eq:mures} and \eqref{eq:cres}, the first equation  can be divided into two pieces, the time derivative and the $\mu$ residual term, and the second equation can also be divided into two, the $c_i$ residual term and the additional energy term, as shown in Table~\ref{tab:splitCH}.  A base class has been created for each of these four terms.  The $\mu$ residual class requires $M_i$ parameter but has no functions to be overridden.  The $c_i$ residual class requires $\kappa_i$ be defined and the function $\partial f_{loc} / \partial c_i$ be overridden; the additional energy class does not require any parameters, but does require that $\partial E_d / \partial c_i$ be overridden.  Thus, to define the residual for a conserved variable, a material object is created supplying $\kappa_i$ and $M_i$, as are objects inheriting from the $c_i$ residual and additional energy classes, overriding the necessary functions. This process is repeated for all of the conserved variables required by the model, though often their forms are similar and code can be reused.  
+
+\begin{table}[h!]
+\centering
+\footnotesize
+{\bf Residual Equation} \\
+$\textcolor{NavyBlue}{\left( \frac{\partial \eta_i}{\partial t}, \psi_m \right) }+\textcolor{Red}{\left( L_i \kappa_i \nabla \eta_i, \nabla \psi_m \right)} + \textcolor{OliveGreen}{\left( L_i  \frac{\partial f_{loc} }{\partial \eta_i}, \psi_m \right)} + \textcolor{Bittersweet}{\left( L_i \frac{\partial E_d}{\partial \eta_i}, \psi_m \right)} $
+\begin{center}
+  \begin{tabular}{@{} ccccc @{}}
+    \hline
+    Class & Term & Param. & Function & Kernel\\
+    \hline
+    \color{NavyBlue} Time deriv. &     \color{NavyBlue}$\left(  \frac{\partial \eta_i}{\partial t}, \psi_m \right)$ &  & & \emph{TimeDerivative} \\ 
+    \color{Red} Gradient & \color{Red} $\left( L_i \kappa_i \nabla \eta_i, \nabla \psi_m \right)$ & \color{Red} $\kappa_i,\ L_i$ & & \emph{ACInterface} \\ 
+    \color{OliveGreen} Local & \color{OliveGreen} $\left( L_i \frac{\partial f_{loc} }{\partial \eta_i} , \psi_m \right)  $ &\color{OliveGreen}  $L_i$ & $ \color{OliveGreen} \frac{\partial f_{loc} }{\partial \eta_i}$ & \emph{ACBulk} \\ 
+    \color{Bittersweet} Additional & \color{Bittersweet} $\left( L_i  \frac{\partial E_d }{\partial \eta_i} , \psi_m \right)  $ & \color{Bittersweet} $L_i$ & \color{Bittersweet} $ \frac{\partial E_d }{\partial \eta_i}$ & \emph{ACBulk}\\ 
+  \end{tabular}
+\end{center}
+\caption{Example of marmot\ object-oriented architecture for the Allen-Cahn equation.  Each term in the residual equation is separated and created as a base class.  New objects inherit from these base classes and the necessary functions are overridden to provide the specific free energy terms. All required parameters must be defined in a material object.  \label{tab:AC}}
+\end{table}
+For the Allen-Cahn equation, Eq.~\eqref{eq:op_residual_weak} is again divided into four sections, the time derivative, the gradient energy term, the local energy term and the additional energy term, as shown in Table~\ref{tab:AC}.  The structure is very similar to that used for the direct solution of the Cahn-Hilliard equation.
+
+\section{Individual Physics}
+
+In this section, we summarize the various physics that is available in MARMOT. We summarize the models, provide references, give examples of the code and run through examples.
+
+\subsection{Grain Growth}
+
+Grain boundaries (GBs) migrate to reduce the total free energy of the system. Various sources of free energy drive the GB migration, including stored defect energy, deformation energy, and GB energy. Modeling and simulation play important roles in investigating GB migration and grain growth, and grain growth models have been under development for many years.  Starting in the 1980's, numerical models that explicitly represented the grain topology were developed, ranging from front tracking methods \citep{frost1988, moldovan2002}, Monte Carlo Potts models \citep{anderson1984, srolovitz1984}, phase-field methods \citep{fan1997, kim2006}, cellular automation \citep{lan2006} and level set methods \citep{zhang2008}.  Each of these models was first developed only considering the curvature driving force, but many have been expanded later to consider other driving forces \citep{chen2004, battaile2007, zhang2010, tonks2010, tonks2011}.  While all of the various models predict similar behavior, the phase-field method has emerged as the most popular due to its flexibility and computational efficiency.  
+
+
+The grain growth model implemented in MARMOT is from \citet{moelans2008}.  In the model, each grain is represented by a continuous order parameter $\eta_i$ equal to one within the grain and zero in all other grains.  The evolution of each grain's order parameter is defined with Eq.\eqref{eq:op_residual_weak}.  The implementation of the Allen-Cahn equation is shown in Table \ref{tab:AC}. Specific for the grain growth model, a local energy kernel called \emph{ACGrGrPoly} was created, in which 
+\begin{eqnarray}
+    \frac{\partial f_{loc}}{\partial \eta_i} =&  \mu \left( \eta_i^3 - \eta_i  + 2 \gamma \sum_{j=1}^N \eta_i \eta_j^2 \right).
+\end{eqnarray}
+The code in the kernels takes the form:
+\begin{verbatim}
+  SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp]; 
+
+  return _mu[_qp]*(_u[_qp]*_u[_qp]*_u[_qp] - _u[_qp] + 
+            2.0*_gamma*_u[_qp]*SumEtaj);
+\end{verbatim}
+where \_u[\_qp] stores the current order parameter value $\eta_i$ and \_vals[i][\_qp] stores the values of $\eta_j$. Since this equation takes the same form for each order parameter, only one kernel was created and reused for each order parameter.  
+
+In \citet{moelans2008}, the model parameters $L_j$, $\mu$ and $\kappa_j$ are defined in terms of the grain boundary (GB) surface energy $\sigma$, the diffuse GB width $w_{GB}$ and the GB mobility $m_{GB}$. These expressions are coded in various MARMOT materials for various types of material, i.e. \emph{CuGrGr} for copper. The most generic form of the equations is in the material \emph{GBEvolution}.
+
+The grain growth model can have an arbitrary number of variables, depending on the number of grains that will be represented. The default input file for MOOSE, in which each variable is added individually, would be very cumbersome for such a system. Therefore, we have created a custom input file syntax that automates the creation of the various order parameters.  This was created with the Action system within MOOSE, and the most basic action that creates grain growth variables is \emph{PolycrystalVariablesAction}. Given the number order parameters (n\_crys) and some base name to which the numbers will be appended (var\_name\_base), each variable is created, e.g. if var\_name\_base = gr and n\_crys = 3, then the variables gr0, gr1 and gr2 will be created.
+
+The initial conditions (ICs) for the polycrystal models are created using the ICs block in the MARMOT input file. Under the ICs block, there is an additional block called "PolycrystalICs." Under this block, there are various options to create initial conditions for bicrystals, tricrystals and polycrystals. These options are shown in Table \ref{table:polycrystalICs}.
+\begin{table}[htdp]
+\caption{PolycrystalICs options available in MARMOT.\label{table:polycrystalICs}}
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+Action name & description \\
+\hline
+BicrystalBoundingBoxIC & Two grains defined by a bounding box. \\
+BicrystalCircleGrainIC & Circle grain and matrix grain \\
+Tricrystal2CircleGrainsIC & Two circle grains and a matrix grain\\
+PolycrystalHexGrainIC & $n\_grain$ grains in a hexagonal structure\\
+PolycrystalVoronoiIC & $n\_grain$ grains using a Voronoi tesselation\\
+PolycrystalRandomIC & Randomly seeds grain order parameters\\
+\hline
+\end{tabular}
+\end{center}
+\label{default}
+\end{table}%
+
+
+
+An additional option is to reconstruct the microstructure from experimental data. Given data exported from EBSD software in our specific format, the initial grain structure can mimic the microstructure of the data.  More information is given on this topic in Section~\ref{sec:microstructure_reconstruction}.
+
+The residual equation used to solve for the value of each order parameter at a specific time is divided into parts and implemented in separate kernels, as shown in Table~\ref{tab:AC}. As with the variables, defining the three kernels needed for each variable, when we can have an arbitrary number of variables would be very cumbersome using the default MOOSE input file syntax. Thus, we have also created a custom syntax to automatically generate the required kernels. This is implemented in the action \textit{PolycrystalKernelAction}. As with the variables, the inputs are the number of order parameters (n\_crys) and the base name (var\_name\_base).
+
+With the above information, we are ready to run grain growth simulations. The first step is to verify the model predictions against analytical models of grain growth. Here, we derive the analytical model for two-grain configurations, a circular grain imbedded in a larger grain and a half loop grain imbedded in a larger grain. The grain boundary velocity is calculated according to
+\begin{eqnarray}
+	v = M F
+\end{eqnarray}
+where $F$ is the driving force. In our simple verification cases, the driving force depends only on the curvature of the grain boundary and can be written as
+\begin{eqnarray}
+	F = \frac{\gamma}{R},
+\end{eqnarray}
+where $\gamma$ is the GB energy and $R$ is the radius of curvature. The change in area with time is equal to
+\begin{eqnarray}
+\frac{\partial A}{\partial t} &=& 2 \pi R \frac{\partial R}{\partial t} = 2 \pi R v\\
+&=& 2 \pi M \gamma.
+\end{eqnarray}
+Thus, the area at any time $t$ can be calculated with
+\begin{eqnarray}
+	A = A_0 - 2 \pi M \gamma t,
+\end{eqnarray}
+where $A_0$ is the initial radius of the circular grain. Following the same approach for the half loop geometry gives the expression
+\begin{eqnarray}
+	A = A_0 - \pi M \gamma t.
+\end{eqnarray}
+To verify the grain growth code in MARMOT, tests have been created that evolve a circular grain (marmot$/$tests$/$grain\_growth\_test$/$GrGr\_test.i) and a half loop grain (marmot$/$tests$/$grain\_growth\_test$/$GrGr\_thumb\_test.i). The MARMOT results compare well with the analytical models, as shown in Fig.~\ref{fig:GrGr_tests}. These tests are run every time the code changes, to ensure the behavior does not change.
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=2.5in]{figures/grain_growth_verification_circle}
+  \includegraphics[width=2.5in]{figures/grain_growth_verification_loop}
+  \caption{Verification of the MARMOT grain growth model for a circular grain (left) and half loop grain (right).}\label{fig:GrGr_tests}
+\end{figure}
+
+For more complex grain structures, two example inputs files can be found in marmot$/$examples$/$grain\_growth. One evolves an initial grain structure created with a Voronoi tessellation, while the second begins with a random initial grain configuration and nucleates grains. Both input files use a range of options that can be used with grain growth simulations and are well documented. Both have been optimized to run on four processors, though fewer could be used but with an increase in computation time.
+
+\subsection{Species Redistribution and Clustering}
+Many of the earliest phase field models focused on species redistribution and phase separation. The Cahn-Hilliard has been used to model spinodal decomposition for many years, and since then the same forms have been adapted to model solidification, precipitation and void and bubble behavior. In each of these models, at least one conserved concentration $c_i$ represents the concentration of a second species and the evolution of that concentration is described with Eq.~\eqref{eq:CH}. The alternative is to split the equation, as shown in Eq~\eqref{split}.
+
+ A detailed comparison between the two approaches has been conducted \citep{zhang2012}. In this work, it was shown that the split solution with first order Lagrange elements is the most efficient, while the direct solution with 3\textsuperscript{rd} order Hermites has the least error. However, the higher order  elements provide the lowest error for a given computation time (see Fig.~\ref{fig:CH_time_error}). Yet, we have found that practically the 1\textsuperscript{st} order Lagrange elements are the most feasible for large problems, due to the large memory usage of the higher order elements.
+\begin{figure}[t]
+\centering
+   \subfigure[\label{fig:time_error_2D_N} 2D, Newton]{\includegraphics[width=0.47\textwidth]{figures/time_error_N}}
+   \subfigure[\label{fig:time_error_2D_JFNK} 2D, JFNK]{\includegraphics[width=0.47\textwidth]{figures/time_error_JFNK}}
+   \subfigure[\label{fig:time_error_3D_N} 3D, Newton]{\includegraphics[width=0.47\textwidth]{figures/time_error_N_3D}}
+   \subfigure[\label{fig:time_error_3D_JFNK} 3D, JFNK]{\includegraphics[width=0.47\textwidth]{figures/time_error_JFNK_3D}}
+\caption{Computational efficiency (computation time vs.\ L$^2$-error) comparison of the three approaches in 2D using Newton's method and JFNK ((a) and (b), respectively), and in 3D using Newton's method and JFNK ((c) and (d), respectively). The computation time reported is the total wall time for one time step, not including the startup time. \label{fig:CH_time_error}}
+\end{figure}
+
+Various models have been implemented in MARMOT so far, with different materials associated with each. There are three main models that have been implemented in MARMOT, each being single species models. The first is a numerical model that provides a qualitative model spinodal decomposition. This model is implemented using the direct solution method and using the split.  
+\begin{itemize}
+	\item A simple qualitative form where $f_{loc} = (1 - c)^2(1 + c)^2$.
+	\begin{itemize}\sloppy
+		\item For the direct solution, see \path{moose/modules/phase_field/src/kernels/CHMath.C}. It is demonstrated in \path{moose/modules/phase_field/tests/CH_IC/CH_CircleIC_test.i}.
+		\item For the split solution, see \path{moose/modules/phase_field/src/kernels/CHSplitCHMath.C} It is demonstrated in \path{moose/modules/phase_field/tests/SplitCH/split_math_test.i}.
+	\end{itemize}
+	\item A physically based form where $f_{loc} = k_b T(c\ln c + (1-c)\ln(1-c)) + w c (1-c)$.
+	\begin{itemize}
+		\item For the direct solution, see \path{marmot/src/kernels/CHPhys.C} It is demonstrated in \path{marmot/tests/CHLog_test/CHLog_test.i}.
+		\item The split solution has not been successfully implemented. See the next paragraph for more information.
+	\end{itemize}
+	\item A quantitative polynomial model where $f_{loc} = C_N W \sum_{i=1}^N a_i c_i$, and the polynomial order $N$ can be 4, 6 or 8. Values for the coefficients and the constant $C_N$ can be found in the kernels.
+	\begin{itemize}\sloppy
+		\item For the direct solution, see \path{marmot/src/kernels/CHPoly.C}. It is demonstrated in \path{marmot/tests/chpoly_test/CHPoly_test.i}.
+		\item For the split solution, see \path{marmot/src/kernels/CHSplitCHPoly.C} It is demonstrated in \path{marmot/tests/split_ch_test/poly_split_test.i}.
+	\end{itemize}
+\end{itemize}
+
+A note should be made here about solving free energy functionals that contain natural log functions. We have struggled with this quite a bit in MARMOT, but we haven't found a single good solution that works with FEM and implicit time integration. The one solution that has consistently worked is to ensure that the second derivative of the log term can cancel with a term in the mobility. For example, for a free energy term of the form
+\begin{eqnarray}
+	f_{loc} = k_b T(c\ln c + (1-c)\ln(1-c)) + w c (1-c)
+\end{eqnarray}
+has a gradient of the chemical potential equal to
+\begin{eqnarray}
+	\nabla \frac{\partial f_{loc}}{\partial c} = \left(k_b T \left( \frac{1}{c} + \frac{1}{1-c} \right) - 2 w \right) \nabla c.
+\end{eqnarray}
+In this equation, the $1/c$ and $1/(1-c)$ terms are problematic for the numerical solution because as $c$ approaches 0 and 1, they approach infinity. If we define the mobility $M = M_0 c(1-c)$, then
+\begin{eqnarray}
+	M \nabla \frac{\partial f_{loc}}{\partial c} = M_0 \left(k_b T - 2 c(1-c) w \right) \nabla c.
+\end{eqnarray}
+Thus, the problematic terms have been canceled out. This approach is what is implemented in the $CHPhys$ kernel. However, this approach does not work with the split approach that we have currently adopted, because the mobility and the $\partial f_{lot}/\partial c$ term are in different residual equations. The Cahn-Hilliard equation could be split in a different manner in which the cancelation would occur, but we have not yet implemented this approach in MARMOT.
+
+The material parameters that must be defined for a single Cahn-Hilliard equation are the interfacial parameter $\kappa$, the mobility $M$. If the direct solution method is used, the gradient of the mobility $\nabla M$ is also required. For quantitative models, these parameters are set by physical properties. These properties are the formation energy, migration energy, interfacial energy and the diffusivity prefactor, though the parameterization will vary by model. A material object must be created that defines $\kappa$, $M$ and $\nabla M$. Examples of such a material objects can be found in \path{marmot/src/materials/} and include \path{ConcEvolution.C}, \path{CuVacProps.C} and \path{GenIrrad.C}. A generic material that simply sets the parameter values from user input is \path{moose/modules/phase_field/src/materials/PFMobility.C}.
+
+The correct approach for verifying the various models varies significantly with the model. However, there are two cases that can be used to verify nearly every Cahn-Hilliard model. First, when modeling species redistribution in a diffusion driven system, the Cahn-Hilliard equation should predict behavior identical to that predicted by Fick's law of diffusion for concentrations much smaller than one.
+
+Second, there is a simple analytical model of precipitate growth in a supersaturated solution.
+
+\subsection{Solid Mechanics}
+Computational solid mechanics is complicated subject that is well beyond the scope of this document. However, we do give a summary of the solid mechanics approach used in MARMOT. In solid mechanics, the displacement vector $\mathbf{u}$ due to applied boundary conditions is determined by solving the stress divergence equation. The strong form of the governing equation on the domain $\Omega$ and boundary $\Gamma=\Gamma_{\mathit{\iota _i}}\cup\Gamma_{\mathit{g_i}}  $
+can be stated as follows:
+\begin{align}
+\nabla \cdot\boldsymbol{\sigma} + \mathbf{b} = \mathbf{0} \;\mathrm{in}\;\Omega\\
+\mathbf{u} = \mathbf{g}\;\mathrm{in}\;\Gamma_{ \mathbf{g}}\\
+\boldsymbol{\sigma} \cdot \mathbf{n}=\boldsymbol{\iota}\;\mathrm{in}\;\Gamma_{ \boldsymbol{\iota}}
+\end{align}
+where $\boldsymbol{\sigma}$  is the Cauchy stress tensor, $\mathbf{b}$ is the body force, $\mathbf{n}$ is the unit normal to the boundary, $\mathbf{g}$ is the prescribed displacement on the boundary and $\boldsymbol{\iota}$ is the prescribed traction on the boundary. The weak form of the residual equation is expressed as:
+\begin{eqnarray}
+	\mathbb{R} = \left( \boldsymbol{\sigma}, \nabla \psi_m \right) - \left< \boldsymbol{\iota}, \psi_m \right> - \left( \mathbf{b}, \psi_m \right)  = \mathbf{0}. \label{eq:stress_divergence}
+\end{eqnarray}
+
+Though Eq.~\eqref{eq:stress_divergence} solves for the displacement vector, vector variables do not exist in MOOSE. Therefore, we define each of the individual components of the displacements as a variable. For example, the $x$-, $y$- and $z$-displacements could be defined as three variables called disp\_x, disp\_y and disp\_z. The residual equation for a specific displacement is defined n the kernel: \sloppy\path{moose/modules/tensor_mechanics/src/kernels/StressDivergenceTensors.C}. As inputs to this kernel, you define the three displacement variables that make up the displacement vector, as well as the component of the residual assigned to the corresponding variable. However, to simplify the process of creating the kernels, a custom Action has been created that defines the three kernels automatically. It can be found in  \path{moose/modules/tensor_mechanics/src/actions/TensorMechanicsAction.C}.
+
+For a given material behavior, the constitutive model describes the stress response of the material, i.e.\ the stress due to a specific strain. The details of the constitutive model depends many factors, including if you consider small or finite strains and whether your material response is linear or nonlinear. MARMOT is not a general mechanics code, but rather it is focused on solving mechanics problems at the level of microstructure. Thus, we have focused on material behavior important at the mesoscale. As such, the tensor mechanics system used in MARMOT defaults to anisotropic material response. A small strain formulation has been implemented, but only for linear Elasticity. The finite strain implementation can be used for both elastic and plastic material response.
+
+Rather than convert the symmetric rank two stress and strain tensors into size six vectors and the rank four elasticity tensor into a six by six matrix, we have chosen to maintain the tensor forms. This was done to reduce the complexity of the code. A common criticism of this approach is that it leads to added computational expense and required memory. However, in our investigations both the computation time and the memory usage have been similar to that from the solid mechanics system in MOOSE modules that uses the matrix and vector forms. 
+
+For the tensor implementation in MOOSE modules, a rank two tensor object (\path{moose/modules/tensor_mechanics/src/materials/RankTwoTensor.C}) was created to represent the stress, strain, etc. A range of operations were defined for the RankTwoTensor, including multiplication with both rank two and rank four tensors, the transpose, the determinant and the inverse. A rank four tensor object was also created (RankFourTensor), with the correct operations, including rotation. We also created an elasticity tensor object as a specialization of the rank four tensor that has all of the symmetries unique to an elasticity tensor (ElasticityTensorR4).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=5in]{figures/tensor_mechanics_material}
+  \caption{Inheritance diagram for the tensor mechanics materials classes.}\label{fig:tensor_mech}
+\end{figure}
+The base material class in tensor mechanics is TensorMechanicsMaterial (Fig.~\ref{fig:tensor_mech}). It defines the basic data structures that are needed for all constitutive models, including defining $\nabla \mathbf{u}$ which are needed to define the strain, the stress that will be outputted, and the creation of the elasticity tensor. It also defines several pure virtual functions that must be overridden by any child materials, computeQpStrain and computeQpStress. Additional functions, computeQpElasticityTensor and computeStrain can be overridden if necessary. TensorMechanicsMaterial makes no assumptions of small strain or any specific constitutive model.
+
+Linear elasticity is implemented in the LinearElasticMaterial. It overrides both computeQpStrain and computeQpStress using a small strain approximation and assuming an elastic material response. Thus, the strain 
+\begin{equation}
+  \boldsymbol{\epsilon} = \frac{1}{2} (\nabla \mathbf{u} + \nabla \mathbf{u}^T)
+\end{equation}
+is defined in computeQpStrain as 
+{\scriptsize \begin{verbatim}
+_elastic_strain[_qp] = (grad_tensor + grad_tensor.transpose())/2.0.
+\end{verbatim}}
+
+The stress $\boldsymbol{\sigma} = \boldsymbol{\mathcal{C}} \boldsymbol{\epsilon}$ is defined in computeQpStress as
+{\scriptsize \begin{verbatim}
+_stress[_qp] = _elasticity_tensor[_qp]*_elastic_strain[_qp].
+\end{verbatim}}
+To create new small strain constitutive models, a new material could be created that inherited from LinearElasticMaterial but that overrode computeQpStress.
+
+Finite strain mechanics is implemented in FiniteStrainMaterial following the approach from \citet{rashid1993}. The method used to prevent volumetric locking is taken from \citet{rashid_notes}. In order to implement the method to prevent volumetric locking, computeStrain is overridden in FiniteStrainMaterial to calculate the average incremental strain $\hat{\mathbf{F}}$ over each element. Within computeQpStrain, the corrected $\hat{\mathbf{F}}$ is used to calculate the incremental strain, incremental rotation and the strain rate $\mathbf{D}$. The function computeQpStrain is left pure virtual, such that any finite strain model implemented in MARMOT must override this function.
+
+In this formulation, the constitutive model is applied in an intermediate configuration with no rigid body rotation. Thus $\mathbf{F} = \mathbf{U}$. Once the stress has been calculated via the constitutive model, the stress is rotated into the current configuration using the incremental rotation $\hat{\mathbf{R}}$, i.e. 
+\begin{equation}
+  \mathbf{T} = \hat{\mathbf{R}} \mathbf{T}_i \mathbf{R}^T.
+\end{equation}
+This is demonstrated in FiniteStrainElasticMaterial:
+{\scriptsize \begin{verbatim}
+  _stress[_qp] = _stress_old[_qp] + _elasticity_tensor[_qp]*_strain_increment[_qp]; 
+  _stress[_qp] = _rotation_increment[_qp]*_stress[_qp]*_rotation_increment[_qp].transpose();
+\end{verbatim}}
+Therefore, any new finite strain constitutive model would override computeQpStress and, after calculating the stress, rotate it to the current configuration. This also means that within the constitutive model, there would be no spin $\mathbf{W}$, such that the velocity gradient $\mathbf{L} = \mathbf{D}$. If any state variables are tensor quantities, they must also be rotated into the current configuration after being updated.
+
+\subsection{Heat Transfer}
+Heat transport is impacted by microstructural features. For example, GBs, bubbles and voids all restrict the flow of heat. Therefore, it is often important to model the heat transport at the mesoscale. The heat transport is modeled using Fourier's law:
+
+\subsection{Nucleation}
+
+\subsection{Microstructure Reconstruction} \label{sec:microstructure_reconstruction}
+
+\section{Coupled Physics}
+
+\subsection{Grain Growth and Species Interaction}
+
+\subsection{Coupling Microstructure Evolution and Solid Mechanics}
+
+\subsection{Coupling Microstructure Evolution and Heat Conduction}
+
+\subsection{Effective Property Determination}
+
+\begin{appendices}
+\section{Useful Math}
+
+\subsection{Divergence Theorem}
+The divergence theorem states that the volume integral of the divergence of a vector field over a volume $V$ bounded by a surface $S$ is equal to the surface integral of the vector field projected on the outward facing normal of the surface $S$.
+\begin{equation}
+\int_\Omega \nabla F dV = \int_{\partial\Omega} F\cdot\mathbf{n}dS \label{eq:divtheo}
+\end{equation}
+
+\subsection{Product Rule}
+Product rule for the product of a scalar $a$ and a vector $\mathbf{b}$ is useful to reduce the derivative order on an expression in conjunction with the divergence theorem. 
+\begin{equation}
+\nabla (a\mathbf{b})= \nabla a \cdot \mathbf{b} + a \nabla\cdot\mathbf{b} \label{eq:prodrule}
+\end{equation}
+
+Shuffle the terms (and note that this is valid for a vector $\mathbf{a}$ and a scalar $b$ as well)
+\begin{eqnarray}
+-\nabla a \cdot \mathbf{b} & = &  a \nabla\cdot\mathbf{b} - \nabla (a\mathbf{b}) \label{eq:prodrule1} \\
+-\nabla \cdot \mathbf{a} b & = &  \mathbf{a}\cdot \nabla b - \nabla (\mathbf{a}b) \label{eq:prodrule2}
+\end{eqnarray}
+
+The right most term ($\nabla(\dots)$) can be transformed using the divergence theorem \eqref{eq:divtheo}. This can be used to effectively shift a derivative over to the test function when building a residual.
+
+\subsection{Fundamental Lemma of calculus of variations}
+The functional derivative in the Cahn-Hilliard equation can be calculated using this rule
+\begin{eqnarray}
+\frac{\delta F}{\delta c} = \frac{\partial f}{\partial c} - \nabla \cdot \frac{\partial f}{\partial\nabla c} \label{eq:vlemma}
+\end{eqnarray}
+\end{appendices}
+
+%
+\bibliographystyle{plainnat} 
+\bibliography{../manual/Microstructure}
+
+\end{document}

@@ -1,0 +1,8 @@
+[Tests]
+  [./randompointsource]
+    max_parallel = 1
+    type = 'Exodiff'
+    input = 'randompointsource.i'
+    exodiff = 'randompointsource_out.e'
+  [../]
+[]

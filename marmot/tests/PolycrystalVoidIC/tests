@@ -1,0 +1,7 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = 'grain_with_gb_pore.i'
+    exodiff = 'out.e'
+  [../]
+[]

@@ -1,0 +1,13 @@
+[Tests]
+  [./bicrystal_gen]
+    type = 'Exodiff'
+    input = 'bicrystal_generator.i'
+    exodiff = 'bicrystal_gen.e'
+  [../]
+  [./test]
+    type = 'Exodiff'
+    input = 'thermal_cond_test.i'
+    exodiff = 'thermal_cond_test_out.e'
+    prereq = 'bicrystal_gen'
+  [../]
+[]

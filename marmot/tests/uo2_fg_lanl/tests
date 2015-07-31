@@ -1,0 +1,12 @@
+[Tests]
+  [./uo2_fg_lanl]
+    type = 'Exodiff'
+    input = 'uo2_fg_lanl.i'
+    exodiff = 'uo2_fg_lanl_out.e'
+  [../]
+  [./uo2_fg_lanl_binary]
+    type = 'Exodiff'
+    input = 'uo2_fg_binary_lanl.i'
+    exodiff = 'uo2_fg_binary_lanl_out.e-s002'
+  [../]
+[]

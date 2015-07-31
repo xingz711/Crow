@@ -1,0 +1,16 @@
+[Tests]
+
+  [./discreteIC_test]
+    type = 'Exodiff'
+    input = 'GrGr_randomIC_discrete_test.i'
+    exodiff = 'discrete.e'
+    rel_err = 0.0001
+  [../]
+
+  [./continuousIC_test]
+    type = 'Exodiff'
+    input = 'GrGr_randomIC_continuous_test.i'
+    exodiff = 'continuous.e'
+    rel_err = 0.0001
+  [../]
+[]

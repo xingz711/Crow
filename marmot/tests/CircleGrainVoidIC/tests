@@ -1,0 +1,27 @@
+[Tests]
+  [./test]
+    type = 'Exodiff'
+    input = 'CircleGrainVoidIC_test.i'
+    exodiff = 'void_gb_circle.e'
+  [../]
+  [./variation_test]
+    type = 'Exodiff'
+    input = 'CircleGrainVoidIC_variation_test.i'
+    exodiff = 'void_gb_circle_var.e'
+  [../]
+  [./3Dcol_test]
+    type = 'Exodiff'
+    input = 'CircleGrainVoidIC_3Dcolumn_test.i'
+    exodiff = 'void_gb_circle_3Dcol.e'
+  [../]
+  [./3Dsph_test]
+    type = 'Exodiff'
+    input = 'CircleGrainVoidIC_3Dsphere_test.i'
+    exodiff = 'void_gb_circle_3Dsph.e'
+  [../]
+  [./seed_test]
+    type = 'Exodiff'
+    input = 'CircleGrainVoidIC_seed_test.i'
+    exodiff = 'void_gb_circle_seed.e'
+  [../]
+[]

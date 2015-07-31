@@ -1,0 +1,7 @@
+[Tests]
+  [./fecrchbulk]
+    type = 'Exodiff'
+    input = './fecrchbulk.i'
+    exodiff = './fecrchbulk_out.e'
+  [../]
+[]

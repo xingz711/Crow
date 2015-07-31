@@ -1,0 +1,13 @@
+[Tests]
+  [./bicrystal]
+    type = 'Exodiff'
+    input = 'bicrystal.i'
+    exodiff = 'bicrystal_out.e-s005'
+  [../]
+
+  [./thermal_expansion]
+    type = 'Exodiff'
+    input = 'thermal_expansion.i'
+    exodiff = 'thermal_expansion_out.e-s005'
+  [../]
+[]

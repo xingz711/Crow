@@ -1,0 +1,8 @@
+[Tests]
+  [./aniso_test]
+    type = 'Exodiff'
+    input = 'GasSegr_Aniso_test.i'
+    exodiff = 'aniso.e-s002'
+    group = 'adaptive'
+  [../]
+[]

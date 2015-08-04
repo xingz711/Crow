@@ -18,46 +18,62 @@
 []
 
 [Variables]
-  active = 'PolycrystalVariables c w'
   [./c]
   [../]
   [./w]
-  [../]
-  [./disp_x]
-    block = 0
-  [../]
-  [./disp_y]
-    block = 0
   [../]
   [./PolycrystalVariables]
   [../]
 []
 
 [AuxVariables]
-  active = 'bnds total_en'
+  # [./gr0]
+  # [../]
+  # [./gr1]
+  # [../]
+  # [./df0]
+  # order = CONSTANT
+  # family = MONOMIAL
+  # [../]
+  # [./df1]
+  # order = CONSTANT
+  # family = MONOMIAL
+  # [../]
   [./bnds]
   [../]
   [./total_en]
     order = CONSTANT
     family = MONOMIAL
   [../]
-  [./gr0]
-  [../]
-  [./gr1]
-  [../]
-  [./df0]
+  [./dF00]
     order = CONSTANT
     family = MONOMIAL
   [../]
-  [./df1]
+  [./dF01]
     order = CONSTANT
     family = MONOMIAL
   [../]
-  [./vadv0]
+  [./dF10]
     order = CONSTANT
     family = MONOMIAL
   [../]
-  [./vadv1]
+  [./dF11]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv00]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv01]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv10]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv11]
     order = CONSTANT
     family = MONOMIAL
   [../]
@@ -87,7 +103,6 @@
 []
 
 [Kernels]
-  active = 'PolycrystalSinteringKernel wres cres time'
   [./cres]
     type = SplitCHParsed
     variable = c
@@ -106,18 +121,6 @@
     variable = w
     v = c
   [../]
-  [./Elstc_gr0]
-    type = ACParsed
-    variable = gr0
-    f_name = E
-    args = 'c gr1'
-  [../]
-  [./Elstc_gr1]
-    type = ACParsed
-    variable = gr1
-    f_name = E
-    args = 'c gr0 '
-  [../]
   [./PolycrystalSinteringKernel]
     c = c
   [../]
@@ -125,13 +128,37 @@
     type = MultiGrainRigidBodyMotion
     variable = w
     c = c
-    advection_velocity = advection_velocity
-    advection_velocity_divergence = advection_velocity_divergence
+    v = 'gr0 gr1'
+  [../]
+  [./vadv_gr0]
+    type = SingleGrainRigidBodyMotion
+    variable = gr0
+    c = c
+    v = 'gr0 gr1'
+  [../]
+  [./vadv_gr1]
+    type = SingleGrainRigidBodyMotion
+    variable = gr1
+    c = c
+    v = 'gr0 gr1'
   [../]
 []
 
 [AuxKernels]
-  active = 'bnds Total_en'
+  # [./df0]
+  # type = MaterialStdVectorRealGradientAux
+  # variable = df0
+  # index = 0
+  # component = 1
+  # property = force_density
+  # [../]
+  # [./df1]
+  # type = MaterialStdVectorRealGradientAux
+  # variable = df1
+  # index = 1
+  # component = 1
+  # property = force_density
+  # [../]
   [./bnds]
     type = BndsCalcAux
     variable = bnds
@@ -143,32 +170,53 @@
     kappa_names = 'kappa_c kappa_op kappa_op'
     interfacial_vars = 'c  gr0 gr1'
   [../]
-  [./df0]
+  [./dF00]
     type = MaterialStdVectorRealGradientAux
-    variable = df0
-    index = 0
-    component = 1
+    variable = dF00
     property = force_density
   [../]
-  [./df1]
+  [./dF01]
     type = MaterialStdVectorRealGradientAux
-    variable = df1
-    index = 1
-    component = 1
+    variable = dF01
     property = force_density
-  [../]
-  [./vadv0]
-    type = MaterialStdVectorRealGradientAux
-    variable = vadv0
     component = 1
-    property = advection_velocity
   [../]
-  [./vadv1]
+  [./dF10]
     type = MaterialStdVectorRealGradientAux
-    variable = vadv1
+    variable = dF10
+    property = force_density
+    index = 1
+  [../]
+  [./dF11]
+    type = MaterialStdVectorRealGradientAux
+    variable = dF11
+    property = force_density
     index = 1
     component = 1
+  [../]
+  [./vadv00]
+    type = MaterialStdVectorRealGradientAux
+    variable = vadv00
     property = advection_velocity
+  [../]
+  [./vadv01]
+    type = MaterialStdVectorRealGradientAux
+    variable = vadv01
+    property = advection_velocity
+    component = 1
+  [../]
+  [./vadv10]
+    type = MaterialStdVectorRealGradientAux
+    variable = vadv10
+    property = advection_velocity
+    index = 1
+  [../]
+  [./vadv11]
+    type = MaterialStdVectorRealGradientAux
+    variable = vadv11
+    property = advection_velocity
+    index = 1
+    component = 1
   [../]
   [./vadv_div0]
     type = MaterialStdVectorAux
@@ -184,7 +232,7 @@
 []
 
 [Materials]
-  active = 'constant_mat CH_mat free_energy'
+  active = 'constant_mat CH_mat vadv force_density free_energy'
   [./free_energy]
     type = SinteringFreeEnergy
     block = 0
@@ -206,6 +254,7 @@
     block = 0
     c = c
     etas = 'gr0 gr1'
+    cgb = 0.14
   [../]
   [./vadv]
     type = GrainAdvectionVelocity
@@ -241,6 +290,35 @@
   [../]
 []
 
+[VectorPostprocessors]
+  [./centers]
+    type = GrainCentersPostprocessor
+    grain_data = grain_center
+  [../]
+  [./forces]
+    type = GrainForcesPostprocessor
+    grain_force = grain_force
+  [../]
+[]
+
+[UserObjects]
+  [./grain_center]
+    type = ComputeGrainCenterUserObject
+    etas = 'gr0 gr1'
+    execute_on = 'initial linear'
+  [../]
+  [./grain_force]
+    type = ComputeGrainForceAndTorque
+    grain_data = grain_center
+  [../]
+  #[./grain_force_const]
+  #  type = ConstantGrainForceAndTorque
+  #  execute_on = 'initial linear'
+  #  torque = '0.0 0.0 5.0 0.0 0.0 5.0'
+  #  force = '0.2 0.3 0.0 -0.2 -0.3 0.0'
+  #[../]
+[]
+
 [Postprocessors]
   active = 'elem_c elem_bnds bnds_avg'
   [./mat_D]
@@ -268,16 +346,13 @@
   solve_type = PJFNK
   petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
   petsc_options_value = 'asm         31   preonly   lu      1'
-  l_max_its = 30
+  l_max_its = 20
+  nl_max_its = 20
   l_tol = 1.0e-3
   nl_rel_tol = 1.0e-10
   dt = 0.01
   num_steps = 10000
   end_time = 60
-  [./TimeStepper]
-    type = IterationAdaptiveDT
-    dt = 0.01
-  [../]
   [./Adaptivity]
     refine_fraction = 0.7
     coarsen_fraction = 0.1
@@ -290,7 +365,6 @@
   exodus = true
   output_on = 'initial timestep_end'
   print_linear_residuals = true
-  csv = true
   [./console]
     type = Console
     perf_log = true

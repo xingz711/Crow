@@ -74,7 +74,7 @@
 [Functions]
   [./load]
     type = PiecewiseLinear
-    y = '0.0 -1.5 -1.5 0.0'
+    y = '0.0 -1.5 -1.5 -1.5'
     x = '0.0 30.0 45.0 60.0'
   [../]
   [./temp]
@@ -120,11 +120,9 @@
   [../]
   [./PolycrystalSinteringKernel]
     c = c
-    v = 'gr0 gr1 '
   [../]
   [./TensorMechanics]
-    disp_y = disp_y
-    disp_x = disp_x
+    displacements = 'disp_x disp_y'
   [../]
   [./Elstc_gr0]
     type = ACParsed
@@ -265,8 +263,8 @@
   [./AC_mat]
     type = GenericConstantMaterial
     block = 0
-    prop_names = 'L kappa_op'
-    prop_values = '1.0 0.5'
+    prop_names = 'L kappa_op A B'
+    prop_values = '1.0 0.5 16.0 1.0'
   [../]
   [./temp]
     type = DerivativeParsedMaterial
@@ -280,7 +278,6 @@
     tol_values = 1e-3
     tol_names = c
     derivative_order = 2
-    outputs = console
   [../]
   [./sum]
     type = DerivativeSumMaterial
@@ -288,7 +285,6 @@
     sum_materials = 'S Ft E'
     args = 'c gr0 gr1'
     derivative_order = 2
-    outputs = console
   [../]
   [./Eigen]
     type = PFEigenStrainMaterial1
@@ -310,7 +306,6 @@
     f_name = E
     args = 'c gr0 gr1 '
     derivative_order = 2
-    outputs = console
   [../]
   [./ElasticityTensor]
     type = ComputeConcentrationDependentElasticityTensor
@@ -324,8 +319,7 @@
   [./strain]
     type = ComputeSmallStrain
     block = 0
-    disp_y = disp_y
-    disp_x = disp_x
+    displacements = 'disp_x disp_y'
   [../]
   [./stress]
     type = ComputeLinearElasticStress
@@ -414,22 +408,25 @@
 []
 
 [ICs]
-  active = 'PolycrystalICs multip'
-  [./PolycrystalICs]
-    [./MultiSmoothParticleIC]
-      x_positions = '15.0 15.0 '
-      z_positions = '0 0'
-      radii = '7.0 7.0 '
-      y_positions = '0.0 15.0 '
-      int_width = 2.0
-    [../]
+  [./ic_gr0]
+    int_width = 2.0
+    x1 = 15.0
+    y1 = 0.0
+    radius = 7.0
+    outvalue = 0.0
+    variable = gr0
+    invalue = 1.0
+    type = SmoothCircleIC
   [../]
-  [./2p_dens]
-    radius = '5.0 5.0 '
-    variable = c
-    type = TwoParticleDensityIC
-    block = 0
-    tol = 1e-3
+  [./IC_gr1]
+    int_width = 2.0
+    x1 = 15.0
+    y1 = 15.0
+    radius = 7.0
+    outvalue = 0.0
+    variable = gr1
+    invalue = 1.0
+    type = SmoothCircleIC
   [../]
   [./multip]
     x_positions = '15.0 15.0'

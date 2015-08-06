@@ -6,13 +6,13 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 60
-  ny = 30
+  nx = 80
+  ny = 40
   nz = 0
   xmin = 0.0
-  xmax = 30.0
+  xmax = 40.0
   ymin = 0.0
-  ymax = 15
+  ymax = 20
   zmax = 0
   elem_type = QUAD4
 []
@@ -26,26 +26,14 @@
   [../]
 []
 
-[Functions]
-  [./load]
-    type = ConstantFunction
-    value = -0.005
-  [../]
-[]
+#[Functions]
+#  [./load]
+#    type = ConstantFunction
+#    value = -0.005
+#  [../]
+#[]
 
 [AuxVariables]
-  # [./gr0]
-  # [../]
-  # [./gr1]
-  # [../]
-  # [./df0]
-  # order = CONSTANT
-  # family = MONOMIAL
-  # [../]
-  # [./df1]
-  # order = CONSTANT
-  # family = MONOMIAL
-  # [../]
   [./bnds]
   [../]
   [./total_en]
@@ -89,6 +77,30 @@
     family = MONOMIAL
   [../]
   [./vadv_div1]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  #[./dF01_ext]
+  #  order = CONSTANT
+  #  family = MONOMIAL
+  #[../]
+  #[./dF11_ext]
+  #  order = CONSTANT
+  #  family = MONOMIAL
+  #[../]
+  [./vadv01_ext]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv11_ext]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv_div0_ext]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv_div1_ext]
     order = CONSTANT
     family = MONOMIAL
   [../]
@@ -148,24 +160,33 @@
     variable = gr1
     c = c
     v = 'gr0 gr1'
+    op_index = 1
+  [../]
+  [./motion_ext]
+    type = MultiGrainRigidBodyMotion
+    variable = w
+    c = c
+    v = 'gr0 gr1'
+    force_type = ext
+  [../]
+  [./vadv_ext_gr0]
+    type = SingleGrainRigidBodyMotion
+    variable = gr0
+    c = c
+    v = 'gr0 gr1'
+    force_type = ext
+  [../]
+  [./vadv_ext_gr1]
+    type = SingleGrainRigidBodyMotion
+    variable = gr1
+    c = c
+    op_index = 1
+    v = 'gr0 gr1'
+    force_type = ext
   [../]
 []
 
 [AuxKernels]
-  # [./df0]
-  # type = MaterialStdVectorRealGradientAux
-  # variable = df0
-  # index = 0
-  # component = 1
-  # property = force_density
-  # [../]
-  # [./df1]
-  # type = MaterialStdVectorRealGradientAux
-  # variable = df1
-  # index = 1
-  # component = 1
-  # property = force_density
-  # [../]
   [./bnds]
     type = BndsCalcAux
     variable = bnds
@@ -236,10 +257,47 @@
     index = 1
     property = advection_velocity_divergence
   [../]
+  #[./dF01_ext]
+  #  type = MaterialStdVectorRealGradientAux
+  #  variable = dF01_ext
+  #  property = force_density_ext
+  #  component = 0
+  #[../]
+  #[./dF11_ext]
+  #  type = MaterialStdVectorRealGradientAux
+  #  variable = dF11_ext
+  #  property = force_density_ext
+  #  index = 1
+  #  component = 0
+  #[../]
+  [./vadv01_ext]
+    type = MaterialStdVectorRealGradientAux
+    variable = vadv01_ext
+    property = ext_advection_velocity
+    component = 0
+  [../]
+  [./vadv11_ext]
+    type = MaterialStdVectorRealGradientAux
+    variable = vadv11_ext
+    property = ext_advection_velocity
+    index = 1
+    component = 0
+  [../]
+  [./vadv_div0_ext]
+    type = MaterialStdVectorAux
+    variable = vadv_div0_ext
+    property = ext_advection_velocity_divergence
+  [../]
+  [./vadv_div1_ext]
+    type = MaterialStdVectorAux
+    variable = vadv_div1
+    index = 1
+    property = ext_advection_velocity_divergence
+  [../]
 []
 
 [Materials]
-  active = 'constant_mat CH_mat force_density_ext vadv force_density free_energy'
+  active = 'constant_mat CH_mat vadv force_density free_energy vadv_ext'
   [./free_energy]
     type = SinteringFreeEnergy
     block = 0
@@ -262,6 +320,7 @@
     c = c
     etas = 'gr0 gr1'
     cgb = 0.14
+    k = 10
   [../]
   [./force_density_ext]
     type = ExternalForceDensityMaterial
@@ -281,9 +340,10 @@
   [./vadv_ext]
     type = GrainAdvectionVelocity
     block = 0
-    grain_force = grain_force_ext
+    grain_force = grain_force_const
     etas = 'gr0 gr1'
     grain_data = grain_center
+    force_type = ext
   [../]
   [./constant_mat]
     type = GenericConstantMaterial
@@ -323,17 +383,17 @@
   [../]
   [./forces_ext]
     type = GrainForcesPostprocessor
-    grain_force = grain_force_ext
+    grain_force = grain_force_const
   [../]
 []
 
 [UserObjects]
-  # [./grain_force_const]
-  # type = ConstantGrainForceAndTorque
-  # execute_on = 'initial linear'
-  # torque = '0.0 0.0 5.0 0.0 0.0 5.0'
-  # force = '0.2 0.3 0.0 -0.2 -0.3 0.0'
-  # [../]
+   [./grain_force_const]
+   type = ConstantGrainForceAndTorque
+   execute_on = 'initial linear'
+   torque = '0.0 0.0 5.0 0.0 0.0 5.0'
+   force =  '0.2 0.0 0.0 0.0 0.0 0.0'
+   [../]
   [./grain_center]
     type = ComputeGrainCenterUserObject
     etas = 'gr0 gr1'
@@ -342,14 +402,15 @@
   [./grain_force]
     type = ComputeGrainForceAndTorque
     grain_data = grain_center
-  [../]
-  [./grain_force_ext]
-    type = ComputeGrainForceAndTorque
     execute_on = 'initial linear'
-    grain_data = grain_center
-    force_density = force_density_ext
-    force_density_derivative = dFdc_ext
   [../]
+  #[./grain_force_ext]
+  #  type = ComputeGrainForceAndTorque
+  #  execute_on = 'initial linear'
+  #  grain_data = grain_center
+  #  force_density = force_density_ext
+  #  force_density_derivative = dFdc_ext
+  #[../]
 []
 
 [Postprocessors]
@@ -399,7 +460,6 @@
   output_on = 'initial timestep_end'
   print_linear_residuals = true
   csv = true
-  file_base = dens_ext
   [./console]
     type = Console
     perf_log = true
@@ -410,20 +470,20 @@
 [ICs]
   [./ic_gr1]
     int_width = 2.0
-    x1 = 15.0
-    y1 = 15.0
-    radius = 7.5
+    x1 = 30.0
+    y1 = 10.0
+    radius = 7.0
     outvalue = 0.0
     variable = gr1
     invalue = 1.0
     type = SmoothCircleIC
   [../]
   [./multip]
-    x_positions = '15.0 15.0'
+    x_positions = '10.0 30.0'
     int_width = 2.0
     z_positions = '0 0'
-    y_positions = '0.0 15.0 '
-    radii = '7.5 7.5'
+    y_positions = '10.0 10.0 '
+    radii = '7.0 7.0'
     3D_spheres = false
     outvalue = 0.001
     variable = c
@@ -433,9 +493,9 @@
   [../]
   [./ic_gr0]
     int_width = 2.0
-    x1 = 15.0
-    y1 = 0.0
-    radius = 7.5
+    x1 = 10.0
+    y1 = 10.0
+    radius = 7.0
     outvalue = 0.0
     variable = gr0
     invalue = 1.0
@@ -446,4 +506,3 @@
 [Debug]
   show_var_residual_norms = true
 []
-

@@ -34,18 +34,6 @@
 []
 
 [AuxVariables]
-  # [./gr0]
-  # [../]
-  # [./gr1]
-  # [../]
-  # [./df0]
-  # order = CONSTANT
-  # family = MONOMIAL
-  # [../]
-  # [./df1]
-  # order = CONSTANT
-  # family = MONOMIAL
-  # [../]
   [./bnds]
   [../]
   [./total_en]
@@ -89,6 +77,30 @@
     family = MONOMIAL
   [../]
   [./vadv_div1]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./dF01_ext]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./dF11_ext]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv01_ext]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv11_ext]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv_div0_ext]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv_div1_ext]
     order = CONSTANT
     family = MONOMIAL
   [../]
@@ -148,24 +160,33 @@
     variable = gr1
     c = c
     v = 'gr0 gr1'
+    op_index = 1
+  [../]
+  [./motion_ext]
+    type = MultiGrainRigidBodyMotion
+    variable = w
+    c = c
+    v = 'gr0 gr1'
+    force_type = ext
+  [../]
+  [./vadv_ext_gr0]
+    type = SingleGrainRigidBodyMotion
+    variable = gr0
+    c = c
+    v = 'gr0 gr1'
+    force_type = ext
+  [../]
+  [./vadv_ext_gr1]
+    type = SingleGrainRigidBodyMotion
+    variable = gr1
+    c = c
+    op_index = 1
+    v = 'gr0 gr1'
+    force_type = ext
   [../]
 []
 
 [AuxKernels]
-  # [./df0]
-  # type = MaterialStdVectorRealGradientAux
-  # variable = df0
-  # index = 0
-  # component = 1
-  # property = force_density
-  # [../]
-  # [./df1]
-  # type = MaterialStdVectorRealGradientAux
-  # variable = df1
-  # index = 1
-  # component = 1
-  # property = force_density
-  # [../]
   [./bnds]
     type = BndsCalcAux
     variable = bnds
@@ -236,10 +257,47 @@
     index = 1
     property = advection_velocity_divergence
   [../]
+  [./dF01_ext]
+    type = MaterialStdVectorRealGradientAux
+    variable = dF01_ext
+    property = force_density_ext
+    component = 1
+  [../]
+  [./dF11_ext]
+    type = MaterialStdVectorRealGradientAux
+    variable = dF11_ext
+    property = force_density_ext
+    index = 1
+    component = 1
+  [../]
+  [./vadv01_ext]
+    type = MaterialStdVectorRealGradientAux
+    variable = vadv01_ext
+    property = ext_advection_velocity
+    component = 1
+  [../]
+  [./vadv11_ext]
+    type = MaterialStdVectorRealGradientAux
+    variable = vadv11_ext
+    property = ext_advection_velocity
+    index = 1
+    component = 1
+  [../]
+  [./vadv_div0_ext]
+    type = MaterialStdVectorAux
+    variable = vadv_div0_ext
+    property = ext_advection_velocity_divergence
+  [../]
+  [./vadv_div1_ext]
+    type = MaterialStdVectorAux
+    variable = vadv_div1
+    index = 1
+    property = ext_advection_velocity_divergence
+  [../]
 []
 
 [Materials]
-  active = 'constant_mat CH_mat force_density_ext vadv force_density free_energy'
+  active = 'constant_mat CH_mat force_density_ext vadv force_density free_energy vadv_ext'
   [./free_energy]
     type = SinteringFreeEnergy
     block = 0
@@ -262,6 +320,7 @@
     c = c
     etas = 'gr0 gr1'
     cgb = 0.14
+    k = 10
   [../]
   [./force_density_ext]
     type = ExternalForceDensityMaterial
@@ -284,6 +343,14 @@
     grain_force = grain_force_ext
     etas = 'gr0 gr1'
     grain_data = grain_center
+  [../]
+  [./vadv_ext]
+    type = GrainAdvectionVelocity
+    block = 0
+    grain_force = grain_force_ext
+    etas = 'gr0 gr1'
+    grain_data = grain_center
+    force_type = ext
   [../]
   [./constant_mat]
     type = GenericConstantMaterial
@@ -446,4 +513,3 @@
 [Debug]
   show_var_residual_norms = true
 []
-

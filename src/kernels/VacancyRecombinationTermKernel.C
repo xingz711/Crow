@@ -13,8 +13,8 @@ InputParameters validParams<VacancyRecombinationTermKernel>()
   return params;
 }
 
-VacancyRecombinationTermKernel::VacancyRecombinationTermKernel(const std::string & name, InputParameters parameters) :
-    Kernel(name,parameters),
+VacancyRecombinationTermKernel::VacancyRecombinationTermKernel(const InputParameters & parameters) :
+    Kernel(parameters),
     _eta(coupledValue("eta")),
     _ci(coupledValue("ci")),
     _Rbulk(getParam<Real>("Rbulk")),

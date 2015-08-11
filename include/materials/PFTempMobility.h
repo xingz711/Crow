@@ -12,8 +12,7 @@ InputParameters validParams<PFTempMobility>();
 class PFTempMobility : public Material
 {
 public:
-  PFTempMobility(const std::string & name,
-             InputParameters parameters);
+  PFTempMobility(const InputParameters & parameters);
 
 protected:
   virtual void computeQpProperties();

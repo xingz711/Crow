@@ -17,7 +17,7 @@ InputParameters validParams<VacancyRecombinationTermKernel>();
 class VacancyRecombinationTermKernel : public Kernel
 {
 public:
-  VacancyRecombinationTermKernel(const std::string & name, InputParameters parameters);
+  VacancyRecombinationTermKernel(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();

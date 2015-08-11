@@ -13,8 +13,8 @@ InputParameters validParams<VacancySourceTermKernel>()
   return params;
 }
 
-VacancySourceTermKernel::VacancySourceTermKernel(const std::string & name, InputParameters parameters) :
-    Kernel(name, parameters),
+VacancySourceTermKernel::VacancySourceTermKernel(const InputParameters & parameters) :
+    Kernel(parameters),
     _eta(coupledValue("eta")),
     //_R1(coupledValue("R1")),
     //_R2(coupledValue("R2")),

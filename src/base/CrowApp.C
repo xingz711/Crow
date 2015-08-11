@@ -56,10 +56,9 @@ InputParameters validParams<CrowApp>()
   return params;
 }
 
-CrowApp::CrowApp(const std::string & name, InputParameters parameters) :
-    MooseApp(name, parameters)
+CrowApp::CrowApp(InputParameters parameters) :
+    MooseApp(parameters)
 {
-  srand(processor_id());
 
    Moose::registerObjects(_factory);
 //  ModulesApp::registerObjects(_factory);

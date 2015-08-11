@@ -25,7 +25,7 @@ InputParameters validParams<RandomNumberGeneration>();
 class RandomNumberGeneration : public Function
 {
 public:
-  RandomNumberGeneration(const std::string & name, InputParameters parameters);
+  RandomNumberGeneration(const InputParameters & parameters);
   virtual ~RandomNumberGeneration();
 
   virtual Real value(Real /*t*/, const Point & /*p*/);

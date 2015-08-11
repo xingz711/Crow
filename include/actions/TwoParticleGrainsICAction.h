@@ -10,7 +10,7 @@
 class TwoParticleGrainsICAction: public Action
 {
 public:
-  TwoParticleGrainsICAction(const std::string & name, InputParameters params);
+  TwoParticleGrainsICAction(InputParameters params);
 
   virtual void act();
 

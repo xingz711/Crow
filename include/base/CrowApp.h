@@ -11,7 +11,7 @@ InputParameters validParams<CrowApp>();
 class CrowApp : public MooseApp
 {
 public:
-  CrowApp(const std::string & name, InputParameters parameters);
+  CrowApp(InputParameters parameters);
   virtual ~CrowApp();
 
   static void registerApps();

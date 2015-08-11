@@ -14,7 +14,7 @@
 class PFEigenStrainBaseMaterial : public DerivativeMaterialInterface<LinearElasticMaterial>
 {
 public:
-  PFEigenStrainBaseMaterial(const std:: string & name, InputParameters parameters);
+  PFEigenStrainBaseMaterial(const InputParameters & parameters);
 
 protected:
   virtual void computeEigenStrain() = 0;

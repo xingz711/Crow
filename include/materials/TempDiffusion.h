@@ -12,8 +12,7 @@ InputParameters validParams<TempDiffusion>();
 class TempDiffusion : public Material
 {
 public:
-  TempDiffusion(const std::string & name,
-             InputParameters parameters);
+  TempDiffusion(const InputParameters & parameters);
 
 protected:
   virtual void computeQpProperties();

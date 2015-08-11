@@ -13,9 +13,8 @@ InputParameters validParams<LangevinNoiseVoid>()
   params.addParam<Real>("max", 1.0, "Upper bound of the randomly generated values");
   return params;
 }
-LangevinNoiseVoid::LangevinNoiseVoid(const std::string & name,
-                             InputParameters parameters) :
-    Kernel(name, parameters),
+LangevinNoiseVoid::LangevinNoiseVoid(const InputParameters & parameters) :
+    Kernel(parameters),
     _amplitude(getParam<Real>("amplitude")),
     _Pcasc(getParam<Real>("Pcasc")),
     _multiplier_prop(parameters.isParamValid("multiplier") ? &getMaterialProperty<Real>(getParam<std::string>("multiplier")) : NULL),

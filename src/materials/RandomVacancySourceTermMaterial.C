@@ -13,8 +13,8 @@ InputParameters validParams<RandomVacancySourceTermMaterial>()
   return params;
 }
 
-RandomVacancySourceTermMaterial::RandomVacancySourceTermMaterial(const std::string & name, InputParameters parameters) :
-    Material(name, parameters),
+RandomVacancySourceTermMaterial::RandomVacancySourceTermMaterial(const InputParameters & parameters) :
+    Material(parameters),
     _min(getParam<Real>("min")),
     _max(getParam<Real>("max")),
     _range(_max - _min),

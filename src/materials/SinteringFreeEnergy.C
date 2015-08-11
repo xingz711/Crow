@@ -18,9 +18,8 @@ InputParameters validParams<SinteringFreeEnergy>()
   return params;
 }
 
-SinteringFreeEnergy::SinteringFreeEnergy(const std::string & name,
-                       InputParameters parameters) :
-    DerivativeFunctionMaterialBase(name, parameters),
+SinteringFreeEnergy::SinteringFreeEnergy(const InputParameters & parameters) :
+    DerivativeFunctionMaterialBase(parameters),
     _c(coupledValue("c")),
     _c_var(coupled("c"))
    // _kbT(getParam<Real>("kbT")),

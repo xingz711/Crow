@@ -31,7 +31,7 @@ InputParameters validParams<RandomVoidSourceAux>();
 class RandomVoidSourceAux : public AuxKernel
 {
 public:
-  RandomVoidSourceAux(const std::string & name, InputParameters params);
+  RandomVoidSourceAux(const InputParameters & params);
 
   virtual ~RandomVoidSourceAux();
 

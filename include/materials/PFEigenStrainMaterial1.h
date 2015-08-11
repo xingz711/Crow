@@ -13,7 +13,7 @@
 class PFEigenStrainMaterial1 : public EigenStrainBaseMaterial
 {
 public:
-  PFEigenStrainMaterial1(const std:: string & name, InputParameters parameters);
+  PFEigenStrainMaterial1(const InputParameters & parameters);
 
 protected:
   virtual void computeEigenStrain();

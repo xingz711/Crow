@@ -16,7 +16,7 @@
 class MultiSmoothParticleICAction: public Action
 {
 public:
-  MultiSmoothParticleICAction(const std::string & name, InputParameters params);
+  MultiSmoothParticleICAction(InputParameters params);
 
   virtual void act();
 

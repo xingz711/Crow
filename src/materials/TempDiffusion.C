@@ -12,9 +12,8 @@ InputParameters validParams<TempDiffusion>()
   return params;
 }
 
-TempDiffusion::TempDiffusion(const std::string & name,
-                       InputParameters parameters) :
-    Material(name, parameters),
+TempDiffusion::TempDiffusion(const InputParameters & parameters) :
+    Material(parameters),
     _Dv(getParam<Real>("Dv")),
     _kb(getParam<Real>("kb")),
     _T(getParam<Real>("T")),

@@ -17,7 +17,7 @@ InputParameters validParams<ACSinteringGrowth>();
 class ACSinteringGrowth : public ACBulk
 {
 public:
-  ACSinteringGrowth(const std::string & name, InputParameters parameters);
+  ACSinteringGrowth(const InputParameters & parameters);
 
 protected:
   virtual Real computeDFDOP(PFFunctionType type);

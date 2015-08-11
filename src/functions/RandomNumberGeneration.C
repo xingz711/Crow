@@ -27,8 +27,8 @@ InputParameters validParams<RandomNumberGeneration>()
   return params;
 }
 
-RandomNumberGeneration::RandomNumberGeneration(const std::string & name, InputParameters parameters) :
-  Function(name, parameters),
+RandomNumberGeneration::RandomNumberGeneration(const InputParameters & parameters) :
+  Function(parameters),
     _min(getParam<Real>("min")),
     _max(getParam<Real>("max")),
     _range(_max - _min)

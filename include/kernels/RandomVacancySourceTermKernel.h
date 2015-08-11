@@ -14,7 +14,7 @@ InputParameters validParams<RandomVacancySourceTermKernel>();
 class RandomVacancySourceTermKernel : public Kernel
 {
 public:
-  RandomVacancySourceTermKernel(const std::string & name, InputParameters parameters);
+  RandomVacancySourceTermKernel(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();

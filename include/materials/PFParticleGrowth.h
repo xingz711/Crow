@@ -12,8 +12,7 @@ InputParameters validParams<PFParticleGrowth>();
 class PFParticleGrowth : public Material
 {
 public:
-  PFParticleGrowth(const std::string & name,
-             InputParameters parameters);
+  PFParticleGrowth(const InputParameters & parameters);
 
 protected:
   virtual void computeQpProperties();

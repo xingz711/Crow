@@ -11,9 +11,8 @@ InputParameters validParams<PFParticleGrowth>()
   return params;
 }
 
-PFParticleGrowth::PFParticleGrowth(const std::string & name,
-                       InputParameters parameters) :
-    Material(name, parameters),
+PFParticleGrowth::PFParticleGrowth(const InputParameters & parameters) :
+    Material(parameters),
     _beta(getParam<Real>("beta")),
     _l(getParam<Real>("L")),
       

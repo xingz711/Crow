@@ -33,8 +33,7 @@ public:
    * @param parameters The parameters object holding data for the class to use.
    * @param var_name The variable this InitialCondtion is supposed to provide values for.
    */
-  MultiSmoothParticleIC(const std::string & name,
-                      InputParameters parameters);
+  MultiSmoothParticleIC(const InputParameters & parameters);
 
   virtual void initialSetup();
 

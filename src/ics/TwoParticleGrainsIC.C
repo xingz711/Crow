@@ -12,9 +12,8 @@ InputParameters validParams<TwoParticleGrainsIC>()
   return params;
 }
 
-TwoParticleGrainsIC::TwoParticleGrainsIC(const std::string & name,
-                                                     InputParameters parameters) :
-    InitialCondition(name, parameters),
+TwoParticleGrainsIC::TwoParticleGrainsIC(const InputParameters & parameters) :
+    InitialCondition(parameters),
     _mesh(_fe_problem.mesh()),
     _nl(_fe_problem.getNonlinearSystem()),
     _op_num(getParam<unsigned int>("op_num")),

@@ -17,7 +17,7 @@ InputParameters validParams<VacancyAnnihilationKernel>();
 class VacancyAnnihilationKernel : public Kernel
 {
 public:
-  VacancyAnnihilationKernel(const std::string & name, InputParameters parameters);
+  VacancyAnnihilationKernel(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();

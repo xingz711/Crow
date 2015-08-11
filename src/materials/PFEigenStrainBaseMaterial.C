@@ -9,9 +9,8 @@ InputParameters validParams<PFEigenStrainBaseMaterial>()
   return params;
 }
 
-PFEigenStrainBaseMaterial::PFEigenStrainBaseMaterial(const std::string & name,
-                                                 InputParameters parameters) :
-    DerivativeMaterialInterface<LinearElasticMaterial>(name, parameters),
+PFEigenStrainBaseMaterial::PFEigenStrainBaseMaterial(const InputParameters & parameters) :
+    DerivativeMaterialInterface<LinearElasticMaterial>(parameters),
 
     _c(coupledValue("c")),
     _c_name(getVar("c", 0)->name()),

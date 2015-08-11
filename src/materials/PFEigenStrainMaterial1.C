@@ -13,9 +13,8 @@ InputParameters validParams<PFEigenStrainMaterial1>()
   return params;
 }
 
-PFEigenStrainMaterial1::PFEigenStrainMaterial1(const std::string & name,
-                                                 InputParameters parameters) :
-    EigenStrainBaseMaterial(name, parameters),
+PFEigenStrainMaterial1::PFEigenStrainMaterial1(const InputParameters & parameters) :
+    EigenStrainBaseMaterial(parameters),
     _e_v(getParam<Real>("e_v")),
     _epsilon0(getParam<Real>("epsilon0")),
     _c0(getParam<Real>("c0"))

@@ -15,8 +15,8 @@ InputParameters validParams<RigidBodyMotionKernel>()
   return params;
 }
 
-RigidBodyMotionKernel::RigidBodyMotionKernel(const std::string & name, InputParameters parameters) :
-    KernelGrad(name,parameters),
+RigidBodyMotionKernel::RigidBodyMotionKernel(const InputParameters & parameters) :
+    KernelGrad(parameters),
     _k_name(getParam<std::string>("k")),
     _k(getMaterialProperty<Real>(_k_name)),
     _ceq(getParam<Real>("ceq")),

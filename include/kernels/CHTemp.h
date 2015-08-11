@@ -14,7 +14,7 @@ InputParameters validParams<CHTemp>();
 class CHTemp : public CHBulk
 {
 public:
-  CHTemp(const std::string & name, InputParameters parameters);
+  CHTemp(const InputParameters & parameters);
 
 protected:
   virtual RealGradient computeGradDFDCons(PFFunctionType type);

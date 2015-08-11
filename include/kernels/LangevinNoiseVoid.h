@@ -12,7 +12,7 @@ InputParameters validParams<LangevinNoiseVoid>();
 class LangevinNoiseVoid : public Kernel
 {
 public:
-  LangevinNoiseVoid(const std::string & name, InputParameters parameters);
+  LangevinNoiseVoid(const InputParameters & parameters);
 
 protected:
   virtual void residualSetup();

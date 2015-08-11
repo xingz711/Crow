@@ -16,9 +16,8 @@ InputParameters validParams<PFTempMobility>()
   return params;
 }
 
-PFTempMobility::PFTempMobility(const std::string & name,
-                       InputParameters parameters) :
-    Material(name, parameters),
+PFTempMobility::PFTempMobility(const InputParameters & parameters) :
+    Material(parameters),
     _Da(getParam<Real>("Da")),
     _Db(getParam<Real>("Db")),
     _R(getParam<Real>("R")),

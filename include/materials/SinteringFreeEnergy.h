@@ -22,8 +22,7 @@ InputParameters validParams<SinteringFreeEnergy>();
 class SinteringFreeEnergy : public DerivativeFunctionMaterialBase
 {
 public:
-  SinteringFreeEnergy(const std::string & name,
-             InputParameters parameters);
+  SinteringFreeEnergy(const InputParameters & parameters);
 
 protected:
   virtual Real computeF();

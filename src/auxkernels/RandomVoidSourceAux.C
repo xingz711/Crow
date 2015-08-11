@@ -25,8 +25,8 @@ InputParameters validParams<RandomVoidSourceAux>()
   return params;
 }
 
-RandomVoidSourceAux::RandomVoidSourceAux(const std::string & name, InputParameters params) :
-    AuxKernel(name, params),
+RandomVoidSourceAux::RandomVoidSourceAux(const InputParameters & params) :
+    AuxKernel(params),
     _random_uo(params.isParamValid("random_user_object") ? &getUserObject<ConservedNoiseInterface>("random_user_object") : NULL)
     //_generate_ints(getParam<bool>("generate_integers"))
 {

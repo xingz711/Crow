@@ -17,9 +17,8 @@ InputParameters validParams<PFDiffusionGrowthConst>()
   return params;
 }
 
-PFDiffusionGrowthConst::PFDiffusionGrowthConst(const std::string & name,
-                       InputParameters parameters) :
-    Material(name, parameters),
+PFDiffusionGrowthConst::PFDiffusionGrowthConst(const InputParameters & parameters) :
+    Material(parameters),
     _Dvol(getParam<Real>("Dvol")),
     _Dvap(getParam<Real>("Dvap")),
     _Dsurf(getParam<Real>("Dsurf")),

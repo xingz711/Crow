@@ -13,7 +13,7 @@ template<class T>
 class ConservedUniformVoidSourceVeneer : public T
 {
 public:
-  ConservedUniformVoidSourceVeneer(const std::string & name, InputParameters parameters);
+  ConservedUniformVoidSourceVeneer(const InputParameters & parameters);
 
 protected:
   Real getQpRandom();
@@ -21,7 +21,7 @@ protected:
 
 
 template<class T>
-ConservedUniformVoidSourceVeneer<T>::ConservedUniformVoidSourceVeneer(const std::string & name, InputParameters parameters) :
+ConservedUniformVoidSourceVeneer<T>::ConservedUniformVoidSourceVeneer(const InputParameters & parameters) :
     T(name, parameters)
 {
 }

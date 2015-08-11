@@ -17,7 +17,7 @@ InputParameters validParams<ACParticleGrowth>();
 class ACParticleGrowth : public ACBulk
 {
 public:
-  ACParticleGrowth(const std::string & name, InputParameters parameters);
+  ACParticleGrowth(const InputParameters & parameters);
 
 protected:
   virtual Real computeDFDOP(PFFunctionType type);

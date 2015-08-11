@@ -10,9 +10,8 @@ InputParameters validParams<PFElasticEnergyAux>()
   return params;
 }
 
-PFElasticEnergyAux::PFElasticEnergyAux( const std::string & name,
-                      InputParameters parameters )
-  :AuxKernel( name, parameters ),
+PFElasticEnergyAux::PFElasticEnergyAux(const InputParameters & parameters)
+  :AuxKernel(parameters),
    _stress( getMaterialProperty<SymmTensor>("stress") ),
    _elastic_strain(getMaterialProperty<SymmTensor>("elastic_strain"))
    //_applied_stress_vector(getParam<std::vector<Real> >("applied_stress_vector")),

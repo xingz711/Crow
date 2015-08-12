@@ -177,16 +177,3 @@ CrowApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
   #undef registerAction
   #define registerAction(tplt, action) action_factory.regLegacy<tplt>(stringifyName(tplt), action)
 }
-
-// DEPRECATED CONSTRUCTOR
-CrowApp::CrowApp(const std::string & deprecated_name, InputParameters parameters) :
-    MooseApp(deprecated_name, parameters)
-{
-  srand(processor_id());
-
-  Moose::registerObjects(_factory);
-  CrowApp::registerObjects(_factory);
-
-  Moose::associateSyntax(_syntax, _action_factory);
-  CrowApp::associateSyntax(_syntax, _action_factory);
-}

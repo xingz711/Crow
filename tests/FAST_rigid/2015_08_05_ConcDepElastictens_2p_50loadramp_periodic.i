@@ -12,7 +12,7 @@
   xmin = 0.0
   xmax = 30.0
   ymin = 0.0
-  ymax = 15.0
+  ymax = 15
   zmax = 0
   elem_type = QUAD4
 []
@@ -66,46 +66,6 @@
     family = MONOMIAL
   [../]
   [./C2222]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./dF00]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./dF01]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./dF10]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./dF11]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./vadv00]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./vadv01]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./vadv10]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./vadv11]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./vadv_div0]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./vadv_div1]
     order = CONSTANT
     family = MONOMIAL
   [../]
@@ -175,24 +135,6 @@
     variable = gr1
     f_name = E
     args = 'c gr0 '
-  [../]
-  [./motion]
-    type = MultiGrainRigidBodyMotion
-    variable = w
-    c = c
-    v = 'gr0 gr1'
-  [../]
-  [./vadv_gr0]
-    type = SingleGrainRigidBodyMotion
-    variable = gr0
-    c = c
-    v = 'gr0 gr1'
-  [../]
-  [./vadv_gr1]
-    type = SingleGrainRigidBodyMotion
-    variable = gr1
-    c = c
-    v = 'gr0 gr1'
   [../]
 []
 
@@ -271,65 +213,6 @@
     index_i = 1
     block = 0
   [../]
-  [./dF00]
-    type = MaterialStdVectorRealGradientAux
-    variable = dF00
-    property = force_density
-  [../]
-  [./dF01]
-    type = MaterialStdVectorRealGradientAux
-    variable = dF01
-    property = force_density
-    component = 1
-  [../]
-  [./dF10]
-    type = MaterialStdVectorRealGradientAux
-    variable = dF10
-    property = force_density
-    index = 1
-  [../]
-  [./dF11]
-    type = MaterialStdVectorRealGradientAux
-    variable = dF11
-    property = force_density
-    index = 1
-    component = 1
-  [../]
-  [./vadv00]
-    type = MaterialStdVectorRealGradientAux
-    variable = vadv00
-    property = advection_velocity
-  [../]
-  [./vadv01]
-    type = MaterialStdVectorRealGradientAux
-    variable = vadv01
-    property = advection_velocity
-    component = 1
-  [../]
-  [./vadv10]
-    type = MaterialStdVectorRealGradientAux
-    variable = vadv10
-    property = advection_velocity
-    index = 1
-  [../]
-  [./vadv11]
-    type = MaterialStdVectorRealGradientAux
-    variable = vadv11
-    property = advection_velocity
-    index = 1
-    component = 1
-  [../]
-  [./vadv_div0]
-    type = MaterialStdVectorAux
-    variable = vadv_div0
-    property = advection_velocity_divergence
-  [../]
-  [./vadv_div1]
-    type = MaterialStdVectorAux
-    variable = vadv_div1
-    index = 1
-    property = advection_velocity_divergence
-  [../]
 []
 
 [BCs]
@@ -351,10 +234,16 @@
     boundary = top
     function = load
   [../]
+  [./Periodic]
+    [./pf_bc]
+      variable = 'c w gr0 gr1'
+      auto_direction = 'x y'
+    [../]
+  [../]
 []
 
 [Materials]
-  active = 'AC_mat stress temp Elstc_en ElasticityTensor sum CH_mat strain free_energy force_density vadv'
+  active = 'AC_mat stress temp Elstc_en ElasticityTensor sum CH_mat strain free_energy'
   [./constant]
     type = PFMobility
     block = 0
@@ -442,48 +331,6 @@
     type = ComputeLinearElasticStress
     block = 0
   [../]
-  [./force_density]
-    type = ForceDensityMaterial
-    block = 0
-    c = c
-    etas = 'gr0 gr1'
-    cgb = 0.14
-  [../]
-  [./vadv]
-    type = GrainAdvectionVelocity
-    block = 0
-    grain_force = grain_force
-    etas = 'gr0 gr1'
-    grain_data = grain_center
-  [../]
-[]
-[VectorPostprocessors]
-  [./centers]
-    type = GrainCentersPostprocessor
-    grain_data = grain_center
-  [../]
-  [./forces]
-    type = GrainForcesPostprocessor
-    grain_force = grain_force
-  [../]
-[]
-
-[UserObjects]
-  [./grain_center]
-    type = ComputeGrainCenterUserObject
-    etas = 'gr0 gr1'
-    execute_on = 'initial linear'
-  [../]
-  [./grain_force]
-    type = ComputeGrainForceAndTorque
-    grain_data = grain_center
-  [../]
-  #[./grain_force_const]
-  #  type = ConstantGrainForceAndTorque
-  #  execute_on = 'initial linear'
-  #  torque = '0.0 0.0 5.0 0.0 0.0 5.0'
-  #  force = '0.2 0.3 0.0 -0.2 -0.3 0.0'
-  #[../]
 []
 
 [Postprocessors]
@@ -549,6 +396,12 @@
   nl_rel_tol = 1.0e-10
   dt = 0.05
   end_time = 60
+  [./Adaptivity]
+    refine_fraction = 0.7
+    coarsen_fraction = 0.1
+    max_h_level = 2
+    initial_adaptivity = 1
+  [../]
 []
 
 [Outputs]
@@ -561,15 +414,16 @@
     type = Console
     perf_log = true
     output_on = 'timestep_end failed nonlinear linear'
+    file_base = comb_multip
   [../]
 []
 
 [ICs]
   [./ic_gr0]
     int_width = 2.0
-    x1 = 15.0
-    y1 = 0.0
-    radius = 7.0
+    x1 = 10.0
+    y1 = 7.5
+    radius = 6.0
     outvalue = 0.0
     variable = gr0
     invalue = 1.0
@@ -577,20 +431,20 @@
   [../]
   [./IC_gr1]
     int_width = 2.0
-    x1 = 15.0
+    x1 = 20.0
     y1 = 15.0
-    radius = 7.0
+    radius = 6.0
     outvalue = 0.0
     variable = gr1
     invalue = 1.0
     type = SmoothCircleIC
   [../]
   [./multip]
-    x_positions = '15.0 15.0'
+    x_positions = '10.0 20.0'
     int_width = 2.0
     z_positions = '0 0'
-    y_positions = '0.0 15.0 '
-    radii = '7.0 7.0 '
+    y_positions = '7.5 15.0 '
+    radii = '6.0 6.0 '
     3D_spheres = false
     outvalue = 0.001
     variable = c

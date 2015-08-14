@@ -12,7 +12,7 @@
   xmin = 0.0
   xmax = 30.0
   ymin = 0.0
-  ymax = 15.0
+  ymax = 15
   zmax = 0
   elem_type = QUAD4
 []
@@ -55,8 +55,8 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
-  [./T]
-  [../]
+  #[./T]
+  #[../]
   [./ElasticEn]
     order = CONSTANT
     family = MONOMIAL
@@ -69,46 +69,6 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
-  [./dF00]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./dF01]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./dF10]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./dF11]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./vadv00]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./vadv01]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./vadv10]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./vadv11]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./vadv_div0]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./vadv_div1]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
 []
 
 [Functions]
@@ -117,11 +77,11 @@
     y = '0.0 -1.5 -1.5 -1.5'
     x = '0.0 30.0 45.0 60.0'
   [../]
-  [./temp]
-    type = PiecewiseLinear
-    y = '300.0 673.0 2473.0 2473.0 673.0 300.0'
-    x = '0.0 5.32 21.26 45.51 50.69 60.0'
-  [../]
+  #[./temp]
+  #  type = PiecewiseLinear
+  #  y = '300.0 673.0 2473.0 2473.0 673.0 300.0'
+  #  x = '0.0 5.32 21.26 45.51 50.69 60.0'
+  #[../]
 []
 
 [Preconditioning]
@@ -176,24 +136,6 @@
     f_name = E
     args = 'c gr0 '
   [../]
-  [./motion]
-    type = MultiGrainRigidBodyMotion
-    variable = w
-    c = c
-    v = 'gr0 gr1'
-  [../]
-  [./vadv_gr0]
-    type = SingleGrainRigidBodyMotion
-    variable = gr0
-    c = c
-    v = 'gr0 gr1'
-  [../]
-  [./vadv_gr1]
-    type = SingleGrainRigidBodyMotion
-    variable = gr1
-    c = c
-    v = 'gr0 gr1'
-  [../]
 []
 
 [AuxKernels]
@@ -240,12 +182,12 @@
     index_i = 1
     block = 0
   [../]
-  [./T]
-    type = FunctionAux
-    variable = T
-    function = temp
-    block = 0
-  [../]
+  #[./T]
+  #  type = FunctionAux
+  #  variable = T
+  #  function = temp
+  #  block = 0
+  #[../]
   [./ElasticEn]
     type = TensorElasticEnergyAux
     variable = ElasticEn
@@ -271,65 +213,6 @@
     index_i = 1
     block = 0
   [../]
-  [./dF00]
-    type = MaterialStdVectorRealGradientAux
-    variable = dF00
-    property = force_density
-  [../]
-  [./dF01]
-    type = MaterialStdVectorRealGradientAux
-    variable = dF01
-    property = force_density
-    component = 1
-  [../]
-  [./dF10]
-    type = MaterialStdVectorRealGradientAux
-    variable = dF10
-    property = force_density
-    index = 1
-  [../]
-  [./dF11]
-    type = MaterialStdVectorRealGradientAux
-    variable = dF11
-    property = force_density
-    index = 1
-    component = 1
-  [../]
-  [./vadv00]
-    type = MaterialStdVectorRealGradientAux
-    variable = vadv00
-    property = advection_velocity
-  [../]
-  [./vadv01]
-    type = MaterialStdVectorRealGradientAux
-    variable = vadv01
-    property = advection_velocity
-    component = 1
-  [../]
-  [./vadv10]
-    type = MaterialStdVectorRealGradientAux
-    variable = vadv10
-    property = advection_velocity
-    index = 1
-  [../]
-  [./vadv11]
-    type = MaterialStdVectorRealGradientAux
-    variable = vadv11
-    property = advection_velocity
-    index = 1
-    component = 1
-  [../]
-  [./vadv_div0]
-    type = MaterialStdVectorAux
-    variable = vadv_div0
-    property = advection_velocity_divergence
-  [../]
-  [./vadv_div1]
-    type = MaterialStdVectorAux
-    variable = vadv_div1
-    index = 1
-    property = advection_velocity_divergence
-  [../]
 []
 
 [BCs]
@@ -352,26 +235,21 @@
     function = load
   [../]
   [./Periodic]
-    active = 'PF_BC'
-    [./PF_BC]
+    [./pf_bc]
       variable = 'c w gr0 gr1'
       auto_direction = 'x y'
-    [../]
-    [./disp_x_periodic]
-      variable = disp_x
-      auto_direction = y
-    [../]
-    [./disp_x_periodic]
-      variable = disp_x
-      translation = '0 0 0'
-      secondary = bottom
-      primary = top
     [../]
   [../]
 []
 
 [Materials]
-  # active = 'AC_mat stress temp Elstc_en ElasticityTensor CH_mat strain free_energy force_density vadv sum'
+  active = 'AC_mat stress Elstc_en ElasticityTensor sum CH_mat strain free_energy'
+  [./constant]
+    type = PFMobility
+    block = 0
+    mob = 1.0
+    kappa = 2.0
+  [../]
   [./free_energy]
     type = SinteringFreeEnergy
     block = 0
@@ -394,19 +272,19 @@
     prop_names = 'L kappa_op A B'
     prop_values = '1.0 0.5 16.0 1.0'
   [../]
-  [./temp]
-    type = DerivativeParsedMaterial
-    block = 0
-    constant_expressions = 8.617e-5
-    fail_on_evalerror = true
-    function = kb*T*(c*log(c)+(1-c)*log(1-c))
-    f_name = Ft
-    args = 'c  T'
-    constant_names = kb
-    tol_values = 1e-3
-    tol_names = c
-    derivative_order = 2
-  [../]
+  #[./temp]
+  #  type = DerivativeParsedMaterial
+  #  block = 0
+  #  constant_expressions = 8.617e-5
+  #  fail_on_evalerror = true
+  #  function = kb*T*(c*log(c)+(1-c)*log(1-c))
+  #  f_name = Ft
+  #  args = 'c  T'
+  #  constant_names = kb
+  #  tol_values = 1e-3
+  #  tol_names = c
+  #  derivative_order = 2
+  #[../]
   [./Elstc_en]
     type = ElasticEnergyMaterial
     block = 0
@@ -432,55 +310,12 @@
     type = ComputeLinearElasticStress
     block = 0
   [../]
-  [./force_density]
-    type = ForceDensityMaterial
-    block = 0
-    c = c
-    etas = 'gr0 gr1'
-    cgb = 0.14
-  [../]
-  [./vadv]
-    type = GrainAdvectionVelocity
-    block = 0
-    grain_force = grain_force
-    etas = 'gr0 gr1'
-    grain_data = grain_center
-  [../]
   [./sum]
     type = DerivativeSumMaterial
     block = 0
-    sum_materials = 'S Ft E'
+    sum_materials = 'S E'
     args = 'c gr0 gr1'
     derivative_order = 2
-  [../]
-[]
-
-[VectorPostprocessors]
-  [./centers]
-    type = GrainCentersPostprocessor
-    grain_data = grain_center
-  [../]
-  [./forces]
-    type = GrainForcesPostprocessor
-    grain_force = grain_force
-  [../]
-[]
-
-[UserObjects]
-  # [./grain_force_const]
-  # type = ConstantGrainForceAndTorque
-  # execute_on = 'initial linear'
-  # torque = '0.0 0.0 5.0 0.0 0.0 5.0'
-  # force = '0.2 0.3 0.0 -0.2 -0.3 0.0'
-  # [../]
-  [./grain_center]
-    type = ComputeGrainCenterUserObject
-    etas = 'gr0 gr1'
-    execute_on = 'initial linear'
-  [../]
-  [./grain_force]
-    type = ComputeGrainForceAndTorque
-    grain_data = grain_center
   [../]
 []
 
@@ -509,10 +344,10 @@
     type = PlotFunction
     function = load
   [../]
-  [./temp]
-    type = PlotFunction
-    function = temp
-  [../]
+  #[./temp]
+  #  type = PlotFunction
+  #  function = temp
+  #[../]
   [./s11]
     type = ElementAverageValue
     variable = S11
@@ -542,12 +377,10 @@
   solve_type = NEWTON
   petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
   petsc_options_value = 'asm         31   preonly   lu      1'
-  l_max_its = 20
-  nl_max_its = 20
+  l_max_its = 30
   l_tol = 1.0e-3
-  nl_rel_tol = 1.0e-8
-  nl_abs_tol = 1.0e-7
-  dt = 0.01
+  nl_rel_tol = 1.0e-10
+  dt = 0.05
   end_time = 60
   [./Adaptivity]
     refine_fraction = 0.7
@@ -567,6 +400,7 @@
     type = Console
     perf_log = true
     output_on = 'timestep_end failed nonlinear linear'
+    file_base = comb_multip
   [../]
 []
 

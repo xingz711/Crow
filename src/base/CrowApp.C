@@ -10,6 +10,7 @@
 
 #ifdef MARMOT_ENABLED
 #  include "MarmotApp.h"
+#  include "MarmotSyntax.h"
 #endif
 
 #include "CHChemPotential.h"
@@ -67,20 +68,30 @@ InputParameters validParams<CrowApp>()
 CrowApp::CrowApp(const InputParameters & parameters) :
     MooseApp(parameters)
 {
-  //srand(processor_id());
+  Moose::registerObjects(_factory);
+  PhaseFieldApp::registerObjects(_factory);
+  SolidMechanicsApp::registerObjects(_factory);
+  TensorMechanicsApp::registerObjects(_factory);
+  HeatConductionApp::registerObjects(_factory);
+  MiscApp::registerObjects(_factory);
+  CrowApp::registerObjects(_factory);
 
-   Moose::registerObjects(_factory);
-//  ModulesApp::registerObjects(_factory);
-   PhaseFieldApp::registerObjects(_factory);
-   SolidMechanicsApp::registerObjects(_factory);
-   TensorMechanicsApp::registerObjects(_factory);
-   HeatConductionApp:: registerObjects(_factory);
-   MiscApp::registerObjects(_factory);
-   CrowApp::registerObjects(_factory);
+  Moose::associateSyntax(_syntax, _action_factory);
+//  ModulesApp::associateSyntax(_syntax, _action_factory);
+   PhaseFieldApp::associateSyntax(_syntax, _action_factory);
+   SolidMechanicsApp::associateSyntax(_syntax, _action_factory);
+   TensorMechanicsApp::associateSyntax(_syntax, _action_factory);
+   HeatConductionApp::associateSyntax(_syntax, _action_factory);
+   MiscApp::associateSyntax(_syntax, _action_factory);
+  // CombinedApp::associateSyntax(_syntax, _action_factory);
+//+  MooseTestApp::associateSyntax(_syntax, _action_factory);
 
-   #ifdef MARMOT_ENABLED
-     MarmotApp::registerObjects(_factory);
-   #endif
+  #ifdef MARMOT_ENABLED
+    MarmotApp::registerObjects(_factory);
+    Marmot::associateSyntax(_syntax, _action_factory);
+  #endif
+
+  CrowApp::associateSyntax(_syntax, _action_factory);
 }
 
 CrowApp::~CrowApp()

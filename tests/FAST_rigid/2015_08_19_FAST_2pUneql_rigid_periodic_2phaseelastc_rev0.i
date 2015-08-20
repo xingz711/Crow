@@ -2,7 +2,7 @@
   var_name_base = gr
   op_num = 2.0
   use_displaced_mesh = true
-  output = exodus
+  outputs = exodus
 []
 
 [Mesh]
@@ -44,10 +44,6 @@
     family = MONOMIAL
   [../]
   [./S22]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./ElasticEn]
     order = CONSTANT
     family = MONOMIAL
   [../]
@@ -181,11 +177,6 @@
     rank_two_tensor = stress
     index_j = 1
     index_i = 1
-    block = 0
-  [../]
-  [./ElasticEn]
-    type = TensorElasticEnergyAux
-    variable = ElasticEn
     block = 0
   [../]
   [./dF00]
@@ -458,7 +449,7 @@
   # Preconditioned JFNK (default)
   type = Transient
   scheme = BDF2
-  solve_type = NEWTON
+  solve_type = PJFNK
   petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
   petsc_options_value = 'asm         31   preonly   lu      1'
   l_max_its = 20

@@ -2,7 +2,7 @@
   var_name_base = gr
   op_num = 2.0
   use_displaced_mesh = true
-  output = exodus
+  outputs = exodus
 []
 
 [Mesh]
@@ -44,10 +44,6 @@
     family = MONOMIAL
   [../]
   [./S22]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./ElasticEn]
     order = CONSTANT
     family = MONOMIAL
   [../]
@@ -115,8 +111,8 @@
     variable = c
     kappa_name = kappa_c
     w = w
-    f_name = S
-    args = 'gr0  gr1 '
+    f_name = F
+    args = 'gr0  gr1'
   [../]
   [./wres]
     type = SplitCHWRes
@@ -181,11 +177,6 @@
     rank_two_tensor = stress
     index_j = 1
     index_i = 1
-    block = 0
-  [../]
-  [./ElasticEn]
-    type = TensorElasticEnergyAux
-    variable = ElasticEn
     block = 0
   [../]
   [./dF00]
@@ -296,7 +287,7 @@
     type = PFDiffusionGrowth
     block = 0
     rho = c
-    v = 'gr0 gr1 '
+    v = 'gr0 gr1'
     outputs = console
   [../]
   [./force_density]

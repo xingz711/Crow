@@ -8,6 +8,9 @@
 #include "HeatConductionApp.h"
 #include "MiscApp.h"
 
+#ifdef MARMOT_ENABLED
+#  include "MarmotApp.h"
+#endif
 
 #include "CHChemPotential.h"
 #include "CHTemp.h"
@@ -64,7 +67,7 @@ InputParameters validParams<CrowApp>()
 CrowApp::CrowApp(const InputParameters & parameters) :
     MooseApp(parameters)
 {
-  srand(processor_id());
+  //srand(processor_id());
 
    Moose::registerObjects(_factory);
 //  ModulesApp::registerObjects(_factory);
@@ -73,20 +76,11 @@ CrowApp::CrowApp(const InputParameters & parameters) :
    TensorMechanicsApp::registerObjects(_factory);
    HeatConductionApp:: registerObjects(_factory);
    MiscApp::registerObjects(_factory);
-  // CombinedApp::registerObjects(_factory);
-//+  MooseTestApp::registerObjects(_factory);
    CrowApp::registerObjects(_factory);
 
-   Moose::associateSyntax(_syntax, _action_factory);
-//  ModulesApp::associateSyntax(_syntax, _action_factory);
-   PhaseFieldApp::associateSyntax(_syntax, _action_factory);
-   SolidMechanicsApp::associateSyntax(_syntax, _action_factory);
-   TensorMechanicsApp::associateSyntax(_syntax, _action_factory);
-   HeatConductionApp::associateSyntax(_syntax, _action_factory);
-   MiscApp::associateSyntax(_syntax, _action_factory);
-  // CombinedApp::associateSyntax(_syntax, _action_factory);
-//+  MooseTestApp::associateSyntax(_syntax, _action_factory);
-  CrowApp::associateSyntax(_syntax, _action_factory);
+   #ifdef MARMOT_ENABLED
+     MarmotApp::registerObjects(_factory);
+   #endif
 }
 
 CrowApp::~CrowApp()
@@ -114,8 +108,6 @@ CrowApp::registerObjects(Factory & factory)
 
   #undef registerObject
   #define registerObject(name) factory.reg<name>(stringifyName(name))
-  #undef registerDeprecatedObjectName
-  #define registerDeprecatedObjectName(obj, name, time) factory.regReplaced<obj>(stringifyName(obj), name, time)
 
   // Register any custom objects you have built on the MOOSE Framework
   registerKernel(CHChemPotential);  // <- registration

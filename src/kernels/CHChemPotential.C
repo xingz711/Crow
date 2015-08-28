@@ -3,7 +3,7 @@
 template<>
 InputParameters validParams<CHChemPotential>()
 {
-  InputParameters params = validParams<CHBulk>();
+  InputParameters params = CHBulk<Real>::validParams();
 
   return params;
 }

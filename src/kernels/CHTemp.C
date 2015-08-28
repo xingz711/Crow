@@ -3,7 +3,7 @@
 template<>
 InputParameters validParams<CHTemp>()
 {
-  InputParameters params = validParams<CHBulk>();
+  InputParameters params = CHBulk<Real>::validParams();
   params.addRequiredParam<Real>("Temperature", "Process Temperature");
   params.addParam<Real>("R", 8.3144621e-3 ,"Universal Gas Constant in kilo J K−1 mol−1");
   return params;

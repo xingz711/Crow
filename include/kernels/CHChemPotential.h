@@ -11,7 +11,7 @@ InputParameters validParams<CHChemPotential>();
 
 /**Cahn-Hilliard Kernel implementing the free energy for sintering
  **/
-class CHChemPotential : public CHBulk
+class CHChemPotential : public CHBulk<Real>
 {
 public:
   CHChemPotential(const InputParameters & parameters);

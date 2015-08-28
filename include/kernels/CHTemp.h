@@ -11,7 +11,7 @@ InputParameters validParams<CHTemp>();
 
 /**Cahn-Hilliard Kernel implementing the free energy for sintering
  **/
-class CHTemp : public CHBulk
+class CHTemp : public CHBulk<Real>
 {
 public:
   CHTemp(const InputParameters & parameters);

@@ -9,7 +9,7 @@ InputParameters validParams<CHChemPotential>()
 }
 
 CHChemPotential::CHChemPotential(const InputParameters & parameters) :
-    CHBulk(parameters)
+    CHBulk<Real>(parameters)
 {
 }
 

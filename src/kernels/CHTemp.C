@@ -10,7 +10,7 @@ InputParameters validParams<CHTemp>()
 }
 
 CHTemp::CHTemp(const InputParameters & parameters) :
-    CHBulk(parameters),
+    CHBulk<Real>(parameters),
     _temp(getParam<Real>("Temperature")),
     _r(getParam<Real>("R"))
 {

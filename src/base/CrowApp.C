@@ -19,7 +19,6 @@
 #include "ACParticleGrowth.h"
 #include "VacancySourceTermKernel.h"
 #include "RandomVacancySourceTermKernel.h"
-#include "VacancyAnnihilationKernel.h"
 #include "LangevinNoiseVoid.h"
 #include "PFDiffusion.h"
 #include "TempDiffusion.h"
@@ -36,7 +35,6 @@
 #include "RandomNumberGeneration.h"
 #include "ConservedLangevinNoiseVoidSource.h"
 #include "BicrystalIC.h"
-#include "VacancyRecombinationTermKernel.h"
 #include "RigidBodyMotionKernel.h"
 #include "SinteringFreeEnergy.h"
 #include "ThermalVariation.h"
@@ -127,10 +125,8 @@ CrowApp::registerObjects(Factory & factory)
   registerKernel(ACParticleGrowth);
   registerKernel(VacancySourceTermKernel);
   registerKernel(RandomVacancySourceTermKernel);
-  registerKernel(VacancyAnnihilationKernel);
   registerKernel(ConservedLangevinNoiseVoidSource);
   registerKernel(LangevinNoiseVoid);
-  registerKernel(VacancyRecombinationTermKernel);
   registerKernel(RigidBodyMotionKernel);
   registerFunction(RandomNumberGeneration);
 

@@ -51,7 +51,7 @@ LangevinNoiseVoid::computeQpResidual()
 
   Real e = _eta[_qp];
 
-  if ( e < 0.8 && R1<= _Pcasc)
+  if ( e <= 0.8 && R1< _Pcasc)
   return -_test[_i][_qp] * R2 * _amplitude * (_multiplier_prop == NULL ? 1.0 : (*_multiplier_prop)[_qp]);
 
   return 0.0;

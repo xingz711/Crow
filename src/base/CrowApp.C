@@ -37,6 +37,7 @@
 #include "BicrystalIC.h"
 #include "RigidBodyMotionKernel.h"
 #include "SinteringFreeEnergy.h"
+#include "SinteringMobility.h"
 #include "ThermalVariation.h"
 
 
@@ -142,6 +143,7 @@ CrowApp::registerObjects(Factory & factory)
   registerMaterial(Mobility);
   registerMaterial(RandomVacancySourceTermMaterial);
   registerMaterial(SinteringFreeEnergy);
+  registerMaterial(SinteringMobility);
 
   registerInitialCondition(TwoParticleGrainsIC);
   registerInitialCondition(TwoParticleDensityIC);

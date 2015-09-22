@@ -5,8 +5,8 @@ template<>
 InputParameters validParams<LangevinNoiseVoid>()
 {
   InputParameters params = validParams<Kernel>();
-  params.addRequiredParam<Real>("amplitude", "Amplitude"); // per sqrt(time)");
-  params.addRequiredParam<Real>("Pcasc", "Probability of cascade occurance."); // per sqrt(time)");
+  params.addParam<Real>("amplitude", 1.0, "Amplitude"); // per sqrt(time)");
+  params.addParam<Real>("Pcasc", 0.0, "Probability of cascade occurance."); // per sqrt(time)");
   params.addParam<std::string>("multiplier", "Material property to multiply the random numbers with (defaults to 1.0 if omitted)");
   params.addRequiredCoupledVar("eta", "order parameter for void");
   params.addParam<Real>("min", 0.0, "Lower bound of the randomly generated values");
@@ -51,8 +51,9 @@ LangevinNoiseVoid::computeQpResidual()
 
   Real e = _eta[_qp];
 
-  if ( e <= 0.8 && R1< _Pcasc)
-  return -_test[_i][_qp] * R2 * _amplitude * (_multiplier_prop == NULL ? 1.0 : (*_multiplier_prop)[_qp]);
+  // if ( e <= 0.8 && R1< _Pcasc)
+  if ( e <= 0.8)
+    return -_test[_i][_qp] * R2 * _amplitude * (_multiplier_prop == NULL ? 1.0 : (*_multiplier_prop)[_qp]);
 
   return 0.0;
 }

@@ -1,12 +1,12 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 64
-  ny = 64
-  xmin = -64
-  xmax = 64
-  ymin = -64
-  ymax = 64
+  nx = 40
+  ny = 40
+  xmin = -10
+  xmax = 10
+  ymin = -10
+  ymax = 10
 []
 
 [Variables]
@@ -88,16 +88,16 @@
     type = LangevinNoiseVoid
     Pcasc = 0.9
     eta = e
-    amplitude = 1.0
+    amplitude = 0.5
     variable = cv
   [../]
-  [./e_source]
-    type = LangevinNoiseVoid
-    Pcasc = 0.9
-    eta = e
-    amplitude = 1.0
-    variable = e
-  [../]
+  #[./e_source]
+  #  type = LangevinNoiseVoid
+  #  Pcasc = 0.9
+  #  eta = e
+  #  amplitude = 1.0
+  #  variable = e
+  #[../]
 []
 
 [AuxKernels]
@@ -140,7 +140,7 @@
   [../]
   [./ElementInt_cv]
     type = ElementIntegralVariablePostprocessor
-    variable = cv
+    variable = e
   [../]
   [./total_en]
     type = ElementIntegralVariablePostprocessor
@@ -160,7 +160,7 @@
   type = Transient
   scheme = bdf2
   solve_type = NEWTON
-  end_time = 20.0
+  end_time = 100.0
   l_max_its = 20
   nl_max_its = 20
   petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'

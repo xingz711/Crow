@@ -1,18 +1,18 @@
-#ifndef SINTERINGDIFFUSIONGROWTH_H
-#define SINTERINGDIFFUSIONGROWTH_H
+#ifndef SINTERINGDIFFUSION_H
+#define SINTERINGDIFFUSION_H
 
 #include "Material.h"
 
 //Forward Declarations
-class SinteringDiffusionGrowth;
+class SinteringDiffusion;
 
 template<>
-InputParameters validParams<SinteringDiffusionGrowth>();
+InputParameters validParams<SinteringDiffusion>();
 
-class SinteringDiffusionGrowth : public Material
+class SinteringDiffusion : public Material
 {
 public:
-  SinteringDiffusionGrowth(const InputParameters & parameters);
+  SinteringDiffusion(const InputParameters & parameters);
 
 protected:
   virtual void computeQpProperties();
@@ -26,19 +26,18 @@ private:
   Real _Dsurf0;
   Real _Dgb0;
   Real _int_width;
+  Real _Em;
   Real _GB_energy;
   Real _surface_energy;
   Real _GBmob0;
-  Real _Qbulk;
-  Real _Qmgb;
+  Real _Q;
   Real _Qs;
   Real _Qgb;
+  const Real _kb;
 
-  Real _kappa;
-
-  VariableValue & _T;
   VariableValue & _rho;
-  VariableValue & _v;
+  VariableGradient & _grad_rho;
+  VariableValue & _T;
 
   MaterialProperty<Real> & _D;
   MaterialProperty<Real> & _kappa_c;
@@ -46,8 +45,7 @@ private:
   MaterialProperty<Real> & _L;
   MaterialProperty<Real> & _kappa_op;
 
-  const Real _kb;
   unsigned int _ncrys;
 };
 
-#endif //SINTERINGDIFFUSIONGROWTH_H
+#endif //SinteringDiffusion_H

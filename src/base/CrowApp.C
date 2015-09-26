@@ -38,6 +38,7 @@
 #include "RigidBodyMotionKernel.h"
 #include "SinteringFreeEnergy.h"
 #include "SinteringMobility.h"
+#include "SinteringDiffusion.h"
 #include "ThermalVariation.h"
 
 
@@ -144,6 +145,7 @@ CrowApp::registerObjects(Factory & factory)
   registerMaterial(RandomVacancySourceTermMaterial);
   registerMaterial(SinteringFreeEnergy);
   registerMaterial(SinteringMobility);
+  registerMaterial(SinteringDiffusion);
 
   registerInitialCondition(TwoParticleGrainsIC);
   registerInitialCondition(TwoParticleDensityIC);

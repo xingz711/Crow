@@ -154,8 +154,8 @@
   num_steps = 2
   l_max_its = 20
   nl_max_its = 20
-  petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
-  petsc_options_value = 'asm         31   preonly   lu      1'
+  #petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
+  #petsc_options_value = 'asm         31   preonly   lu      1'
   dt = 1.0
   l_tol = 1.0e-3
   nl_rel_tol = 1.0e-8

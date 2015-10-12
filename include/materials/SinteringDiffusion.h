@@ -15,7 +15,7 @@ public:
   SinteringDiffusion(const InputParameters & parameters);
 
 protected:
-  virtual void computeQpProperties();
+  virtual void computeProperties();
 
 private:
   std::vector<VariableValue *> _vals;
@@ -26,13 +26,17 @@ private:
   Real _Dsurf0;
   Real _Dgb0;
   Real _int_width;
-  Real _Em;
+  Real _length_scale;
+  Real _time_scale;
+  Real _Qv;
   Real _GB_energy;
   Real _surface_energy;
   Real _GBmob0;
   Real _Q;
   Real _Qs;
   Real _Qgb;
+  Real _Vm;
+  Real _GBMobility;
   const Real _kb;
 
   VariableValue & _rho;
@@ -42,6 +46,8 @@ private:
   MaterialProperty<Real> & _D;
   MaterialProperty<Real> & _kappa_c;
   MaterialProperty<Real> & _dDdc;
+  MaterialProperty<Real> & _M;
+  MaterialProperty<Real> & _dMdc;
   MaterialProperty<Real> & _L;
   MaterialProperty<Real> & _kappa_op;
 

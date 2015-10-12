@@ -116,14 +116,16 @@
     int_width = 20
     D0 = 4e-4
     Em = 1.0
-    GB_energy = 0.033
-    surface_energy = 0.0224
+    GB_energy = 6.86
+    surface_energy = 9.32
     GBmob0 = 3.986e-6
     Q = 1.0307
     c = c
+    omega = 31.855013e-30
     bulkindex = 1.0
-    surfindex = 0.0
-    gbindex = 0.0
+    surfindex = 1.0
+    gbindex = 1.0
+    output = exodus
   [../]
 []
 

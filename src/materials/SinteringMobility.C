@@ -7,7 +7,7 @@ InputParameters validParams<SinteringMobility>()
   params.addRequiredCoupledVarWithAutoBuild("v", "var_name_base", "op_num", "Array of coupled variables");
   params.addCoupledVar("T", "Temperature variable in Kelvin");
   params.addRequiredParam<Real>("int_width","The interfacial width in the lengthscale of the problem");
-  params.addParam<Real>("length_scale", 1.0e-6,"defines the base length scale of the problem in m");
+  params.addParam<Real>("length_scale", 1.0e-9,"defines the base length scale of the problem in m");
   params.addParam<Real>("ls", 1.0e-9,"Surface layer thickness in m");
   params.addRequiredParam<Real>("D0", "Diffusivity prefactor for vacancies in m^2/s");
   params.addRequiredParam<Real>("Em", "Vacancy migration energy in eV");
@@ -34,7 +34,7 @@ SinteringMobility::SinteringMobility(const InputParameters & parameters) :
     _T(coupledValue("T")),
     _c(coupledValue("c")),
     _grad_c(coupledGradient("c")),
-    _M(declareProperty<Real>("M")),
+    _M(declareProperty<Real>("D")),
     _dMdc(declareProperty<Real>("dDdc")),
     _L(declareProperty<Real>("L")),
     _kappa_c(declareProperty<Real>("kappa_c")),
@@ -61,7 +61,7 @@ SinteringMobility::SinteringMobility(const InputParameters & parameters) :
     _gbindex(getParam<Real>("gbindex")),
     _bulkindex(getParam<Real>("bulkindex")),
     _GBMobility(getParam<Real>("GBMobility")),
-    // _JtoeV(6.24150974e18), // Joule to eV conversion
+    _JtoeV(6.24150974e18), // Joule to eV conversion
     _kb(8.617343e-5), // Boltzmann constant in eV/K
     _ncrys(coupledComponents("v"))
 {
@@ -156,7 +156,7 @@ SinteringMobility::computeProperties()
     }
 
     // Compute different mobility tensors and their derivatives
-    Real omega_kT = _omega / (_kb * _T[_qp]); // omega/kT in m^3/J
+    Real omega_kT = _omega / (_kb * _T[_qp])*_JtoeV; // omega/kT in m^3/J
     Real Mbulk = Dbulk * mult_bulk * omega_kT * _energy_scale[_qp];
     Real dMbulkdc = Dbulk * dmult_bulk * omega_kT * _energy_scale[_qp];
     Real Msurf = 2.0/3.0*Dsurf*mult_surf*omega_kT*_energy_scale[_qp]*_ls/(int_width_c*_length_scale);

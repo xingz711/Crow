@@ -12,9 +12,9 @@
   ny = 40
   nz = 0
   xmin = 0.0
-  xmax = 400.0
+  xmax = 40.0
   ymin = 0.0
-  ymax = 200.0
+  ymax = 20.0
   zmax = 0
   elem_type = QUAD4
 []
@@ -93,7 +93,7 @@
 []
 
 [Materials]
-  active = 'mob free_energy constant_mat'
+  active = 'free_energy constant_mat Sint_diff'
   [./free_energy]
     type = SinteringFreeEnergy
     block = 0
@@ -102,29 +102,6 @@
     f_name = F
     derivative_order = 2
     outputs = console
-  [../]
-  [./mob]
-    type = SinteringMobility
-    block = 0
-    v = 'gr0 gr1'
-    outputs = console
-    Em = 2.0
-    Qs = 3.14
-    GBmob0 = 1.41e-5
-    surface_energy = 9.32947
-    c = c
-    Ds0 = 4e-4
-    Qgb = 4.143
-    Q = 4.143
-    T = 500
-    GB_energy = 6.8653
-    omega = 1.582e-29
-    Dgb0 = 1.41e-5
-    D0 = 1.44e-7
-    int_width = 2
-    gbindex = 1
-    surfindex = 1
-    length_scale = 1e-09
   [../]
   [./CH_mat]
     type = PFDiffusionGrowth
@@ -136,10 +113,24 @@
   [./constant_mat]
     type = GenericConstantMaterial
     block = 0
-    #prop_names = 'A B L  kappa_op'
-    #prop_values = '16.0 1.0 1.0 0.5'
-    prop_names = 'D'
-    prop_values = '1.0'
+    prop_names = 'A B '
+    prop_values = '16.0 1.0 '
+  [../]
+  [./Sint_diff]
+    type = SinteringDiffusion
+    block = 0
+    Em = 2.0
+    Qs = 2.44
+    int_width = 2
+    surface_energy = 0.5823e8
+    Q = 3.7
+    T = 1200
+    rho = c
+    v = 'gr0 gr1'
+    GB_energy = 0.4285e8
+    Dgb0 = 8.46e8
+    GBmob0 = 8.46e8
+    Dsurf0 = 0.024e12
   [../]
 []
 
@@ -158,8 +149,24 @@
   [../]
 []
 
+[VectorPostprocessors]
+  [./neck]
+    type = LineValueSampler
+    variable = 'c bnds'
+    start_point = '20.0 0.0 0.0'
+    end_point = '20.0 20.0 0.0'
+    sort_by = id
+    num_points = 40
+  [../]
+[]
+
 [Executioner]
   # Preconditioned JFNK (default)
+  # [./TimeStepper]
+  # type = IterationAdaptiveDT
+  # dt = 0.01
+  # growth_factor = 1.5
+  # [../]
   type = Transient
   scheme = BDF2
   solve_type = NEWTON
@@ -170,20 +177,17 @@
   l_tol = 1.0e-3
   nl_rel_tol = 1.0e-10
   end_time = 100
+  dt = 0.005
   [./Adaptivity]
     refine_fraction = 0.7
     coarsen_fraction = 0.1
     max_h_level = 2
     initial_adaptivity = 1
   [../]
-  #[./TimeStepper]
-  #  type = IterationAdaptiveDT
-  #  dt = 0.01
-  #  growth_factor = 1.5
-  #[../]
 []
 
 [Outputs]
+  interval = 100
   exodus = true
   output_on = 'initial timestep_end'
   print_linear_residuals = true
@@ -191,27 +195,27 @@
   [./console]
     type = Console
     perf_log = true
-    output_on = 'timestep_end failed nonlinear linear'
+    output_on = 'initial timestep_end failed nonlinear linear'
   [../]
 []
 
 [ICs]
   [./ic_gr1]
-    int_width = 20.0
-    x1 = 250.0
-    y1 = 100.0
-    radius = 80.0
+    int_width = 2.0
+    x1 = 25.0
+    y1 = 10.0
+    radius = 7.0
     outvalue = 0.0
     variable = gr1
     invalue = 1.0
     type = SmoothCircleIC
   [../]
   [./multip]
-    x_positions = '110.0 250.0'
-    int_width = 20.0
-    z_positions = '0 0'
-    y_positions = '130.0 100.0 '
-    radii = '55.0 80.0'
+    x_positions = '13.0 25.0'
+    int_width = 2.0
+    z_positions = '0 0 0.0'
+    y_positions = '10.0 10.0 '
+    radii = '4.0 7.0'
     3D_spheres = false
     outvalue = 0.001
     variable = c
@@ -220,10 +224,10 @@
     block = 0
   [../]
   [./ic_gr0]
-    int_width = 20.0
-    x1 = 110.0
-    y1 = 130.0
-    radius = 55.0
+    int_width = 2.0
+    x1 = 13.0
+    y1 = 10.0
+    radius = 4.0
     outvalue = 0.0
     variable = gr0
     invalue = 1.0

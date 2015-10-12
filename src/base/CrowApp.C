@@ -41,7 +41,6 @@
 #include "SinteringDiffusion.h"
 #include "ThermalVariation.h"
 
-
 #include "PolycrystalSinteringKernelAction.h"
 #include "PolycrystalSinteringMaterialAction.h"
 #include "TwoParticleGrainsICAction.h"

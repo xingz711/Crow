@@ -21,6 +21,7 @@
 
 [Variables]
   [./c]
+    scaling = 1e9
   [../]
   [./w]
   [../]
@@ -121,7 +122,7 @@
     omega = 1.582e-29
     Dgb0 = 1.41e-5
     D0 = 1.44e-7
-    int_width = 2
+    int_width = 20
     gbindex = 1
     surfindex = 1
     length_scale = 1e-09
@@ -168,8 +169,9 @@
   l_max_its = 20
   nl_max_its = 20
   l_tol = 1.0e-3
-  nl_rel_tol = 1.0e-10
+  nl_rel_tol = 1.0e-3
   end_time = 100
+  dt = 0.01
   [./Adaptivity]
     refine_fraction = 0.7
     coarsen_fraction = 0.1
@@ -188,6 +190,7 @@
   output_on = 'initial timestep_end'
   print_linear_residuals = true
   csv = true
+  gnuplot = true
   [./console]
     type = Console
     perf_log = true

@@ -58,7 +58,7 @@ private:
   Real _GBMobility;
 
   // Constants
-  // const Real _JtoeV;
+  const Real _JtoeV;
   const Real _kb;
   unsigned int _ncrys;
 };

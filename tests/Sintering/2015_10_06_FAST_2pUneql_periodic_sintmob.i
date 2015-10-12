@@ -12,9 +12,9 @@
   ny = 40
   nz = 0
   xmin = 0.0
-  xmax = 400.0
+  xmax = 40.0
   ymin = 0.0
-  ymax = 200.0
+  ymax = 20.0
   zmax = 0
   elem_type = QUAD4
 []
@@ -110,17 +110,17 @@
     outputs = console
     Em = 2.0
     Qs = 3.14
-    GBmob0 = 1.41e-5
+    GBmob0 = 0.05076
     surface_energy = 9.32947
     c = c
-    Ds0 = 4e-4
+    Ds0 = 1.44
     Qgb = 4.143
     Q = 4.143
-    T = 500
+    T = 1500
     GB_energy = 6.8653
-    omega = 1.582e-29
-    Dgb0 = 1.41e-5
-    D0 = 1.44e-7
+    omega = 1.855013e-29
+    Dgb0 = 0.05076
+    D0 = 1.44
     int_width = 2
     gbindex = 1
     surfindex = 1
@@ -163,6 +163,7 @@
   type = Transient
   scheme = BDF2
   solve_type = NEWTON
+  petsc_options = '-ksp_converged_reason'
   petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
   petsc_options_value = 'asm         31   preonly   lu      1'
   l_max_its = 20
@@ -176,11 +177,11 @@
     max_h_level = 2
     initial_adaptivity = 1
   [../]
-  #[./TimeStepper]
-  #  type = IterationAdaptiveDT
-  #  dt = 0.01
-  #  growth_factor = 1.5
-  #[../]
+  [./TimeStepper]
+    type = IterationAdaptiveDT
+    dt = 0.01
+    growth_factor = 1.5
+  [../]
 []
 
 [Outputs]
@@ -197,21 +198,21 @@
 
 [ICs]
   [./ic_gr1]
-    int_width = 20.0
-    x1 = 250.0
-    y1 = 100.0
-    radius = 80.0
+    int_width = 2.0
+    x1 = 25.0
+    y1 = 10.0
+    radius = 8.0
     outvalue = 0.0
     variable = gr1
     invalue = 1.0
     type = SmoothCircleIC
   [../]
   [./multip]
-    x_positions = '110.0 250.0'
-    int_width = 20.0
+    x_positions = '11.0 25.0'
+    int_width = 2.0
     z_positions = '0 0'
-    y_positions = '130.0 100.0 '
-    radii = '55.0 80.0'
+    y_positions = '13.0 10.0 '
+    radii = '5.5 8.0'
     3D_spheres = false
     outvalue = 0.001
     variable = c
@@ -220,10 +221,10 @@
     block = 0
   [../]
   [./ic_gr0]
-    int_width = 20.0
-    x1 = 110.0
-    y1 = 130.0
-    radius = 55.0
+    int_width = 2.0
+    x1 = 11.0
+    y1 = 13.0
+    radius = 5.5
     outvalue = 0.0
     variable = gr0
     invalue = 1.0

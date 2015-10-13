@@ -13,7 +13,7 @@ ACParticleGrowth::ACParticleGrowth(const InputParameters & parameters) :
     ACBulk(parameters),
     _c(coupledValue("c")),
     _c_var(coupled("c")),
-    _L(getMaterialProperty<Real>("L")),
+    _L(getMaterialProperty<Real>("mob_name")),
     _B(getMaterialProperty<Real>("B")),
     _ncrys(coupledComponents("v")) //determine number of grains from the number of names passed in.  Note this is the actual number -1
 {

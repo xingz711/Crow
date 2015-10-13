@@ -28,7 +28,7 @@ PFDiffusionGrowth::PFDiffusionGrowth(const InputParameters & parameters) :
     _v(coupledValue("v")),
 
     _D(declareProperty<Real>("D")),
-    _kappa_c(declareProperty<Real>("kappa_c")),
+    // _kappa_c(declareProperty<Real>("kappa_c")),
     _dDdc(declareProperty<Real>("dDdc"))
 {
   // Array of coupled variables is created in the constructor
@@ -47,20 +47,20 @@ PFDiffusionGrowth::PFDiffusionGrowth(const InputParameters & parameters) :
 void
 PFDiffusionGrowth::computeQpProperties()
 {
-    Real SumEtaj = 0.0;
-    for (unsigned int i = 0; i < _ncrys; ++i)
-      for (unsigned int j = 0; j < _ncrys; ++j)
-      if(j!=i)
-      SumEtaj += (*_vals[i])[_qp] * (*_vals[j])[_qp]; //Sum all other order parameters
-    Real c = _rho[_qp];
-    c = c>1.0 ? 1.0 : (c<0.0 ? 0.0 : c);
+  Real SumEtaj = 0.0;
+  for (unsigned int i = 0; i < _ncrys; ++i)
+    for (unsigned int j = 0; j < _ncrys; ++j)
+    if(j!=i)
+    SumEtaj += (*_vals[i])[_qp] * (*_vals[j])[_qp]; //Sum all other order parameters
+  Real c = _rho[_qp];
+  c = c>1.0 ? 1.0 : (c<0.0 ? 0.0 : c);
 
-    Real phi = c * c * c * (10 - 15 * c + 6 * c * c);
-    phi = phi>1.0 ? 1.0 : (phi<0.0 ? 0.0 : phi);
-    _D[_qp] = _Dvol * phi + _Dvap * (1.0 - phi) + _Dsurf * c * (1-c) + _Dgb * SumEtaj;// + _Dvap*(1 - phi) ;
+  Real phi = c * c * c * (10 - 15 * c + 6 * c * c);
+  phi = phi>1.0 ? 1.0 : (phi<0.0 ? 0.0 : phi);
+  _D[_qp] = _Dvol * phi + _Dvap * (1.0 - phi) + _Dsurf * c * (1-c) + _Dgb * SumEtaj;// + _Dvap*(1 - phi) ;
 
-    Real dphidc =  30.0 * c * c * (1 - 2 * c + c * c);
-    _dDdc[_qp] = _Dvol * dphidc - _Dvap * dphidc + _Dsurf * (1.0 - 2.0 * c);
+  Real dphidc =  30.0 * c * c * (1 - 2 * c + c * c);
+  _dDdc[_qp] = _Dvol * dphidc - _Dvap * dphidc + _Dsurf * (1.0 - 2.0 * c);
 
-    _kappa_c[_qp] = _kappa;
-  }
+  // _kappa_c[_qp] = _kappa;
+}

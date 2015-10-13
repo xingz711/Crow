@@ -44,12 +44,12 @@ private:
   VariableValue & _T;
 
   MaterialProperty<Real> & _D;
-  MaterialProperty<Real> & _kappa_c;
+  // MaterialProperty<Real> & _kappa_c;
   MaterialProperty<Real> & _dDdc;
   MaterialProperty<Real> & _M;
   MaterialProperty<Real> & _dMdc;
-  MaterialProperty<Real> & _L;
-  MaterialProperty<Real> & _kappa_op;
+  // MaterialProperty<Real> & _L;
+  // MaterialProperty<Real> & _kappa_op;
 
   unsigned int _ncrys;
 };

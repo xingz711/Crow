@@ -53,12 +53,12 @@ SinteringDiffusion::SinteringDiffusion(const InputParameters & parameters) :
     _T(coupledValue("T")),
 
     _D(declareProperty<Real>("D")),
-    _kappa_c(declareProperty<Real>("kappa_c")),
+    // _kappa_c(declareProperty<Real>("kappa_c")),
     _dDdc(declareProperty<Real>("dDdc")),
     _M(declareProperty<Real>("M")),
-    _dMdc(declareProperty<Real>("dMdc")),
-    _L(declareProperty<Real>("L")),
-    _kappa_op(declareProperty<Real>("kappa_op"))
+    _dMdc(declareProperty<Real>("dMdc"))
+    // _L(declareProperty<Real>("L")),
+    // _kappa_op(declareProperty<Real>("kappa_op"))
 {
   // Array of coupled variables is created in the constructor
   _ncrys = coupledComponents("v"); // determine number of grains from the number of names passed in.
@@ -129,11 +129,11 @@ SinteringDiffusion::computeProperties()
     _dDdc[_qp] = Dvol * dphidc - Dvap * dphidc + Dsurf * (1.0 - 2.0 * c);
     _dMdc[_qp] = _dDdc[_qp] * Vm / (_kb * _T[_qp]); // * energy_scale;
 
-    _kappa_c[_qp] =  3.0/4.0 * (2.0 * surface_energy - GB_energy) * int_width_c;
-    _kappa_op[_qp] = 3.0/4.0 * GB_energy * int_width_c;
+    // _kappa_c[_qp] =  3.0/4.0 * (2.0 * surface_energy - GB_energy) * int_width_c;
+    // _kappa_op[_qp] = 3.0/4.0 * GB_energy * int_width_c;
     // _A[_qp] = (12.0 * _surface_energy - 7.0 * _GB_energy) / _int_width;
     // _B[_qp] = GB_energy / int_width_c;
 
-    _L[_qp] = 4.0/3.0 * GBmob / int_width_c;
+    // _L[_qp] = 4.0/3.0 * GBmob / int_width_c;
   }
 }

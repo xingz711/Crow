@@ -234,7 +234,7 @@
     args = 'disp_x disp_y'
     derivative_order = 2
   [../]
-  switching function for elastic energy calculation
+  #switching function for elastic energy calculation
   [./switching]
     type = SwitchingFunctionMaterial
     block = 0

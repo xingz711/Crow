@@ -33,7 +33,7 @@ private:
   VariableValue & _v;
 
   MaterialProperty<Real> & _D;
-  MaterialProperty<Real> & _kappa_c;
+  // MaterialProperty<Real> & _kappa_c;
   MaterialProperty<Real> & _dDdc;
 
   unsigned int _ncrys;

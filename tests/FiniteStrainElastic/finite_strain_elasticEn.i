@@ -89,7 +89,7 @@
   #  boundary = back
   #  value = 0
   #[../]
-  [./tdisp]
+  [./load]
     type = FunctionPresetBC
     variable = disp_y
     boundary = top
@@ -120,27 +120,42 @@
     prop_names = 'A B L  kappa_op'
     prop_values = '16.0 1.0 1.0 0.5'
   [../]
-  [./elasticity_tensor]
-    type = ComputeConcentrationDependentElasticityTensor
-    #base_name = phase0
+  #[./elasticity_tensor]
+  #  type = ComputeConcentrationDependentElasticityTensor
+  #  #base_name = phase0
+  #  block = 0
+  #  fill_method0 = symmetric_isotropic
+  #  fill_method1 = symmetric_isotropic
+  #  C0_ijkl = '30.141 35.46'
+  #  C1_ijkl = '10.0 10.0 '
+  #  c = c
+  #[../]
+  #[./strain]
+  #  type = ComputeFiniteStrain
+  #  block = 0
+  #  #base_name = phase0
+  #  displacements = 'disp_x disp_y'
+  #  use_displaced_mesh = true
+  #[../]
+  [./Finite_strain0]
+    type = FiniteStrainElasticMaterial
+    base_name = phase0
     block = 0
-    fill_method0 = symmetric_isotropic
-    fill_method1 = symmetric_isotropic
-    C0_ijkl = '30.141 35.46'
-    C1_ijkl = '10.0 10.0 '
-    c = c
-  [../]
-  [./strain]
-    type = ComputeFiniteStrain
-    block = 0
-    #base_name = phase0
-    displacements = 'disp_x disp_y'
+    fill_method = symmetric_isotropic
+    C_ijkl = '30.141 35.46'
+    disp_x = disp_x
+    disp_y = disp_y
     use_displaced_mesh = true
   [../]
-  [./stress]
-    type = ComputeFiniteStrainElasticStress
-    #base_name = phase0
+  [./Finite_strain1]
+    type = FiniteStrainElasticMaterial
+    base_name = phase1
     block = 0
+    fill_method = symmetric_isotropic
+    C_ijkl = '10.0 10.0'
+    disp_x = disp_x
+    disp_y = disp_y
+    use_displaced_mesh = true
   [../]
   #[./elasticity_tensor1]
   #  type = ComputeElasticityTensor
@@ -163,19 +178,19 @@
   [./elastic_en0]
     type = ElasticEnergyMaterial
     args = 'disp_x disp_y'
-    #base_name = phase0
+    base_name = phase0
     block = 0
     f_name = E0
     #outputs = exodus
   [../]
-  #[./elastic_en1]
-  #  type = ElasticEnergyMaterial
-  #  args = 'disp_x disp_y'
-  #  base_name = phase1
-  #  block = 0
-  #  f_name = E1
-  #  #outputs = exodus
-  #[../]
+  [./elastic_en1]
+    type = ElasticEnergyMaterial
+    args = 'disp_x disp_y'
+    base_name = phase1
+    block = 0
+    f_name = E1
+    #outputs = exodus
+  [../]
   #switching function for elastic energy calculation
   [./switching]
     type = SwitchingFunctionMaterial
@@ -185,32 +200,33 @@
     h_order = SIMPLE
   [../]
   # total elastic energy calculation
-  #[./total_elastc_en]
-  #  type = DerivativeTwoPhaseMaterial
-  #  block = 0
-  #  h = h
-  #  g = 0.0
-  #  W = 0.0
-  #  eta = c
-  #  f_name = E
-  #  fa_name = E1
-  #  fb_name = E0
-  #  derivative_order = 2
-  #[../]
+  [./total_elastc_en]
+    type = DerivativeTwoPhaseMaterial
+    block = 0
+    h = h
+    g = 0.0
+    W = 0.0
+    eta = c
+    f_name = E
+    fa_name = E1
+    fb_name = E0
+    args = 'disp_x disp_y gr0 gr1'
+    derivative_order = 2
+  [../]
   # gloabal Stress
-  #[./global_stress]
-  #  type = TwoPhaseStressMaterial
-  #  block = 0
-  #  base_A = phase1
-  #  base_B = phase0
-  #  h = h
-  #[../]
+  [./global_stress]
+    type = TwoPhaseStressMaterial
+    block = 0
+    base_A = phase1
+    base_B = phase0
+    h = h
+  [../]
   # total energy
   [./sum]
     type = DerivativeSumMaterial
     block = 0
-    sum_materials = 'S E0'
-    args = 'c gr0 gr1'
+    sum_materials = 'S E'
+    args = 'c gr0 gr1 disp_x disp_y'
     derivative_order = 2
   [../]
 []

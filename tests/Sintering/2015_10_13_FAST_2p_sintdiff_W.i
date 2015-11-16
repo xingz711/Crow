@@ -8,13 +8,13 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 80
-  ny = 40
+  nx = 70
+  ny = 60
   nz = 0
   xmin = 0.0
-  xmax = 40.0
+  xmax = 140.0
   ymin = 0.0
-  ymax = 20.0
+  ymax = 120.0
   zmax = 0
   elem_type = QUAD4
 []

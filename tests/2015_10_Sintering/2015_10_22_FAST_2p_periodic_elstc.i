@@ -2,6 +2,7 @@
   var_name_base = gr
   op_num = 2.0
   use_displaced_mesh = true
+  outputs = exodus
 []
 
 [Mesh]
@@ -47,12 +48,11 @@
     family = MONOMIAL
   [../]
 []
-
 [Functions]
   [./load]
     type = PiecewiseLinear
-    y = '0.0 -1.5 -1.5 -1.5'
-    x = '0.0 30.0 45.0 60.0'
+    y = '0.0 -0.4 -0.4'
+    x = '0.0 30.0 100.0'
   [../]
 []
 
@@ -174,8 +174,8 @@
   [./constant_mat]
     type = GenericConstantMaterial
     block = 0
-    prop_names = 'A B L  kappa_op'
-    prop_values = '16.0 1.0 1.0 0.5'
+    prop_names = 'A B L  kappa_op kappa_c'
+    prop_values = '16.0 1.0 10.0 1.0 10.0'
   [../]
   #elastic properties for phase with c =1
   [./elasticity_tensor_phase1]
@@ -210,7 +210,7 @@
     base_name = phase0
     block = 0
     fill_method = symmetric_isotropic
-    C_ijkl = '10.0 10.0'
+    C_ijkl = '2.0 2.0'
   [../]
   [./smallstrain_phase0]
     type = ComputeSmallStrain
@@ -270,17 +270,6 @@
   [../]
 []
 
-[VectorPostprocessors]
-  [./neck]
-    type = LineValueSampler
-    variable = 'c bnds'
-    start_point = '20.0 0.0 0.0'
-    end_point = '20.0 20.0 0.0'
-    sort_by = id
-    num_points = 40
-  [../]
-[]
-
 [Postprocessors]
   [./mat_D]
     type = ElementIntegralMaterialProperty
@@ -289,10 +278,12 @@
   [./elem_c]
     type = ElementIntegralVariablePostprocessor
     variable = c
+    use_displaced_mesh = false
   [../]
   [./elem_bnds]
     type = ElementIntegralVariablePostprocessor
     variable = bnds
+    use_displaced_mesh = false
   [../]
   [./s11]
     type = ElementIntegralVariablePostprocessor
@@ -324,6 +315,17 @@
   [../]
 []
 
+[VectorPostprocessors]
+  [./neck]
+    type = LineValueSampler
+    variable = 'c bnds'
+    start_point = '20.0 0.0 0.0'
+    end_point = '20.0 20.0 0.0'
+    sort_by = id
+    num_points = 40
+  [../]
+[]
+
 [Executioner]
   # Preconditioned JFNK (default)
   type = Transient
@@ -334,15 +336,21 @@
   l_max_its = 20
   nl_max_its = 20
   l_tol = 1.0e-3
-  nl_rel_tol = 1.0e-10
-  dt = 0.005
+  nl_rel_tol = 1.0e-8
+  nl_abs_tol = 1e-10
   end_time = 100
+  dt = 0.005
   [./Adaptivity]
     refine_fraction = 0.7
     coarsen_fraction = 0.1
     max_h_level = 2
     initial_adaptivity = 1
   [../]
+  #[./TimeStepper]
+  #  type = IterationAdaptiveDT
+  #  dt = 0.01
+  #  growth_factor = 1.5
+  #[../]
 []
 
 [Outputs]
@@ -355,7 +363,7 @@
   [./console]
     type = Console
     perf_log = true
-    output_on = 'timestep_end failed nonlinear linear'
+    output_on = 'initial timestep_end failed nonlinear linear'
   [../]
 []
 

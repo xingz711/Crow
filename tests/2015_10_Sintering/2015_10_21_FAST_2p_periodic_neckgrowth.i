@@ -1,21 +1,23 @@
 [GlobalParams]
   var_name_base = gr
   op_num = 2.0
-  use_displaced_mesh = true
-  outputs = exodus
+  block = 0
+  #use_displaced_mesh = true
+  #outputs = exodus
 []
 
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 80
-  ny = 40
+  nx = 40
+  ny = 30
   nz = 0
   xmin = 0.0
-  xmax = 40.0
+  xmax = 160.0
   ymin = 0.0
-  ymax = 20.0
+  ymax = 120.0
   zmax = 0
+  uniform_refine = 2
   elem_type = QUAD4
 []
 
@@ -57,7 +59,7 @@
   [./wres]
     type = SplitCHWRes
     variable = w
-    mob_name = M
+    mob_name = D
   [../]
   [./time]
     type = CoupledTimeDerivative
@@ -66,7 +68,6 @@
   [../]
   [./PolycrystalSinteringKernel]
     c = c
-    mob_name = M
   [../]
 []
 
@@ -103,39 +104,18 @@
     derivative_order = 2
     outputs = console
   [../]
-  #[./CH_mat]
-  #  type = PFDiffusionGrowth
-  #  block = 0
-  #  rho = c
-  #  v = 'gr0 gr1'
-  #  outputs = console
-  #[../]
   [./CH_mat]
-    type = SinteringDiffusion
+    type = PFDiffusionGrowth
     block = 0
-    outputs = console
-    Qv = 2.4
-    Qs = 3.14
-    GBMobility = 5.13e-20
-    surface_energy = 58.23e18
     rho = c
-    Dsurf0 = 4e-4
-    Qgb = 4.143
-    Q = 4.143
-    T = 1200
-    GB_energy = 42.85e18
-    Dgb0 = 5.0e-5
-    Dvol0 = 4e-6
-    int_width = 2
     v = 'gr0 gr1'
-    #length_scale = 1.0
-    time_scale = 1.0
+    outputs = console
   [../]
   [./constant_mat]
     type = GenericConstantMaterial
     block = 0
-    prop_names = 'A      B   kappa_op kappa_c'
-    prop_values = '4.654 0.5 1.5      2.038'
+    prop_names = '  A   B    L  kappa_op kappa_c'
+    prop_values = '16.0 1.0 1.0  0.5     1.0'
   [../]
 []
 
@@ -158,8 +138,8 @@
   [./neck]
     type = LineValueSampler
     variable = 'c bnds'
-    start_point = '20.0 0.0 0.0'
-    end_point = '20.0 20.0 0.0'
+    start_point = '80.0 0.0 0.0'
+    end_point = '80.0 120.0 0.0'
     sort_by = id
     num_points = 40
   [../]
@@ -174,17 +154,17 @@
   petsc_options_value = 'asm         31   preonly   lu      1'
   l_max_its = 20
   nl_max_its = 20
-  l_tol = 1.0e-4
-  nl_rel_tol = 1.0e-6
-  nl_abs_tol = 1.0e-10
-  end_time = 30.0
-  dt = 0.005
-  [./Adaptivity]
-    refine_fraction = 0.7
-    coarsen_fraction = 0.1
-    max_h_level = 2
-    initial_adaptivity = 1
-  [../]
+  l_tol = 1.0e-3
+  nl_rel_tol = 1.0e-8
+  nl_abs_step_tol = 1e-10
+  end_time = 100
+  dt = 0.01
+  #[./Adaptivity]
+  #  refine_fraction = 0.7
+  #  coarsen_fraction = 0.1
+  #  max_h_level = 2
+  #  initial_adaptivity = 1
+  #[../]
   #[./TimeStepper]
   #  type = IterationAdaptiveDT
   #  dt = 0.01
@@ -207,21 +187,21 @@
 
 [ICs]
   [./ic_gr1]
-    int_width = 2.0
-    x1 = 25.0
-    y1 = 10.0
-    radius = 7.0
+    int_width = 9.0
+    x1 = 50.0
+    y1 = 60.0
+    radius = 30.0
     outvalue = 0.0
     variable = gr1
     invalue = 1.0
     type = SmoothCircleIC
   [../]
   [./multip]
-    x_positions = '10.0 25.0'
-    int_width = 2.0
+    x_positions = '50.0 110.0'
+    int_width = 9.0
     z_positions = '0 0'
-    y_positions = '10.0 10.0 '
-    radii = '7.0 7.0'
+    y_positions = '60.0 60.0 '
+    radii = '30.0 30.0'
     3D_spheres = false
     outvalue = 0.001
     variable = c
@@ -230,10 +210,10 @@
     block = 0
   [../]
   [./ic_gr0]
-    int_width = 2.0
-    x1 = 10.0
-    y1 = 10.0
-    radius = 7.0
+    int_width = 9.0
+    x1 = 110.0
+    y1 = 60.0
+    radius = 30.0
     outvalue = 0.0
     variable = gr0
     invalue = 1.0

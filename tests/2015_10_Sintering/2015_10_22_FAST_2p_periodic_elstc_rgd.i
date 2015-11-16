@@ -1,7 +1,8 @@
 [GlobalParams]
   var_name_base = gr
   op_num = 2.0
-  use_displaced_mesh = true
+  #use_displaced_mesh = true
+  #outputs = exodus
 []
 
 [Mesh]
@@ -46,13 +47,52 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
+  [./dF00]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./dF01]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./dF10]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./dF11]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv00]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv01]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv10]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv11]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv_div0]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv_div1]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
 []
-
 [Functions]
   [./load]
     type = PiecewiseLinear
-    y = '0.0 -1.5 -1.5 -1.5'
-    x = '0.0 30.0 45.0 60.0'
+    y = '0.0 -0.4 -0.4'
+    x = '0.0 30.0 100.0'
   [../]
 []
 
@@ -89,6 +129,25 @@
   [./TensorMechanics]
     displacements = 'disp_x disp_y'
   [../]
+  [./motion]
+    type = MultiGrainRigidBodyMotion
+    variable = w
+    c = c
+    v = 'gr0 gr1'
+  [../]
+  [./vadv_gr0]
+    type = SingleGrainRigidBodyMotion
+    variable = gr0
+    c = c
+    v = 'gr0 gr1'
+  [../]
+  [./vadv_gr1]
+    type = SingleGrainRigidBodyMotion
+    variable = gr1
+    c = c
+    v = 'gr0 gr1'
+    op_index = 1
+  [../]
 []
 
 [AuxKernels]
@@ -118,6 +177,65 @@
     index_j = 1
     index_i = 1
     block = 0
+  [../]
+  [./dF00]
+    type = MaterialStdVectorRealGradientAux
+    variable = dF00
+    property = force_density
+  [../]
+  [./dF01]
+    type = MaterialStdVectorRealGradientAux
+    variable = dF01
+    property = force_density
+    component = 1
+  [../]
+  [./dF10]
+    type = MaterialStdVectorRealGradientAux
+    variable = dF10
+    property = force_density
+    index = 1
+  [../]
+  [./dF11]
+    type = MaterialStdVectorRealGradientAux
+    variable = dF11
+    property = force_density
+    index = 1
+    component = 1
+  [../]
+  [./vadv00]
+    type = MaterialStdVectorRealGradientAux
+    variable = vadv00
+    property = advection_velocity
+  [../]
+  [./vadv01]
+    type = MaterialStdVectorRealGradientAux
+    variable = vadv01
+    property = advection_velocity
+    component = 1
+  [../]
+  [./vadv10]
+    type = MaterialStdVectorRealGradientAux
+    variable = vadv10
+    property = advection_velocity
+    index = 1
+  [../]
+  [./vadv11]
+    type = MaterialStdVectorRealGradientAux
+    variable = vadv11
+    property = advection_velocity
+    index = 1
+    component = 1
+  [../]
+  [./vadv_div0]
+    type = MaterialStdVectorAux
+    variable = vadv_div0
+    property = advection_velocity_divergence
+  [../]
+  [./vadv_div1]
+    type = MaterialStdVectorAux
+    variable = vadv_div1
+    index = 1
+    property = advection_velocity_divergence
   [../]
 []
 
@@ -174,8 +292,8 @@
   [./constant_mat]
     type = GenericConstantMaterial
     block = 0
-    prop_names = 'A B L  kappa_op'
-    prop_values = '16.0 1.0 1.0 0.5'
+    prop_names = 'A B L  kappa_op kappa_c'
+    prop_values = '16.0 1.0 10.0 1.0 10.0'
   [../]
   #elastic properties for phase with c =1
   [./elasticity_tensor_phase1]
@@ -210,7 +328,7 @@
     base_name = phase0
     block = 0
     fill_method = symmetric_isotropic
-    C_ijkl = '10.0 10.0'
+    C_ijkl = '2.0 2.0'
   [../]
   [./smallstrain_phase0]
     type = ComputeSmallStrain
@@ -268,9 +386,34 @@
     args = 'c gr0 gr1'
     derivative_order = 2
   [../]
+  # materials for rigid body motion / grain advection
+  [./force_density]
+    type = ForceDensityMaterial
+    block = 0
+    c = c
+    etas = 'gr0 gr1'
+    cgb = 0.14
+    k = 10
+  [../]
+  [./vadv]
+    type = GrainAdvectionVelocity
+    block = 0
+    grain_force = grain_force
+    etas = 'gr0 gr1'
+    c = c
+    grain_data = grain_center
+  [../]
 []
 
 [VectorPostprocessors]
+  [./centers]
+    type = GrainCentersPostprocessor
+    grain_data = grain_center
+  [../]
+  [./forces]
+    type = GrainForcesPostprocessor
+    grain_force = grain_force
+  [../]
   [./neck]
     type = LineValueSampler
     variable = 'c bnds'
@@ -278,6 +421,20 @@
     end_point = '20.0 20.0 0.0'
     sort_by = id
     num_points = 40
+  [../]
+[]
+
+[UserObjects]
+  [./grain_center]
+    type = ComputeGrainCenterUserObject
+    etas = 'gr0 gr1'
+    execute_on = 'initial linear'
+  [../]
+  [./grain_force]
+    type = ComputeGrainForceAndTorque
+    grain_data = grain_center
+    c = c
+    execute_on = 'initial linear'
   [../]
 []
 
@@ -289,10 +446,12 @@
   [./elem_c]
     type = ElementIntegralVariablePostprocessor
     variable = c
+    use_displaced_mesh = false
   [../]
   [./elem_bnds]
     type = ElementIntegralVariablePostprocessor
     variable = bnds
+    use_displaced_mesh = false
   [../]
   [./s11]
     type = ElementIntegralVariablePostprocessor
@@ -324,6 +483,17 @@
   [../]
 []
 
+[VectorPostprocessors]
+  [./neck]
+    type = LineValueSampler
+    variable = 'c bnds'
+    start_point = '20.0 0.0 0.0'
+    end_point = '20.0 20.0 0.0'
+    sort_by = id
+    num_points = 40
+  [../]
+[]
+
 [Executioner]
   # Preconditioned JFNK (default)
   type = Transient
@@ -334,15 +504,21 @@
   l_max_its = 20
   nl_max_its = 20
   l_tol = 1.0e-3
-  nl_rel_tol = 1.0e-10
-  dt = 0.005
+  nl_rel_tol = 1.0e-8
+  nl_abs_tol = 1e-10
   end_time = 100
+  dt = 0.005
   [./Adaptivity]
     refine_fraction = 0.7
     coarsen_fraction = 0.1
     max_h_level = 2
     initial_adaptivity = 1
   [../]
+  #[./TimeStepper]
+  #  type = IterationAdaptiveDT
+  #  dt = 0.01
+  #  growth_factor = 1.5
+  #[../]
 []
 
 [Outputs]
@@ -355,7 +531,7 @@
   [./console]
     type = Console
     perf_log = true
-    output_on = 'timestep_end failed nonlinear linear'
+    output_on = 'initial timestep_end failed nonlinear linear'
   [../]
 []
 

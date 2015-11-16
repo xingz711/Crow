@@ -1,5 +1,7 @@
 #include "ThermalVariation.h"
 // #include "AddV.h"
+// libMesh includes
+#include "libmesh/quadrature.h"
 
 template<>
 InputParameters validParams<ThermalVariation>()

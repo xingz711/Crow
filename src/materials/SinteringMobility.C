@@ -1,4 +1,6 @@
 #include "SinteringMobility.h"
+// libMesh includes
+#include "libmesh/quadrature.h"
 
 template<>
 InputParameters validParams<SinteringMobility>()

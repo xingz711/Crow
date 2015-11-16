@@ -57,7 +57,7 @@
   [./wres]
     type = SplitCHWRes
     variable = w
-    mob_name = M
+    mob_name = D
   [../]
   [./time]
     type = CoupledTimeDerivative
@@ -66,7 +66,6 @@
   [../]
   [./PolycrystalSinteringKernel]
     c = c
-    mob_name = M
   [../]
 []
 
@@ -103,39 +102,18 @@
     derivative_order = 2
     outputs = console
   [../]
-  #[./CH_mat]
-  #  type = PFDiffusionGrowth
-  #  block = 0
-  #  rho = c
-  #  v = 'gr0 gr1'
-  #  outputs = console
-  #[../]
   [./CH_mat]
-    type = SinteringDiffusion
+    type = PFDiffusionGrowth
     block = 0
-    outputs = console
-    Qv = 2.4
-    Qs = 3.14
-    GBMobility = 5.13e-20
-    surface_energy = 58.23e18
     rho = c
-    Dsurf0 = 4e-4
-    Qgb = 4.143
-    Q = 4.143
-    T = 1200
-    GB_energy = 42.85e18
-    Dgb0 = 5.0e-5
-    Dvol0 = 4e-6
-    int_width = 2
     v = 'gr0 gr1'
-    #length_scale = 1.0
-    time_scale = 1.0
+    outputs = console
   [../]
   [./constant_mat]
     type = GenericConstantMaterial
     block = 0
-    prop_names = 'A      B   kappa_op kappa_c'
-    prop_values = '4.654 0.5 1.5      2.038'
+    prop_names = 'A B L  kappa_op kappa_c'
+    prop_values = '16.0 1.0 10.0 1.0 10.0'
   [../]
 []
 
@@ -174,10 +152,9 @@
   petsc_options_value = 'asm         31   preonly   lu      1'
   l_max_its = 20
   nl_max_its = 20
-  l_tol = 1.0e-4
-  nl_rel_tol = 1.0e-6
-  nl_abs_tol = 1.0e-10
-  end_time = 30.0
+  l_tol = 1.0e-3
+  nl_rel_tol = 1.0e-10
+  end_time = 100
   dt = 0.005
   [./Adaptivity]
     refine_fraction = 0.7
@@ -197,7 +174,7 @@
   output_on = 'initial timestep_end'
   print_linear_residuals = true
   csv = true
-  interval = 100
+  #interval = 100
   [./console]
     type = Console
     perf_log = true

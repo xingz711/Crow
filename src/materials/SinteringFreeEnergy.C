@@ -46,7 +46,9 @@ SinteringFreeEnergy::computeF()
       SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp]; //Sum all other order parameters
       SumEtaj3 += (*_vals[i])[_qp]*(*_vals[i])[_qp]*(*_vals[i])[_qp];
     }
-  return _A[_qp] * _c[_qp] * _c[_qp] * (1.0 - _c[_qp]) * (1.0 - _c[_qp]) + _B[_qp] * (_c[_qp] * _c[_qp] + 6.0 * (1.0 - _c[_qp]) * SumEtaj - 4.0 * (2.0 - _c[_qp]) * SumEtaj3 + 3.0 * SumEtaj * SumEtaj);
+  return _A[_qp] * _c[_qp] * _c[_qp] * (1.0 - _c[_qp]) * (1.0 - _c[_qp])
+         + _B[_qp] * (_c[_qp] * _c[_qp] + 6.0 * (1.0 - _c[_qp]) * SumEtaj
+         - 4.0 * (2.0 - _c[_qp]) * SumEtaj3 + 3.0 * SumEtaj * SumEtaj);
 }
 
 Real
@@ -61,7 +63,8 @@ SinteringFreeEnergy::computeDF(unsigned int j_var)
       SumEtaj += (*_vals[i])[_qp] * (*_vals[i])[_qp]; //Sum all other order parameters
       SumEtaj3 += (*_vals[i])[_qp] * (*_vals[i])[_qp] * (*_vals[i])[_qp];
     }
-    return 4.0 * _A[_qp] * _c[_qp] * _c[_qp] * _c[_qp]- 6.0 * _A[_qp] * _c[_qp] * _c[_qp] + 2.0 * (_A[_qp] + _B[_qp]) * _c[_qp] - 6.0 * _B[_qp] * SumEtaj + 4.0 * _B[_qp] * SumEtaj3;
+    return 4.0 * _A[_qp] * _c[_qp] * _c[_qp] * _c[_qp]- 6.0 * _A[_qp] * _c[_qp] * _c[_qp]
+           + 2.0 * (_A[_qp] + _B[_qp]) * _c[_qp] - 6.0 * _B[_qp] * SumEtaj + 4.0 * _B[_qp] * SumEtaj3;
   }
   else
     return 0.0;
@@ -71,7 +74,9 @@ SinteringFreeEnergy::computeDF(unsigned int j_var)
     if (j_var == _vals_var[i])
     {
       SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp]; //Sum all other order parameters
-      return 12.0 * _B[_qp] * (1.0 - _c[_qp]) * (*_vals[i])[_qp] - 12.0 * _B[_qp] * (2.0 - _c[_qp]) * (*_vals[i])[_qp] * (*_vals[i])[_qp] + 12.0 * _B[_qp] * SumEtaj * (*_vals[i])[_qp];
+      return 12.0 * _B[_qp] * (1.0 - _c[_qp]) * (*_vals[i])[_qp]
+             - 12.0 * _B[_qp] * (2.0 - _c[_qp]) * (*_vals[i])[_qp] * (*_vals[i])[_qp]
+             + 12.0 * _B[_qp] * SumEtaj * (*_vals[i])[_qp];
     }
     else
       return 0.0;
@@ -90,14 +95,15 @@ SinteringFreeEnergy::computeD2F(unsigned int j_var, unsigned int k_var)
   for (unsigned int i = 0; i < _ncrys; ++i)
   {
     if ( (j_var == _c_var) && (k_var == _vals_var[i]))
-      return - 12.0 * _B[_qp] * (*_vals[i])[_qp] + 12.0 * _B[_qp] * (*_vals[i])[_qp] * (*_vals[i])[_qp];
+      return -12.0 * _B[_qp] * (*_vals[i])[_qp] + 12.0 * _B[_qp] * (*_vals[i])[_qp] * (*_vals[i])[_qp];
     else
       return 0.0;
 
     if ((j_var == _vals_var[i]) && (k_var == _vals_var[i]))
     {
       SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp]; //Sum all other order parameters
-      return 12.0 * _B[_qp] * (1.0 - _c[_qp]) - 24.0 * _B[_qp] * (2.0 - _c[_qp]) * (*_vals[i])[_qp] + 12.0 * _B[_qp] * SumEtaj + 24.0 * _B[_qp] * (*_vals[i])[_qp]*(*_vals[i])[_qp];
+      return 12.0 * _B[_qp] * (1.0 - _c[_qp]) - 24.0 * _B[_qp] * (2.0 - _c[_qp]) * (*_vals[i])[_qp]
+             + 12.0 * _B[_qp] * SumEtaj + 24.0 * _B[_qp] * (*_vals[i])[_qp]*(*_vals[i])[_qp];
     }
     else
       return 0.0;
@@ -108,7 +114,7 @@ Real
 SinteringFreeEnergy::computeD3F(unsigned int j_var, unsigned int k_var, unsigned int l_var)
 {
   if ((j_var == _c_var) && (k_var == _c_var) && (l_var == _c_var))
-    return - 12.0 * _A[_qp] + 24.0 * _A[_qp] * _c[_qp];
+    return -12.0 * _A[_qp] + 24.0 * _A[_qp] * _c[_qp];
   else
     return 0.0;
 }

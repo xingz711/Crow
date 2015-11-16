@@ -1,4 +1,6 @@
 #include "SinteringDiffusion.h"
+// libMesh includes
+#include "libmesh/quadrature.h"
 
 template<>
 InputParameters validParams<SinteringDiffusion>()

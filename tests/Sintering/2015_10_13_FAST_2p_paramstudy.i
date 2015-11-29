@@ -120,7 +120,7 @@
     type = ParsedMaterial
     block = 0
     f_name = L
-    function = D/10.0
+    function = D*10.0
     material_property_names = D
   [../]
 []

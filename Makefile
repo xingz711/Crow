@@ -22,7 +22,7 @@ include $(FRAMEWORK_DIR)/moose.mk
 ################################## MODULES ####################################
 #-ALL_MODULES := yes
 PHASE_FIELD       := yes
-SOLID_MECHANICS   := yes
+#SOLID_MECHANICS   := yes
 TENSOR_MECHANICS  := yes
 HEAT_CONDUCTION   := yes
 MISC              := yes

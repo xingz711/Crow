@@ -1,6 +1,6 @@
 #include "PFElasticEnergyAux.h"
 
-#include "SymmTensor.h"
+//#include "SymmTensor.h"
 
 template<>
 InputParameters validParams<PFElasticEnergyAux>()
@@ -12,8 +12,8 @@ InputParameters validParams<PFElasticEnergyAux>()
 
 PFElasticEnergyAux::PFElasticEnergyAux( const InputParameters & parameters )
   :AuxKernel(parameters),
-   _stress( getMaterialProperty<SymmTensor>("stress") ),
-   _elastic_strain(getMaterialProperty<SymmTensor>("elastic_strain"))
+   _stress( getMaterialProperty<RankTwoTensor>("stress") ),
+   _elastic_strain(getMaterialProperty<RankTwoTensor>("elastic_strain"))
    //_applied_stress_vector(getParam<std::vector<Real> >("applied_stress_vector")),
     //_applied_stress_tensor
 {

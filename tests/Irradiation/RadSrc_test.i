@@ -36,7 +36,7 @@
   [../]
 
   [./ch_rad]
-    type = CHParsed
+    type = CahnHilliard
     variable = cv
     mob_name = M
     f_name = F

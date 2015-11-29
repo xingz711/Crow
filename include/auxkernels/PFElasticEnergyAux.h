@@ -21,8 +21,8 @@ public:
 protected:
   virtual Real computeValue();
 
-  const MaterialProperty<SymmTensor> & _stress;
-  const MaterialProperty<SymmTensor> & _elastic_strain;
+  const MaterialProperty<RankTwoTensor> & _stress;
+  const MaterialProperty<RankTwoTensor> & _elastic_strain;
 
 //private:
   //std::vector<Real> _applied_stress_vector;

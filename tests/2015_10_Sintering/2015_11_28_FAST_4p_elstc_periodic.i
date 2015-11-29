@@ -40,31 +40,11 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
-  [./e11]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./e22]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
   [./S11]
     order = CONSTANT
     family = MONOMIAL
   [../]
   [./S22]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./ElasticEn]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./C1111]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./C2222]
     order = CONSTANT
     family = MONOMIAL
   [../]
@@ -81,7 +61,8 @@
 [Preconditioning]
   [./SMP]
     type = SMP
-    full = true
+    off_diag_column = 'c w c   c   c   c   gr0 gr1 gr2 gr3 disp_x disp_y'
+    off_diag_row    = 'w c gr0 gr1 gr2 gr3 c   c   c   c   disp_y disp_x'
   [../]
 []
 
@@ -148,22 +129,6 @@
     kappa_names = 'kappa_c kappa_op kappa_op kappa_op kappa_op'
     interfacial_vars = 'c  gr0 gr1 gr2 gr3'
   [../]
-  [./e11]
-    type = RankTwoAux
-    variable = e11
-    rank_two_tensor = total_strain
-    index_j = 0
-    index_i = 0
-    block = 0
-  [../]
-  [./e22]
-    type = RankTwoAux
-    variable = e22
-    rank_two_tensor = total_strain
-    index_j = 1
-    index_i = 1
-    block = 0
-  [../]
   [./S11]
     type = RankTwoAux
     variable = S11
@@ -177,31 +142,6 @@
     variable = S22
     rank_two_tensor = stress
     index_j = 1
-    index_i = 1
-    block = 0
-  [../]
-  [./ElasticEn]
-    type = TensorElasticEnergyAux
-    variable = ElasticEn
-    block = 0
-  [../]
-  [./C1111]
-    type = RankFourAux
-    variable = C1111
-    rank_four_tensor = elasticity_tensor
-    index_l = 0
-    index_j = 0
-    index_k = 0
-    index_i = 0
-    block = 0
-  [../]
-  [./C2222]
-    type = RankFourAux
-    variable = C2222
-    rank_four_tensor = elasticity_tensor
-    index_l = 1
-    index_j = 1
-    index_k = 1
     index_i = 1
     block = 0
   [../]
@@ -251,37 +191,96 @@
     v = 'gr0 gr1 gr2 gr3'
     outputs = console
   [../]
-  [./Elstc_en]
-    type = ElasticEnergyMaterial
-    block = 0
-    f_name = E
-    args = 'c gr0 gr1 gr2 gr3'
-    derivative_order = 2
-  [../]
-  [./ElasticityTensor]
-    type = ComputeConcentrationDependentElasticityTensor
-    block = 0
-    c = c
-    C1_ijkl = '30.141 35.46'
-    C0_ijkl = '10.0 10.0'
-    fill_method1 = symmetric_isotropic
-    fill_method0 = symmetric_isotropic
-  [../]
-  [./strain]
-    type = ComputeSmallStrain
-    block = 0
-    displacements = 'disp_x disp_y'
-  [../]
-  [./stress]
-    type = ComputeLinearElasticStress
-    block = 0
-  [../]
   [./constant_mat]
     type = GenericConstantMaterial
     block = 0
-    prop_names = 'A B L  kappa_op'
-    prop_values = '16.0 1.0 1.0 0.5'
+    prop_names = 'A B L  kappa_op kappa_c'
+    prop_values = '16.0 1.0 10.0 1.0 10.0'
   [../]
+  #elastic properties for phase with c =1
+  [./elasticity_tensor_phase1]
+    type = ComputeElasticityTensor
+    base_name = phase1
+    block = 0
+    fill_method = symmetric_isotropic
+    C_ijkl = '30.141 35.46'
+  [../]
+  [./smallstrain_phase1]
+    type = ComputeSmallStrain
+    base_name = phase1
+    block = 0
+    displacements = 'disp_x disp_y'
+  [../]
+  [./stress_phase1]
+    type = ComputeLinearElasticStress
+    base_name = phase1
+    block = 0
+  [../]
+  [./elstc_en_phase1]
+    type = ElasticEnergyMaterial
+    base_name = phase1
+    f_name = Fe1
+    block = 0
+    args = 'c'
+    derivative_order = 2
+  [../]
+  #elastic properties for phase with c = 0
+  [./elasticity_tensor_phase0]
+    type = ComputeElasticityTensor
+    base_name = phase0
+    block = 0
+    fill_method = symmetric_isotropic
+    C_ijkl = '2.0 2.0'
+  [../]
+  [./smallstrain_phase0]
+    type = ComputeSmallStrain
+    base_name = phase0
+    block = 0
+    displacements = 'disp_x disp_y'
+  [../]
+  [./stress_phase0]
+    type = ComputeLinearElasticStress
+    base_name = phase0
+    block = 0
+  [../]
+  [./elstc_en_phase0]
+    type = ElasticEnergyMaterial
+    base_name = phase0
+    f_name = Fe0
+    block = 0
+    args = 'c'
+    derivative_order = 2
+  [../]
+  #switching function for elastic energy calculation
+  [./switching]
+    type = SwitchingFunctionMaterial
+    block = 0
+    function_name = h
+    eta = c
+    h_order = SIMPLE
+  [../]
+  # total elastic energy calculation
+  [./total_elastc_en]
+    type = DerivativeTwoPhaseMaterial
+    block = 0
+    h = h
+    g = 0.0
+    W = 0.0
+    eta = c
+    f_name = E
+    fa_name = Fe1
+    fb_name = Fe0
+    derivative_order = 2
+  [../]
+  # gloabal Stress
+  [./global_stress]
+    type = TwoPhaseStressMaterial
+    block = 0
+    base_A = phase1
+    base_B = phase0
+    h = h
+  [../]
+  # total energy
   [./sum]
     type = DerivativeSumMaterial
     block = 0
@@ -304,6 +303,34 @@
     type = ElementIntegralVariablePostprocessor
     variable = bnds
   [../]
+  [./s11]
+    type = ElementIntegralVariablePostprocessor
+    variable = S11
+  [../]
+  [./s22]
+    type = ElementIntegralVariablePostprocessor
+    variable = S22
+  [../]
+  [./total_energy]
+    type = ElementIntegralVariablePostprocessor
+    variable = total_en
+  [../]
+  [./free_en]
+    type = ElementIntegralMaterialProperty
+    mat_prop = F
+  [../]
+  [./chem_free_en]
+    type = ElementIntegralMaterialProperty
+    mat_prop = S
+  [../]
+  [./elstc_en0]
+    type = ElementIntegralMaterialProperty
+    mat_prop = Fe0
+  [../]
+  [./elstc_en1]
+    type = ElementIntegralMaterialProperty
+    mat_prop = Fe1
+  [../]
 []
 
 [Executioner]
@@ -316,9 +343,9 @@
   l_max_its = 20
   nl_max_its = 20
   l_tol = 1.0e-3
-  nl_rel_tol = 1.0e-10
+  nl_rel_tol = 1.0e-8
   dt = 0.01
-  end_time = 60
+  end_time = 100
   [./Adaptivity]
     refine_fraction = 0.7
     coarsen_fraction = 0.1

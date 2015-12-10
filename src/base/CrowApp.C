@@ -1,6 +1,8 @@
 #include "CrowApp.h"
 #include "Moose.h"
 #include "AppFactory.h"
+#include "MooseSyntax.h"
+
 //#include "CombinedApp.h"
 #include "PhaseFieldApp.h"
 //#include "SolidMechanicsApp.h"

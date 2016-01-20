@@ -3,14 +3,14 @@
 template<>
 InputParameters validParams<ACParticleGrowth>()
 {
-  InputParameters params = validParams<ACBulk>();
+  InputParameters params = ACBulk<Real>::validParams();
   params.addRequiredCoupledVar("v", "Array of order parameter names except the current one");
   params.addRequiredCoupledVar("c", "phase field variable, particle density");
   return params;
 }
 
 ACParticleGrowth::ACParticleGrowth(const InputParameters & parameters) :
-    ACBulk(parameters),
+    ACBulk<Real>(parameters),
     _c(coupledValue("c")),
     _c_var(coupled("c")),
     _L(getMaterialProperty<Real>("mob_name")),

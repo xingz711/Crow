@@ -5,7 +5,7 @@
 template<>
 InputParameters validParams<ACSinteringGrowth>()
 {
-  InputParameters params = validParams<ACBulk>();
+  InputParameters params = ACBulk<Real>::validParams();
   params.addRequiredCoupledVar("v", "Array of coupled variable names");
   params.addCoupledVar("T", "temperature");
   params.addRequiredCoupledVar("rho", "phase field variable");
@@ -14,7 +14,7 @@ InputParameters validParams<ACSinteringGrowth>()
 }
 
 ACSinteringGrowth::ACSinteringGrowth(const InputParameters & parameters) :
-    ACBulk(parameters),
+    ACBulk<Real>(parameters),
     //_mu(getMaterialProperty<Real>("mu")),
     //_gamma(getMaterialProperty<Real>("gamma_asymm")),
     _tgrad_corr_mult(getMaterialProperty<Real>("tgrad_corr_mult")),

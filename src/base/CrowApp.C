@@ -1,6 +1,7 @@
 #include "CrowApp.h"
 #include "Moose.h"
 #include "AppFactory.h"
+#include "MooseSyntax.h"
 //#include "CombinedApp.h"
 #include "PhaseFieldApp.h"
 //#include "SolidMechanicsApp.h"
@@ -77,11 +78,11 @@ CrowApp::CrowApp(const InputParameters & parameters) :
 
   Moose::associateSyntax(_syntax, _action_factory);
 //  ModulesApp::associateSyntax(_syntax, _action_factory);
-   PhaseFieldApp::associateSyntax(_syntax, _action_factory);
+  PhaseFieldApp::associateSyntax(_syntax, _action_factory);
    //SolidMechanicsApp::associateSyntax(_syntax, _action_factory);
-   TensorMechanicsApp::associateSyntax(_syntax, _action_factory);
-   HeatConductionApp::associateSyntax(_syntax, _action_factory);
-   MiscApp::associateSyntax(_syntax, _action_factory);
+  TensorMechanicsApp::associateSyntax(_syntax, _action_factory);
+  HeatConductionApp::associateSyntax(_syntax, _action_factory);
+  MiscApp::associateSyntax(_syntax, _action_factory);
   // CombinedApp::associateSyntax(_syntax, _action_factory);
 //+  MooseTestApp::associateSyntax(_syntax, _action_factory);
 

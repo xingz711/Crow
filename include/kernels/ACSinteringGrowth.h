@@ -14,7 +14,7 @@ InputParameters validParams<ACSinteringGrowth>();
  * It calculates the residual of the ith order parameter, and the values of
  * all other order parameters are coupled variables and are stored in vals.
  */
-class ACSinteringGrowth : public ACBulk
+class ACSinteringGrowth : public ACBulk<Real>
 {
 public:
   ACSinteringGrowth(const InputParameters & parameters);

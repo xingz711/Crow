@@ -14,7 +14,7 @@ InputParameters validParams<ACParticleGrowth>();
  * It calculates the residual of the ith order parameter, and the values of
  * all other order parameters are coupled variables and are stored in vals.
  */
-class ACParticleGrowth : public ACBulk
+class ACParticleGrowth : public ACBulk<Real>
 {
 public:
   ACParticleGrowth(const InputParameters & parameters);

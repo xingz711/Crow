@@ -1,6 +1,9 @@
 #include "BubblesBicrystalIC.h"
 #include "MooseMesh.h"
 
+// MOOSE includes
+#include "MooseMesh.h"
+
 template<>
 InputParameters validParams<BubblesBicrystalIC>()
 {

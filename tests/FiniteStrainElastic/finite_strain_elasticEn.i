@@ -71,6 +71,12 @@
 []
 
 [BCs]
+  #[./Periodic]
+  #  [./All]
+  #    auto_direction = 'x y'
+  #    variable = 'c w gr0 gr1'
+  #  [../]
+  #[../]
   [./symmy]
     type = PresetBC
     variable = disp_y
@@ -80,7 +86,7 @@
   [./symmx]
     type = PresetBC
     variable = disp_x
-    boundary = left
+    boundary = 'left right'
     value = 0
   [../]
   #[./symmz]
@@ -117,8 +123,8 @@
   [./constant_mat]
     type = GenericConstantMaterial
     block = 0
-    prop_names = 'A B L  kappa_op'
-    prop_values = '16.0 1.0 1.0 0.5'
+    prop_names = 'A B L  kappa_op kappa_c'
+    prop_values = '16.0 1.0 1.0 0.5 1.0'
   [../]
   #[./elasticity_tensor]
   #  type = ComputeConcentrationDependentElasticityTensor
@@ -137,50 +143,69 @@
   #  displacements = 'disp_x disp_y'
   #  use_displaced_mesh = true
   #[../]
-  [./Finite_strain0]
-    type = FiniteStrainElasticMaterial
-    base_name = phase0
-    block = 0
-    fill_method = symmetric_isotropic
-    C_ijkl = '30.141 35.46'
-    disp_x = disp_x
-    disp_y = disp_y
-    use_displaced_mesh = true
-  [../]
-  [./Finite_strain1]
-    type = FiniteStrainElasticMaterial
-    base_name = phase1
-    block = 0
-    fill_method = symmetric_isotropic
-    C_ijkl = '10.0 10.0'
-    disp_x = disp_x
-    disp_y = disp_y
-    use_displaced_mesh = true
-  [../]
-  #[./elasticity_tensor1]
-  #  type = ComputeElasticityTensor
+  #[./Finite_strain0]
+  #  type = FiniteStrainElasticMaterial
+  #  base_name = phase0
+  #  block = 0
+  #  fill_method = symmetric_isotropic
+  #  C_ijkl = '30.141 35.46'
+  #  disp_x = disp_x
+  #  disp_y = disp_y
+  #  use_displaced_mesh = true
+  #[../]
+  #[./Finite_strain1]
+  #  type = FiniteStrainElasticMaterial
   #  base_name = phase1
   #  block = 0
   #  fill_method = symmetric_isotropic
   #  C_ijkl = '10.0 10.0'
+  #  disp_x = disp_x
+  #  disp_y = disp_y
+  #  use_displaced_mesh = true
   #[../]
-  #[./strain1]
-  #  type = ComputeFiniteStrain
-  #  block = 0
-  #  base_name = phase1
-  #  displacements = 'disp_x disp_y'
-  #[../]
-  #[./stress1]
-  #  type = ComputeFiniteStrainElasticStress
-  #  base_name = phase1
-  #  block = 0
-  #[../]
+  [./elasticity_tensor0]
+    type = ComputeElasticityTensor
+    base_name = phase0
+    block = 0
+    fill_method = symmetric_isotropic
+    C_ijkl = '10.0 10.0'
+  [../]
+  [./strain0]
+    type = ComputeFiniteStrain
+    block = 0
+    base_name = phase0
+    displacements = 'disp_x disp_y'
+  [../]
+  [./stress0]
+    type = ComputeFiniteStrainElasticStress
+    base_name = phase0
+    block = 0
+  [../]
+  [./elasticity_tensor1]
+    type = ComputeElasticityTensor
+    base_name = phase1
+    block = 0
+    fill_method = symmetric_isotropic
+    C_ijkl = '1.0 1.0'
+  [../]
+  [./strain1]
+    type = ComputeFiniteStrain
+    block = 0
+    base_name = phase1
+    displacements = 'disp_x disp_y'
+  [../]
+  [./stress1]
+    type = ComputeFiniteStrainElasticStress
+    base_name = phase1
+    block = 0
+  [../]
   [./elastic_en0]
     type = ElasticEnergyMaterial
     args = 'disp_x disp_y'
     base_name = phase0
     block = 0
     f_name = E0
+    derivative_order = 2
     #outputs = exodus
   [../]
   [./elastic_en1]
@@ -189,6 +214,7 @@
     base_name = phase1
     block = 0
     f_name = E1
+    derivative_order = 2
     #outputs = exodus
   [../]
   #switching function for elastic energy calculation
@@ -234,7 +260,9 @@
 [Preconditioning]
   [./smp]
     type = SMP
-    full = true
+    off_diag_column = 'c w c   c   gr0 gr1 disp_x disp_y'
+    off_diag_row    = 'w c gr0 gr1 c   c   disp_y disp_x'
+    #full = true
   [../]
 []
 
@@ -250,13 +278,13 @@
   l_tol = 1.0e-3
   nl_rel_tol = 1.0e-10
   dt = 0.005
-  end_time = 100
-  [./Adaptivity]
-    refine_fraction = 0.7
-    coarsen_fraction = 0.1
-    max_h_level = 2
-    initial_adaptivity = 1
-  [../]
+  end_time = 10
+  #[./Adaptivity]
+  #  refine_fraction = 0.7
+  #  coarsen_fraction = 0.1
+  #  max_h_level = 2
+  #  initial_adaptivity = 1
+  #[../]
 []
 
 

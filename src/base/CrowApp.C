@@ -1,5 +1,7 @@
 #include "CrowApp.h"
-#include "Moose.h"
+// #include "Moose.h"
+#include "Factory.h"
+#include "ActionFactory.h"
 #include "AppFactory.h"
 #include "MooseSyntax.h"
 //#include "CombinedApp.h"
@@ -27,8 +29,8 @@
 #include "PFDiffusionGrowth.h"
 #include "PFDiffusionGrowth1.h"
 #include "PFParticleGrowth.h"
-#include "PFEigenStrainMaterial.h"
-#include "PFEigenStrainMaterial1.h"
+// #include "PFEigenStrainMaterial.h"
+// #include "PFEigenStrainMaterial1.h"
 #include "TwoParticleGrainsIC.h"
 #include "PFTempMobility.h"
 #include "Mobility.h"
@@ -103,13 +105,13 @@ extern "C" void CrowApp__registerApps() { CrowApp::registerApps(); }
 void
 CrowApp::registerApps()
 {
-  #undef  registerApp
-  #define registerApp(name) AppFactory::instance().reg<name>(#name)
+  // #undef  registerApp
+  // #define registerApp(name) AppFactory::instance().reg<name>(#name)
 
     registerApp(CrowApp);
 
-  #undef  registerApp
-  #define registerApp(name) AppFactory::instance().regLegacy<name>(#name)
+  // #undef  registerApp
+  // #define registerApp(name) AppFactory::instance().regLegacy<name>(#name)
 }
 
 extern "C" void CrowApp__registerObjects(Factory & factory) { CrowApp::registerObjects(factory); }
@@ -117,8 +119,8 @@ void
 CrowApp::registerObjects(Factory & factory)
 {
 
-  #undef registerObject
-  #define registerObject(name) factory.reg<name>(stringifyName(name))
+  // #undef registerObject
+  // #define registerObject(name) factory.reg<name>(stringifyName(name))
 
   // Register any custom objects you have built on the MOOSE Framework
   registerKernel(CHChemPotential);  // <- registration
@@ -137,8 +139,8 @@ CrowApp::registerObjects(Factory & factory)
   registerMaterial(PFDiffusionGrowthConst);
   registerMaterial(PFDiffusionGrowth);
   registerMaterial(PFDiffusionGrowth1);
-  registerMaterial(PFEigenStrainMaterial);
-  registerMaterial(PFEigenStrainMaterial1);
+  // registerMaterial(PFEigenStrainMaterial);
+  // registerMaterial(PFEigenStrainMaterial1);
   registerMaterial(PFParticleGrowth);
   registerMaterial(PFTempMobility);
   registerMaterial(Mobility);
@@ -162,8 +164,8 @@ extern "C" void CrowApp__associateSyntax(Syntax & syntax, ActionFactory & action
 void
 CrowApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
-  #undef registerAction
-  #define registerAction(tplt, action) action_factory.reg<tplt>(stringifyName(tplt), action)
+  // #undef registerAction
+  // #define registerAction(tplt, action) action_factory.reg<tplt>(stringifyName(tplt), action)
 
   syntax.registerActionSyntax("PolycrystalSinteringKernelAction", "Kernels/PolycrystalSinteringKernel");
   syntax.registerActionSyntax("PolycrystalSinteringMaterialAction", "Materials/PolycrystalSinteringMaterial");
@@ -177,6 +179,6 @@ CrowApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
   registerAction(BicrystalICAction, "add_ic");
   registerAction(MultiSmoothParticleICAction, "add_ic");
 
-  #undef registerAction
-  #define registerAction(tplt, action) action_factory.regLegacy<tplt>(stringifyName(tplt), action)
+  // #undef registerAction
+  // #define registerAction(tplt, action) action_factory.regLegacy<tplt>(stringifyName(tplt), action)
 }

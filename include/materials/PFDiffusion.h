@@ -31,8 +31,8 @@ private:
   //Real _l;
 
   //VariableValue & _T;
-  VariableValue & _rho;
-  VariableGradient & _grad_rho;
+  const VariableValue & _rho;
+  const VariableGradient & _grad_rho;
   //VariableValue & _eta;
 
   MaterialProperty<Real> & _D;

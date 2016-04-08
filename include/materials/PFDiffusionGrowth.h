@@ -18,7 +18,7 @@ protected:
   virtual void computeQpProperties();
 
 private:
-  std::vector<VariableValue *> _vals;
+  std::vector<const VariableValue *> _vals;
   std::vector<unsigned int> _vals_var;
 
   Real _Dvol;
@@ -28,9 +28,9 @@ private:
 
   Real _kappa;
 
-  VariableValue & _rho;
-  VariableGradient & _grad_rho;
-  VariableValue & _v;
+  const VariableValue & _rho;
+  const VariableGradient & _grad_rho;
+  const VariableValue & _v;
 
   MaterialProperty<Real> & _D;
   // MaterialProperty<Real> & _kappa_c;

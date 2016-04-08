@@ -18,7 +18,7 @@ protected:
   virtual void computeProperties();
 
 private:
-  std::vector<VariableValue *> _vals;
+  std::vector<const VariableValue *> _vals;
   std::vector<unsigned int> _vals_var;
 
   Real _Dvol0;
@@ -39,9 +39,9 @@ private:
   Real _GBMobility;
   const Real _kb;
 
-  VariableValue & _rho;
-  VariableGradient & _grad_rho;
-  VariableValue & _T;
+  const VariableValue & _rho;
+  const VariableGradient & _grad_rho;
+  const VariableValue & _T;
 
   MaterialProperty<Real> & _D;
   // MaterialProperty<Real> & _kappa_c;

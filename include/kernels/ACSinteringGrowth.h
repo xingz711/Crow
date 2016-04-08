@@ -24,7 +24,7 @@ protected:
   virtual Real computeQpOffDiagJacobian(unsigned int jvar);
 
 private:
-  std::vector<VariableValue *> _vals;
+  std::vector<const VariableValue *> _vals;
   std::vector<unsigned int> _vals_var;
 
  // const MaterialProperty<Real> & _mu;
@@ -33,10 +33,10 @@ private:
 
 
   bool _has_T;
-  VariableGradient * _grad_T;
+  const VariableGradient * _grad_T;
 
   unsigned int _ncrys;
-  VariableValue & _rho;
+  const VariableValue & _rho;
   Real _B;
 };
 

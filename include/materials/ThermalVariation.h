@@ -32,9 +32,9 @@ private:
   Real _ko;
 
   unsigned int _n;
-  std::vector<VariableValue *> _vals;
+  std::vector<const VariableValue *> _vals;
 
-  VariableValue & _eta;
+  const VariableValue & _eta;
 
   MaterialProperty<Real> & _thermal_conductivity;
 };

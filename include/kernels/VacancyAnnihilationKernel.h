@@ -26,12 +26,12 @@ protected:
   std::string _Svgb_name;
 
 private:
-  std::vector<VariableValue *> _vals;
+  std::vector<const VariableValue *> _vals;
   std::vector<unsigned int> _vals_var;
 
- const MaterialProperty<Real> & _Svgb;
+  const MaterialProperty<Real> & _Svgb;
 
-unsigned int _ncrys;
+  unsigned int _ncrys;
   Real _ceq;
 
   //VariableValue & _c;

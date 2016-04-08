@@ -21,7 +21,7 @@ protected:
  // virtual Real computeQpJacobian();
 
 private:
-  VariableValue & _eta;
+  const VariableValue & _eta;
   //VariableValue & _R1;
  // VariableValue & _R2;
 

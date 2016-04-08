@@ -28,9 +28,9 @@ private:
   Real _kappa;
   Real _l;
 
-  VariableValue & _c;
-  VariableGradient & _grad_c;
-  VariableValue & _sumetaj;
+  const VariableValue & _c;
+  const VariableGradient & _grad_c;
+  const VariableValue & _sumetaj;
 
   MaterialProperty<Real> & _D;
   MaterialProperty<Real> & _kappa_op;

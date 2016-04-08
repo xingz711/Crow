@@ -22,11 +22,11 @@ protected:
   virtual void computeProperties();
 
 private:
-  VariableValue & _T;
-  std::vector<VariableValue *> _vals;
-  std::vector<VariableGradient *> _grad_vals;
-  VariableValue & _c;
-  VariableGradient & _grad_c;
+  const VariableValue & _T;
+  std::vector<const VariableValue *> _vals;
+  std::vector<const VariableGradient *> _grad_vals;
+  const VariableValue & _c;
+  const VariableGradient & _grad_c;
 
   MaterialProperty<Real> & _M;
   MaterialProperty<Real> & _dMdc;

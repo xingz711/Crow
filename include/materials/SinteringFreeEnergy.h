@@ -32,12 +32,12 @@ protected:
 
 private:
   /// Coupled variable value for the concentration \f$ \c \f$.
-  VariableValue & _c;
+  const VariableValue & _c;
   unsigned int _c_var;
   const MaterialProperty<Real> & _A;
   const MaterialProperty<Real> & _B;
 
-  std::vector<VariableValue *> _vals;
+  std::vector<const VariableValue *> _vals;
   std::vector<unsigned int> _vals_var;
   unsigned int _ncrys;
 };

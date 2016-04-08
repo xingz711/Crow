@@ -21,9 +21,9 @@ protected:
   const Real _amplitude;
   const Real _Pcasc;
   const MaterialProperty<Real> * _multiplier_prop;
-  
+
 private:
-  VariableValue & _eta;
+  const VariableValue & _eta;
   Real _min;
   Real _max;
   Real _range;

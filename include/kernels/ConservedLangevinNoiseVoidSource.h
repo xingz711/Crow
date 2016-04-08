@@ -21,7 +21,7 @@ protected:
 
 private:
   const ConservedNoiseInterface & _noise;
-  VariableValue & _eta;
+  const VariableValue & _eta;
 };
 
 #endif //CONSERVEDLANGEVINNOISE_H

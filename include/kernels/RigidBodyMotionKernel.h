@@ -26,8 +26,8 @@ protected:
   std::string _k_name;
 
 private:
-  std::vector<VariableValue *> _vals;
-  std::vector<VariableGradient *> _grad_vals;
+  std::vector<const VariableValue *> _vals;
+  std::vector<const VariableGradient *> _grad_vals;
   std::vector<unsigned int> _vals_var;
   std::vector<Real> _SumEtaj;
   std::vector<RealGradient> _GradEtaj;

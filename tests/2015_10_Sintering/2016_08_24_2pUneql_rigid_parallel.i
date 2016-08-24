@@ -212,7 +212,7 @@
 
 [UserObjects]
   [./grain_center]
-    type = GrainTracker
+    type = FauxGrainTracker
     outputs = none
     compute_op_maps = true
     calculate_feature_volumes = true

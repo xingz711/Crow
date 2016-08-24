@@ -49,14 +49,6 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
-  [./unique_grains]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./centroids]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
 []
 
 [Kernels]
@@ -86,7 +78,7 @@
     variable = w
     c = c
     v = 'gr0 gr1'
-    grain_tracker_object = grain_center
+    grain_data = grain_center
     grain_force = grain_force
   [../]
   [./vadv_gr0]
@@ -94,7 +86,7 @@
     variable = gr0
     c = c
     v = 'gr0 gr1'
-    grain_tracker_object = grain_center
+    grain_data = grain_center
     grain_force = grain_force
   [../]
   [./vadv_gr1]
@@ -104,7 +96,7 @@
     v = 'gr0 gr1'
     op_index = 1
     grain_force = grain_force
-    grain_tracker_object = grain_center
+    grain_data = grain_center
   [../]
 []
 
@@ -143,20 +135,6 @@
     property = force_density
     index = 1
     component = 1
-  [../]
-  [./unique_grains]
-    type = FeatureFloodCountAux
-    variable = unique_grains
-    flood_counter = grain_center
-    field_display = UNIQUE_REGION
-    execute_on = 'initial timestep_begin'
-  [../]
-  [./centroids]
-    type = FeatureFloodCountAux
-    variable = centroids
-    execute_on = 'initial timestep_begin'
-    field_display = CENTROID
-    flood_counter = grain_center
   [../]
 []
 
@@ -212,12 +190,9 @@
 
 [UserObjects]
   [./grain_center]
-    type = GrainTracker
-    outputs = none
-    compute_op_maps = true
-    calculate_feature_volumes = true
+    type = ComputeGrainCenterUserObject
+    etas = 'gr0 gr1'
     execute_on = 'initial timestep_begin'
-    #threshold = 0.5
   [../]
   [./grain_force]
     type = ComputeGrainForceAndTorque

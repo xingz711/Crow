@@ -41,11 +41,11 @@ SinteringFreeEnergy::computeF()
 {
   Real SumEtaj = 0.0;
   Real SumEtaj3 = 0.0;
-    for (unsigned int i = 0; i < _ncrys; ++i)
-    {
-      SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp]; //Sum all other order parameters
-      SumEtaj3 += (*_vals[i])[_qp]*(*_vals[i])[_qp]*(*_vals[i])[_qp];
-    }
+  for (unsigned int i = 0; i < _ncrys; ++i)
+  {
+    SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp]; //Sum all other order parameters
+    SumEtaj3 += (*_vals[i])[_qp]*(*_vals[i])[_qp]*(*_vals[i])[_qp];
+  }
   return _A[_qp] * _c[_qp] * _c[_qp] * (1.0 - _c[_qp]) * (1.0 - _c[_qp])
          + _B[_qp] * (_c[_qp] * _c[_qp] + 6.0 * (1.0 - _c[_qp]) * SumEtaj
          - 4.0 * (2.0 - _c[_qp]) * SumEtaj3 + 3.0 * SumEtaj * SumEtaj);
@@ -54,8 +54,8 @@ SinteringFreeEnergy::computeF()
 Real
 SinteringFreeEnergy::computeDF(unsigned int j_var)
 {
-    Real SumEtaj = 0.0;
-    Real SumEtaj3 = 0.0;
+  Real SumEtaj = 0.0;
+  Real SumEtaj3 = 0.0;
   if (j_var == _c_var)//Note that these checks are only really necessary when the material has more than one coupled variable
   {
     for (unsigned int i = 0; i < _ncrys; ++i)
@@ -66,11 +66,8 @@ SinteringFreeEnergy::computeDF(unsigned int j_var)
     return 4.0 * _A[_qp] * _c[_qp] * _c[_qp] * _c[_qp]- 6.0 * _A[_qp] * _c[_qp] * _c[_qp]
            + 2.0 * (_A[_qp] + _B[_qp]) * _c[_qp] - 6.0 * _B[_qp] * SumEtaj + 4.0 * _B[_qp] * SumEtaj3;
   }
-  else
-    return 0.0;
 
   for (unsigned int i = 0; i < _ncrys; ++i)
-  {
     if (j_var == _vals_var[i])
     {
       SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp]; //Sum all other order parameters
@@ -78,26 +75,20 @@ SinteringFreeEnergy::computeDF(unsigned int j_var)
              - 12.0 * _B[_qp] * (2.0 - _c[_qp]) * (*_vals[i])[_qp] * (*_vals[i])[_qp]
              + 12.0 * _B[_qp] * SumEtaj * (*_vals[i])[_qp];
     }
-    else
-      return 0.0;
-  }
+  return 0.0;
 }
 
 Real
 SinteringFreeEnergy::computeD2F(unsigned int j_var, unsigned int k_var)
 {
-  if ( (j_var == _c_var) && (k_var == _c_var) )
+  if ((j_var == _c_var) && (k_var == _c_var))
     return 12.0 * _A[_qp] * _c[_qp] * _c[_qp] - 12.0 * _A[_qp] * _c[_qp] + 2.0 * (_A[_qp] + _B[_qp]);
-  else
-    return 0.0;
 
   Real SumEtaj = 0.0;
   for (unsigned int i = 0; i < _ncrys; ++i)
   {
-    if ( (j_var == _c_var) && (k_var == _vals_var[i]))
+    if ((j_var == _c_var) && (k_var == _vals_var[i]))
       return -12.0 * _B[_qp] * (*_vals[i])[_qp] + 12.0 * _B[_qp] * (*_vals[i])[_qp] * (*_vals[i])[_qp];
-    else
-      return 0.0;
 
     if ((j_var == _vals_var[i]) && (k_var == _vals_var[i]))
     {
@@ -105,9 +96,8 @@ SinteringFreeEnergy::computeD2F(unsigned int j_var, unsigned int k_var)
       return 12.0 * _B[_qp] * (1.0 - _c[_qp]) - 24.0 * _B[_qp] * (2.0 - _c[_qp]) * (*_vals[i])[_qp]
              + 12.0 * _B[_qp] * SumEtaj + 24.0 * _B[_qp] * (*_vals[i])[_qp]*(*_vals[i])[_qp];
     }
-    else
-      return 0.0;
   }
+  return 0.0;
 }
 
 Real

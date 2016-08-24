@@ -25,10 +25,10 @@
   [../]
   #[./PolycrystalVariables]
   #[../]
-  [./disp_x]
-  [../]
-  [./disp_y]
-  [../]
+  #[./disp_x]
+  #[../]
+  #[./disp_y]
+  #[../]
 []
 
 [AuxVariables]
@@ -42,14 +42,14 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
-  [./S11]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./S22]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
+  #[./S11]
+  #  order = CONSTANT
+  #  family = MONOMIAL
+  #[../]
+  #[./S22]
+  #  order = CONSTANT
+  #  family = MONOMIAL
+  #[../]
   [./dF00]
     order = CONSTANT
     family = MONOMIAL
@@ -91,20 +91,20 @@
   #  family = MONOMIAL
   #[../]
 []
-
-[Functions]
-  [./load]
-    type = PiecewiseLinear
-    y = '0.0 -1.5 -1.5 -1.5'
-    x = '0.0 30.0 45.0 60.0'
-  [../]
-[]
+#
+#[Functions]
+#  [./load]
+#    type = PiecewiseLinear
+#    y = '0.0 -1.5 -1.5 -1.5'
+#    x = '0.0 30.0 45.0 60.0'
+#  [../]
+#[]
 
 [Preconditioning]
   [./SMP]
     type = SMP
-    off_diag_column = 'c w c   c   gr0 gr1 disp_x disp_y'
-    off_diag_row    = 'w c gr0 gr1 c   c   disp_y disp_x'
+    off_diag_column = 'c w'
+    off_diag_row    = 'w c'
   [../]
 #[./FDP]
 #  type = FDP
@@ -131,9 +131,9 @@
     variable = w
     v = c
   [../]
-  #[./PolycrystalSinteringKernel]
-  #  c = c
-  #[../]
+  [./PolycrystalSinteringKernel]
+    c = c
+  [../]
   #[./ElstcEn_gr0]
   #  type = AllenCahn
   #  variable = gr0
@@ -146,28 +146,30 @@
   #  args = 'c gr0'
   #  f_name = E
   #[../]
-  [./TensorMechanics]
-    displacements = 'disp_x disp_y'
-  [../]
+  #[./TensorMechanics]
+  #  displacements = 'disp_x disp_y'
+  #[../]
   [./motion]
     type = MultiGrainRigidBodyMotion
     variable = w
     c = c
     v = 'gr0 gr1'
+    grain_data = grain_center
+    grain_force = grain_force
   [../]
-  #[./vadv_gr0]
-  #  type = SingleGrainRigidBodyMotion
-  #  variable = gr0
-  #  c = c
-  #  v = 'gr0 gr1'
-  #[../]
-  #[./vadv_gr1]
-  #  type = SingleGrainRigidBodyMotion
-  #  variable = gr1
-  #  c = c
-  #  v = 'gr0 gr1'
-  #  op_index = 1
-  #[../]
+  [./vadv_gr0]
+    type = SingleGrainRigidBodyMotion
+    variable = gr0
+    c = c
+    v = 'gr0 gr1'
+  [../]
+  [./vadv_gr1]
+    type = SingleGrainRigidBodyMotion
+    variable = gr1
+    c = c
+    v = 'gr0 gr1'
+    op_index = 1
+  [../]
 []
 
 [AuxKernels]
@@ -182,22 +184,22 @@
     kappa_names = 'kappa_c kappa_op kappa_op'
     interfacial_vars = 'c  gr0 gr1'
   [../]
-  [./S11]
-    type = RankTwoAux
-    variable = S11
-    rank_two_tensor = stress
-    index_j = 0
-    index_i = 0
-    block = 0
-  [../]
-  [./S22]
-    type = RankTwoAux
-    variable = S22
-    rank_two_tensor = stress
-    index_j = 1
-    index_i = 1
-    block = 0
-  [../]
+  #[./S11]
+  #  type = RankTwoAux
+  #  variable = S11
+  #  rank_two_tensor = stress
+  #  index_j = 0
+  #  index_i = 0
+  #  block = 0
+  #[../]
+  #[./S22]
+  #  type = RankTwoAux
+  #  variable = S22
+  #  rank_two_tensor = stress
+  #  index_j = 1
+  #  index_i = 1
+  #  block = 0
+  #[../]
   [./dF00]
     type = MaterialStdVectorRealGradientAux
     variable = dF00
@@ -222,74 +224,39 @@
     index = 1
     component = 1
   [../]
-  [./vadv00]
-    type = MaterialStdVectorRealGradientAux
-    variable = vadv00
-    property = advection_velocity
-  [../]
-  [./vadv01]
-    type = MaterialStdVectorRealGradientAux
-    variable = vadv01
-    property = advection_velocity
-    component = 1
-  [../]
-  [./vadv10]
-    type = MaterialStdVectorRealGradientAux
-    variable = vadv10
-    property = advection_velocity
-    index = 1
-  [../]
-  [./vadv11]
-    type = MaterialStdVectorRealGradientAux
-    variable = vadv11
-    property = advection_velocity
-    index = 1
-    component = 1
-  [../]
-  [./vadv_div0]
-    type = MaterialStdVectorAux
-    variable = vadv_div0
-    property = advection_velocity_divergence
-  [../]
-  [./vadv_div1]
-    type = MaterialStdVectorAux
-    variable = vadv_div1
-    index = 1
-    property = advection_velocity_divergence
-  [../]
 []
 
 [BCs]
-  [./Periodic]
-    [./All]
-      auto_direction = 'x y'
-      variable = 'c w gr0 gr1'
-    [../]
-  [../]
-  [./bottom_y]
-    type = PresetBC
-    variable = disp_y
-    boundary = bottom
-    value = 0
-  [../]
-  [./left_x]
-    type = PresetBC
-    variable = disp_x
-    boundary = left
-    value = 0
-  [../]
-  [./right_x]
-    type = PresetBC
-    variable = disp_x
-    boundary = right
-    value = 0
-  [../]
-  [./top_y]
-    type = FunctionPresetBC
-    variable = disp_y
-    boundary = top
-    function = load
-  [../]
+  #[./Periodic]
+  #  [./All]
+  #    auto_direction = 'x y'
+  #    variable = 'c w'
+  #  [../]
+  #[../]
+  #[./bottom_y]
+  #  type = PresetBC
+  #  variable = disp_y
+  #  boundary = bottom
+  #  value = 0
+  #[../]
+  #[./left_x]
+  #  type = PresetBC
+  #  variable = disp_x
+  #  boundary = left
+  #  value = 0
+  #[../]
+  #[./right_x]
+  #  type = PresetBC
+  #  variable = disp_x
+  #  boundary = right
+  #  value = 0
+  #[../]
+  #[./top_y]
+  #  type = FunctionPresetBC
+  #  variable = disp_y
+  #  boundary = top
+  #  function = load
+  #[../]
 []
 
 [Materials]
@@ -298,7 +265,7 @@
     block = 0
     c = c
     v = 'gr0 gr1'
-    f_name = S
+    #f_name = S
     derivative_order = 2
     outputs = console
   [../]
@@ -324,105 +291,105 @@
     cgb = 0.14
     k = 10
   [../]
-  [./vadv]
-    type = GrainAdvectionVelocity
-    block = 0
-    grain_force = grain_force
-    etas = 'gr0 gr1'
-    c = c
-    grain_data = grain_center
-  [../]
+  #[./vadv]
+  #  type = GrainAdvectionVelocity
+  #  block = 0
+  #  grain_force = grain_force
+  #  etas = 'gr0 gr1'
+  #  c = c
+  #  grain_data = grain_center
+  #[../]
   #elastic properties for phase with c =1
-  [./elasticity_tensor_phase1]
-    type = ComputeElasticityTensor
-    base_name = phase1
-    block = 0
-    fill_method = symmetric_isotropic
-    C_ijkl = '30.141 35.46'
-  [../]
-  [./smallstrain_phase1]
-    type = ComputeSmallStrain
-    base_name = phase1
-    block = 0
-    displacements = 'disp_x disp_y'
-  [../]
-  [./stress_phase1]
-    type = ComputeLinearElasticStress
-    base_name = phase1
-    block = 0
-  [../]
-  [./elstc_en_phase1]
-    type = ElasticEnergyMaterial
-    base_name = phase1
-    f_name = Fe1
-    block = 0
-    args = 'c'
-    derivative_order = 2
-  [../]
+  #[./elasticity_tensor_phase1]
+  #  type = ComputeElasticityTensor
+  #  base_name = phase1
+  #  block = 0
+  #  fill_method = symmetric_isotropic
+  #  C_ijkl = '30.141 35.46'
+  #[../]
+  #[./smallstrain_phase1]
+  #  type = ComputeSmallStrain
+  #  base_name = phase1
+  #  block = 0
+  #  displacements = 'disp_x disp_y'
+  #[../]
+  #[./stress_phase1]
+  #  type = ComputeLinearElasticStress
+  #  base_name = phase1
+  #  block = 0
+  #[../]
+  #[./elstc_en_phase1]
+  #  type = ElasticEnergyMaterial
+  #  base_name = phase1
+  #  f_name = Fe1
+  #  block = 0
+  #  args = 'c'
+  #  derivative_order = 2
+  #[../]
   #elastic properties for phase with c = 0
-  [./elasticity_tensor_phase0]
-    type = ComputeElasticityTensor
-    base_name = phase0
-    block = 0
-    fill_method = symmetric_isotropic
-    C_ijkl = '10.0 10.0'
-  [../]
-  [./smallstrain_phase0]
-    type = ComputeSmallStrain
-    base_name = phase0
-    block = 0
-    displacements = 'disp_x disp_y'
-  [../]
-  [./stress_phase0]
-    type = ComputeLinearElasticStress
-    base_name = phase0
-    block = 0
-  [../]
-  [./elstc_en_phase0]
-    type = ElasticEnergyMaterial
-    base_name = phase0
-    f_name = Fe0
-    block = 0
-    args = 'c'
-    derivative_order = 2
-  [../]
-  #switching function for elastic energy calculation
-  [./switching]
-    type = SwitchingFunctionMaterial
-    block = 0
-    function_name = h
-    eta = c
-    h_order = SIMPLE
-  [../]
-  # total elastic energy calculation
-  [./total_elastc_en]
-    type = DerivativeTwoPhaseMaterial
-    block = 0
-    h = h
-    g = 0.0
-    W = 0.0
-    eta = c
-    f_name = E
-    fa_name = Fe1
-    fb_name = Fe0
-    derivative_order = 2
-  [../]
-  # gloabal Stress
-  [./global_stress]
-    type = TwoPhaseStressMaterial
-    block = 0
-    base_A = phase1
-    base_B = phase0
-    h = h
-  [../]
-  # total energy
-  [./sum]
-    type = DerivativeSumMaterial
-    block = 0
-    sum_materials = 'S E'
-    args = 'c gr0 gr1'
-    derivative_order = 2
-  [../]
+  #[./elasticity_tensor_phase0]
+  #  type = ComputeElasticityTensor
+  #  base_name = phase0
+  #  block = 0
+  #  fill_method = symmetric_isotropic
+  #  C_ijkl = '10.0 10.0'
+  #[../]
+  #[./smallstrain_phase0]
+  #  type = ComputeSmallStrain
+  #  base_name = phase0
+  #  block = 0
+  #  displacements = 'disp_x disp_y'
+  #[../]
+  #[./stress_phase0]
+  #  type = ComputeLinearElasticStress
+  #  base_name = phase0
+  #  block = 0
+  #[../]
+  #[./elstc_en_phase0]
+  #  type = ElasticEnergyMaterial
+  #  base_name = phase0
+  #  f_name = Fe0
+  #  block = 0
+  #  args = 'c'
+  #  derivative_order = 2
+  #[../]
+  ##switching function for elastic energy calculation
+  #[./switching]
+  #  type = SwitchingFunctionMaterial
+  #  block = 0
+  #  function_name = h
+  #  eta = c
+  #  h_order = SIMPLE
+  #[../]
+  ## total elastic energy calculation
+  #[./total_elastc_en]
+  #  type = DerivativeTwoPhaseMaterial
+  #  block = 0
+  #  h = h
+  #  g = 0.0
+  #  W = 0.0
+  #  eta = c
+  #  f_name = E
+  #  fa_name = Fe1
+  #  fb_name = Fe0
+  #  derivative_order = 2
+  #[../]
+  ## gloabal Stress
+  #[./global_stress]
+  #  type = TwoPhaseStressMaterial
+  #  block = 0
+  #  base_A = phase1
+  #  base_B = phase0
+  #  h = h
+  #[../]
+  ## total energy
+  #[./sum]
+  #  type = DerivativeSumMaterial
+  #  block = 0
+  #  sum_materials = 'S E'
+  #  args = 'c gr0 gr1'
+  #  derivative_order = 2
+  #[../]
 []
 
 [VectorPostprocessors]
@@ -440,13 +407,14 @@
   [./grain_center]
     type = ComputeGrainCenterUserObject
     etas = 'gr0 gr1'
-    execute_on = 'initial linear'
+    execute_on = 'initial linear nonlinear'
   [../]
   [./grain_force]
     type = ComputeGrainForceAndTorque
     grain_data = grain_center
     c = c
-    execute_on = 'initial linear'
+    etas = 'gr0 gr1'
+    execute_on = 'initial linear nonlinear'
   [../]
 []
 
@@ -463,14 +431,14 @@
     type = ElementIntegralVariablePostprocessor
     variable = bnds
   [../]
-  [./s11]
-    type = ElementIntegralVariablePostprocessor
-    variable = S11
-  [../]
-  [./s22]
-    type = ElementIntegralVariablePostprocessor
-    variable = S22
-  [../]
+  #[./s11]
+  #  type = ElementIntegralVariablePostprocessor
+  #  variable = S11
+  #[../]
+  #[./s22]
+  #  type = ElementIntegralVariablePostprocessor
+  #  variable = S22
+  #[../]
   [./total_energy]
     type = ElementIntegralVariablePostprocessor
     variable = total_en
@@ -479,18 +447,18 @@
     type = ElementIntegralMaterialProperty
     mat_prop = F
   [../]
-  [./chem_free_en]
-    type = ElementIntegralMaterialProperty
-    mat_prop = S
-  [../]
-  [./elstc_en0]
-    type = ElementIntegralMaterialProperty
-    mat_prop = Fe0
-  [../]
-  [./elstc_en1]
-    type = ElementIntegralMaterialProperty
-    mat_prop = Fe1
-  [../]
+  #[./chem_free_en]
+  #  type = ElementIntegralMaterialProperty
+  #  mat_prop = S
+  #[../]
+  #[./elstc_en0]
+  #  type = ElementIntegralMaterialProperty
+  #  mat_prop = Fe0
+  #[../]
+  #[./elstc_en1]
+  #  type = ElementIntegralMaterialProperty
+  #  mat_prop = Fe1
+  #[../]
   [./time]
     type = RunTime
     time_type = active
@@ -515,12 +483,12 @@
   nl_rel_tol = 1.0e-10
   dt = 0.001
   end_time = 60
-  [./Adaptivity]
-    refine_fraction = 0.7
-    coarsen_fraction = 0.1
-    max_h_level = 2
-    initial_adaptivity = 1
-  [../]
+  #[./Adaptivity]
+  #  refine_fraction = 0.7
+  #  coarsen_fraction = 0.1
+  #  max_h_level = 2
+  #  initial_adaptivity = 1
+  #[../]
 []
 
 [Outputs]

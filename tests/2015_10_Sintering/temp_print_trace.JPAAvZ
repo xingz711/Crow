@@ -1,0 +1,12 @@
+0x00007fff82fd559a in ?? () from /usr/lib/system/libsystem_kernel.dylib
+#0  0x00007fff82fd559a in ?? () from /usr/lib/system/libsystem_kernel.dylib
+#1  0x00007fff85dedfdd in system () from /usr/lib/system/libsystem_c.dylib
+#2  0x000000010a1063e3 in libMesh::print_trace(std::__1::basic_ostream<char, std::__1::char_traits<char> >&) () from /Users/bisws/projects/moose/scripts/../libmesh/installed/lib/libmesh_opt.0.dylib
+#3  0x0000000109143a50 in GrainTracker::remapGrains() () from /Users/bisws/projects/moose/modules/phase_field/lib/libphase_field-opt.0.dylib
+#4  0x000000010913fd7e in GrainTracker::finalize() () from /Users/bisws/projects/moose/modules/phase_field/lib/libphase_field-opt.0.dylib
+#5  0x00000001097c86ab in FEProblem::computeUserObjects(ExecFlagType const&, Moose::AuxGroup const&) () from /Users/bisws/projects/moose/framework/libmoose-opt.0.dylib
+#6  0x00000001097b78b8 in FEProblem::initialSetup() () from /Users/bisws/projects/moose/framework/libmoose-opt.0.dylib
+#7  0x000000010993ef26 in Transient::init() () from /Users/bisws/projects/moose/framework/libmoose-opt.0.dylib
+#8  0x000000010989e67b in MooseApp::executeExecutioner() () from /Users/bisws/projects/moose/framework/libmoose-opt.0.dylib
+#9  0x000000010989f446 in MooseApp::run() () from /Users/bisws/projects/moose/framework/libmoose-opt.0.dylib
+#10 0x0000000108e3e568 in main ()

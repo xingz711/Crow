@@ -21,7 +21,7 @@ protected:
  // virtual Real computeQpJacobian();
 
 private:
-  VariableValue & _eta;
+  const VariableValue & _eta;
   Real _min;
   Real _max;
    //Real _Pcasc;

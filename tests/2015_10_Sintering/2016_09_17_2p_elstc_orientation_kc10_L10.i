@@ -291,7 +291,7 @@
     type = GenericConstantMaterial
     block = 0
     prop_names = 'A     B   L   kappa_op kappa_c'
-    prop_values = '16.0 1.0 1.0 0.5      1.0'
+    prop_values = '16.0 1.0 10.0 1.0      10.0'
   [../]
   #[./AC_prop]
   #  type = ParsedMaterial
@@ -305,6 +305,8 @@
     type = ComputePolycrystalElasticityTensor
     grain_tracker = grain_tracker
     base_name = phase1
+    length_scale = 1e-09
+
     block = 0
   [../]
   [./elasticity_tensor_phase0]
@@ -486,7 +488,7 @@
     int_width = 2.0
     z_positions = '0 0'
     y_positions = '13.0 10.0 '
-    radii = '6.0 8.0'
+    radii = '5.5 8.0'
     3D_spheres = false
     outvalue = 0.001
     variable = c
@@ -498,7 +500,7 @@
     int_width = 2.0
     x1 = 11.0
     y1 = 13.0
-    radius = 6.0
+    radius = 5.5
     outvalue = 0.0
     variable = gr0
     invalue = 1.0

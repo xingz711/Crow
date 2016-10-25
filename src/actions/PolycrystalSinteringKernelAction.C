@@ -1,6 +1,7 @@
 #include "PolycrystalSinteringKernelAction.h"
 #include "Factory.h"
 #include "Parser.h"
+#include "Conversion.h"
 #include "FEProblem.h"
 
 template<>
@@ -13,6 +14,14 @@ InputParameters validParams<PolycrystalSinteringKernelAction>()
   params.addParam<VariableName>("c", "NONE", "Name of coupled concentration variable");
   params.addParam<MaterialPropertyName>("mob_name", "L", "The mobility used with the kernel");
   params.addParam<MaterialPropertyName>("kappa_name", "kappa_op", "The kappa used with the kernel");
+  params.addParam<std::string>("base_name", "Optional parameter that allows the user to define type of force density under consideration");
+  params.addParam<Real>("translation_constant", 500, "constant value characterizing grain translation");
+  params.addParam<Real>("rotation_constant", 1.0, "constant value characterizing grain rotation");
+  params.addParam<UserObjectName>("grain_force","grain_force", "userobject for getting force and torque acting on grains");
+  params.addParam<UserObjectName>("grain_tracker_object", "grain_center", "The FeatureFloodCount UserObject to get values from.");
+  params.addParam<VectorPostprocessorName>("grain_volumes", "grain_volumes", "The feature volume VectorPostprocessorValue.");
+  params.addParam<bool>("consider_rigidbodymotion", true, "Whether to consider riogidbodymotion or particles or not");
+  params.addParam<bool>("implicit", true, "Whether kernels are implicit or not");
   params.addParam<bool>("use_displaced_mesh", false, "Whether to use displaced mesh in the kernels");
 
   return params;
@@ -24,7 +33,9 @@ PolycrystalSinteringKernelAction::PolycrystalSinteringKernelAction(const InputPa
     _var_name_base(getParam<std::string>("var_name_base")),
     _c(getParam<VariableName>("c")),
     _mob_name(getParam<MaterialPropertyName>("mob_name")),
-    _kappa_name(getParam<MaterialPropertyName>("kappa_name"))
+    _kappa_name(getParam<MaterialPropertyName>("kappa_name")),
+    _consider_rbm(getParam<bool>("consider_rigidbodymotion")),
+    _implicit(getParam<bool>("implicit"))
 {
 }
 
@@ -39,34 +50,22 @@ PolycrystalSinteringKernelAction::act()
   for (unsigned int op = 0; op < _op_num; ++op)
   {
     //Create variable names
-    std::string var_name = _var_name_base;
-    std::stringstream out;
-    out << op;
-    var_name.append(out.str());
 
+    std::string var_name = _var_name_base + Moose::stringify(op);
     std::vector<VariableName> v;
     v.resize(_op_num - 1);
 
     unsigned int ind = 0;
-
     for (unsigned int j = 0; j < _op_num; ++j)
-    {
       if (j != op)
-      {
-        std::string coupled_var_name = _var_name_base;
-        std::stringstream out2;
-        out2 << j;
-        coupled_var_name.append(out2.str());
-        v[ind] = coupled_var_name;
-        ind++;
-      }
-    }
+      v[ind++] = _var_name_base + Moose::stringify(j);
 
     InputParameters poly_params = _factory.getValidParams("ACParticleGrowth");
     poly_params.set<NonlinearVariableName>("variable") = var_name;
     poly_params.set<std::vector<VariableName> >("c").push_back(_c);
     poly_params.set<std::vector<VariableName> >("v") = v;
     poly_params.set<MaterialPropertyName>("mob_name") = _mob_name;
+    poly_params.set<bool>("implicit") = _implicit;
     poly_params.set<bool>("use_displaced_mesh") = getParam<bool>("use_displaced_mesh");
 
     std::string kernel_name = "ACBulk_";
@@ -80,6 +79,7 @@ PolycrystalSinteringKernelAction::act()
     poly_params.set<NonlinearVariableName>("variable") = var_name;
     poly_params.set<MaterialPropertyName>("mob_name") = _mob_name;
     poly_params.set<MaterialPropertyName>("kappa_name") = _kappa_name;
+    poly_params.set<bool>("implicit") = _implicit;
     poly_params.set<bool>("use_displaced_mesh") = getParam<bool>("use_displaced_mesh");
 
     kernel_name = "ACInt_";
@@ -91,11 +91,41 @@ PolycrystalSinteringKernelAction::act()
 
     poly_params = _factory.getValidParams("TimeDerivative");
     poly_params.set<NonlinearVariableName>("variable") = var_name;
+    poly_params.set<bool>("implicit") = _implicit;
     poly_params.set<bool>("use_displaced_mesh") = getParam<bool>("use_displaced_mesh");
 
     kernel_name = "IE_";
     kernel_name.append(var_name);
 
     _problem->addKernel("TimeDerivative", kernel_name, poly_params);
+
+  //
+  // Set up SingleGrainRigidBodyMotion kernels
+  //
+    if (_consider_rbm)
+    {
+      std::vector<VariableName> etas(_op_num);
+      for (unsigned int j = 0; j < _op_num; ++j)
+        etas[j] = _var_name_base + Moose::stringify(j);
+
+      InputParameters params = _factory.getValidParams("SingleGrainRigidBodyMotion");
+      params.set<NonlinearVariableName>("variable") = var_name;
+      params.set<std::vector<VariableName> >("v") = etas;
+      params.set<unsigned int>("op_index") = op;
+      params.set<std::vector<VariableName> >("c") = {getParam<VariableName>("c")};
+      if (isParamValid("base_name"))
+        params.set<std::string>("base_name") = getParam<std::string>("base_name");
+      params.set<Real>("translation_constant") = getParam<Real>("translation_constant");
+      params.set<Real>("rotation_constant") = getParam<Real>("rotation_constant");
+      params.set<UserObjectName>("grain_force") = getParam<UserObjectName>("grain_force");
+      params.set<UserObjectName>("grain_tracker_object") = getParam<UserObjectName>("grain_tracker_object");
+      params.set<VectorPostprocessorName>("grain_volumes") = getParam<VectorPostprocessorName>("grain_volumes");
+
+      params.set<bool>("implicit") = _implicit;
+      params.set<bool>("use_displaced_mesh") = getParam<bool>("use_displaced_mesh");
+
+      std::string kernel_name = "RigidBody_" + var_name;
+      _problem->addKernel("SingleGrainRigidBodyMotion", kernel_name, params);
+    }
   }
 }

@@ -7,19 +7,19 @@
   type = GeneratedMesh
   dim = 2
   nx = 80
-  ny = 40
+  ny = 80
   nz = 0
   xmin = 0.0
   xmax = 40.0
   ymin = 0.0
-  ymax = 20.0
+  ymax = 40.0
   zmax = 0
   elem_type = QUAD4
 []
 
 [Variables]
   [./c]
-    #scaling = 10
+    scale = 10
   [../]
   [./w]
   [../]
@@ -58,22 +58,22 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
-  #[./vadv_dns_x]
-  #  order = CONSTANT
-  #  family = MONOMIAL
-  #[../]
-  #[./vadv_dns_y]
-  #  order = CONSTANT
-  #  family = MONOMIAL
-  #[../]
-  #[./vadv_ext_x]
-  #  order = CONSTANT
-  #  family = MONOMIAL
-  #[../]
-  #[./vadv_ext_y]
-  #  order = CONSTANT
-  #  family = MONOMIAL
-  #[../]
+  [./vadv_dns_x]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv_dns_y]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv_ext_x]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv_ext_y]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
 []
 
 [Kernels]
@@ -98,15 +98,15 @@
   [./PolycrystalSinteringKernel]
     c = c
   [../]
-  [./motion]
-    type = MultiGrainRigidBodyMotion
-    variable = w
-    c = c
-    v = 'gr0 gr1'
-    grain_force = grain_force
-    grain_tracker_object = grain_center
-    grain_volumes = grain_volumes
-  [../]
+  #[./motion]
+  #  type = MultiGrainRigidBodyMotion
+  #  variable = w
+  #  c = c
+  #  v = 'gr0 gr1'
+  #  grain_force = grain_force
+  #  grain_tracker_object = grain_center
+  #  grain_volumes = grain_volumes
+  #[../]
   #[./vadv_gr0]
   #  type = SingleGrainRigidBodyMotion
   #  variable = gr0
@@ -180,38 +180,38 @@
     grain_force = grain_force
     variable = vadv_y
   [../]
-  #[./vadv_dns_x]
-  #  type = GrainAdvectionAux
-  #  component = x
-  #  grain_tracker_object = grain_center
-  #  grain_force = grain_force_dns
-  #  grain_volumes = grain_volumes
-  #  variable = vadv_dns_x
-  #[../]
-  #[./vadv_dns_y]
-  #  type = GrainAdvectionAux
-  #  component = y
-  #  grain_tracker_object = grain_center
-  #  grain_volumes = grain_volumes
-  #  grain_force = grain_force_dns
-  #  variable = vadv_dns_y
-  #[../]
-  #[./vadv_ext_x]
-  #  type = GrainAdvectionAux
-  #  component = x
-  #  grain_tracker_object = grain_center
-  #  grain_force = grain_force_const
-  #  grain_volumes = grain_volumes
-  #  variable = vadv_ext_x
-  #[../]
-  #[./vadv_ext_y]
-  #  type = GrainAdvectionAux
-  #  component = y
-  #  grain_tracker_object = grain_center
-  #  grain_volumes = grain_volumes
-  #  grain_force = grain_force_const
-  #  variable = vadv_ext_y
-  #[../]
+  [./vadv_dns_x]
+    type = GrainAdvectionAux
+    component = x
+    grain_tracker_object = grain_center
+    grain_force = grain_force_dns
+    grain_volumes = grain_volumes
+    variable = vadv_dns_x
+  [../]
+  [./vadv_dns_y]
+    type = GrainAdvectionAux
+    component = y
+    grain_tracker_object = grain_center
+    grain_volumes = grain_volumes
+    grain_force = grain_force_dns
+    variable = vadv_dns_y
+  [../]
+  [./vadv_ext_x]
+    type = GrainAdvectionAux
+    component = x
+    grain_tracker_object = grain_center
+    grain_force = grain_force_const
+    grain_volumes = grain_volumes
+    variable = vadv_ext_x
+  [../]
+  [./vadv_ext_y]
+    type = GrainAdvectionAux
+    component = y
+    grain_tracker_object = grain_center
+    grain_volumes = grain_volumes
+    grain_force = grain_force_const
+    variable = vadv_ext_y
+  [../]
 []
 
 [BCs]
@@ -301,10 +301,10 @@
   [./grain_center]
     type = GrainTracker
     outputs = none
-    compute_var_to_feature_map = true
+    #compute_var_to_feature_map = true
     execute_on = 'initial timestep_begin'
   [../]
-  [./grain_force]
+  [./grain_force_dns]
     type = ComputeGrainForceAndTorque
     execute_on = 'linear nonlinear'
     grain_data = grain_center
@@ -313,12 +313,12 @@
     etas = 'gr0 gr1'
     #compute_jacobians = false
   [../]
-  #[./grain_force_const]
-  #  type = ConstantGrainForceAndTorque
-  #  execute_on = 'linear nonlinear'
-  #  force =  '0.3 -0.3 0.0 -0.5 0.5 0.0'
-  #  torque = '0.0 0.0 0.0 0.0 0.0 0.0'
-  #[../]
+  [./grain_force_const]
+    type = ConstantGrainForceAndTorque
+    execute_on = 'linear nonlinear'
+    force =  '0.3 -0.3 0.0 -0.5 0.5 0.0'
+    torque = '0.0 0.0 0.0 0.0 0.0 0.0'
+  [../]
   #[./grain_center]
   #  type = GrainTracker
   #  outputs = none
@@ -360,12 +360,12 @@
   #  force =  '0.5 0.0 0.0 -0.5 0.0 0.0'
   #  torque = '0.0 0.0 0.0 0.0 0.0 0.0'
   #[../]
-  #[./grain_force]
-  #  type = GrainForceAndTorqueSum
-  #  execute_on = 'linear nonlinear'
-  #  grain_forces = 'grain_force_dns grain_force_const'
-  #  grain_num = 2
-  #[../]
+  [./grain_force]
+    type = GrainForceAndTorqueSum
+    execute_on = 'linear nonlinear'
+    grain_forces = 'grain_force_dns grain_force_const'
+    grain_num = 2
+  [../]
 []
 
 [Postprocessors]
@@ -500,7 +500,7 @@
   gnuplot = true
   print_perf_log = true
   #interval = 10
-  file_base = 2016_10_19_2puneql_nonlocal
+  file_base = 2016_10_18_norigid
   [./console]
     type = Console
     perf_log = true
@@ -512,18 +512,18 @@
     int_width = 2.0
     x1 = 25.0
     y1 = 10.0
-    radius = 8.0
+    radius = 7.0
     outvalue = 0.0
     variable = gr1
     invalue = 1.0
     type = SmoothCircleIC
   [../]
   [./multip]
-    x_positions = '11.0 25.0'
+    x_positions = '10.0 25.0 10.0 25.0'
     int_width = 2.0
     z_positions = '0 0'
-    y_positions = '13.0 10.0 '
-    radii = '6.0 8.0'
+    y_positions = '10.0 10.0 25.0 25.0 '
+    radii = '7.0 7.0 7.0 7.0'
     3D_spheres = false
     outvalue = 0.001
     variable = c
@@ -533,11 +533,31 @@
   [../]
   [./ic_gr0]
     int_width = 2.0
-    x1 = 11.0
-    y1 = 13.0
-    radius = 6.0
+    x1 = 10.0
+    y1 = 10.0
+    radius = 7.0
     outvalue = 0.0
     variable = gr0
+    invalue = 1.0
+    type = SmoothCircleIC
+  [../]
+  [./ic_gr2]
+    int_width = 2.0
+    x1 = 10.0
+    y1 = 25.0
+    radius = 7.0
+    outvalue = 0.0
+    variable = gr2
+    invalue = 1.0
+    type = SmoothCircleIC
+  [../]
+  [./ic_gr3]
+    int_width = 2.0
+    x1 = 25.0
+    y1 = 25.0
+    radius = 7.0
+    outvalue = 0.0
+    variable = gr3
     invalue = 1.0
     type = SmoothCircleIC
   [../]

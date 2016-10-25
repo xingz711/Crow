@@ -1,25 +1,25 @@
 [GlobalParams]
   var_name_base = gr
-  op_num = 2.0
+  op_num = 4.0
 []
 
 [Mesh]
   type = GeneratedMesh
   dim = 2
   nx = 80
-  ny = 40
+  ny = 80
   nz = 0
   xmin = 0.0
   xmax = 40.0
   ymin = 0.0
-  ymax = 20.0
+  ymax = 40.0
   zmax = 0
   elem_type = QUAD4
 []
 
 [Variables]
   [./c]
-    #scaling = 10
+    #scaling = 1e6
   [../]
   [./w]
   [../]
@@ -83,7 +83,7 @@
     kappa_name = kappa_c
     w = w
     f_name = F
-    args = 'gr0 gr1'
+    args = 'gr0 gr1 gr2 gr3'
   [../]
   [./wres]
     type = SplitCHWRes
@@ -107,38 +107,19 @@
     grain_tracker_object = grain_center
     grain_volumes = grain_volumes
   [../]
-  #[./vadv_gr0]
-  #  type = SingleGrainRigidBodyMotion
-  #  variable = gr0
-  #  c = c
-  #  v = 'gr0 gr1'
-  #  grain_force = grain_force
-  #  grain_tracker_object = grain_center
-  #  grain_volumes = grain_volumes
-  #[../]
-  #[./vadv_gr1]
-  #  type = SingleGrainRigidBodyMotion
-  #  variable = gr1
-  #  c = c
-  #  v = 'gr0 gr1'
-  #  op_index = 1
-  #  grain_force = grain_force
-  #  grain_tracker_object = grain_center
-  #  grain_volumes = grain_volumes
-  #[../]
 []
 
 [AuxKernels]
   [./bnds]
     type = BndsCalcAux
     variable = bnds
-    v = 'gr0 gr1 '
+    v = 'gr0 gr1 gr2 gr3'
   [../]
   [./Total_en]
     type = TotalFreeEnergy
     variable = total_en
-    kappa_names = 'kappa_c kappa_op kappa_op'
-    interfacial_vars = 'c  gr0 gr1'
+    kappa_names = 'kappa_c kappa_op kappa_op kappa_op kappa_op'
+    interfacial_vars = 'c  gr0         gr1     gr2      gr3'
   [../]
   [./dF00]
     type = MaterialStdVectorRealGradientAux
@@ -235,7 +216,7 @@
     type = SinteringFreeEnergy
     block = 0
     c = c
-    v = 'gr0 gr1'
+    v = 'gr0 gr1 gr2 gr3'
     #f_name = S
     derivative_order = 2
     outputs = console
@@ -258,14 +239,14 @@
     type = ForceDensityMaterial
     block = 0
     c = c
-    etas = 'gr0 gr1'
+    etas = 'gr0 gr1 gr2 gr3'
     cgb = 0.14
-    k = 10
+    k = 100
   [../]
   [./force_density_ext]
     type = ExternalForceDensityMaterial
     c = c
-    etas = 'gr0 gr1'
+    etas = 'gr0 gr1 gr2 gr3'
     k = 1.0
     force_y = load
   [../]
@@ -284,20 +265,6 @@
 []
 
 [UserObjects]
-  #[./grain_center]
-  #  type = ComputeGrainCenterUserObject
-  #  etas = 'gr0 gr1'
-  #  execute_on = 'initial timestep_begin'
-  #[../]
-  #[./grain_force]
-  #  type = ComputeGrainForceAndTorque
-  #  execute_on = 'linear nonlinear'
-  #  grain_data = grain_center
-  #  force_density = force_density
-  #  c = c
-  #  etas = 'gr0 gr1'
-  #[../]
-
   [./grain_center]
     type = GrainTracker
     outputs = none
@@ -310,61 +277,20 @@
     grain_data = grain_center
     force_density = force_density
     c = c
-    etas = 'gr0 gr1'
+    etas = 'gr0 gr1 gr2 gr3'
     #compute_jacobians = false
   [../]
   #[./grain_force_const]
   #  type = ConstantGrainForceAndTorque
   #  execute_on = 'linear nonlinear'
-  #  force =  '0.3 -0.3 0.0 -0.5 0.5 0.0'
-  #  torque = '0.0 0.0 0.0 0.0 0.0 0.0'
-  #[../]
-  #[./grain_center]
-  #  type = GrainTracker
-  #  outputs = none
-  #  compute_var_to_feature_map = true
-  #  execute_on = 'initial timestep_begin'
-  #[../]
-  #[./grain_force_ext]
-  #  type = ComputeGrainForceAndTorque
-  #  execute_on = 'initial linear nonlinear'
-  #  grain_data = grain_center
-  #  c = c
-  #  etas = 'gr0 gr1'
-  #  force_density = force_density_ext
+  #  force =  '0.8 0.0 0.0 0.0 0.0 0.0 0.8 -0.8 0.0 0.0 -0.8 0.0'
+  #  torque = '0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0'
   #[../]
   #[./grain_force]
   #  type = GrainForceAndTorqueSum
   #  execute_on = 'linear nonlinear'
   #  grain_forces = 'grain_force_dns grain_force_const'
-  #  grain_num = 2
-  #[../]
-  #[./grain_force]
-  #  type = MaskedGrainForceAndTorque
-  #  grain_force = grain_force_app
-  #  pinned_grains = 1
-  #  execute_on = 'linear nonlinear'
-  #[../]
-
-  #[./grain_force_dns]
-  #  type = ComputeGrainForceAndTorque
-  #  c = c
-  #  etas = 'gr0 gr1'
-  #  execute_on = 'linear nonlinear'
-  #  grain_data = grain_center
-  #  force_density = force_density
-  #[../]
-  #[./grain_force_const]
-  #  type = ConstantGrainForceAndTorque
-  #  execute_on = 'linear nonlinear'
-  #  force =  '0.5 0.0 0.0 -0.5 0.0 0.0'
-  #  torque = '0.0 0.0 0.0 0.0 0.0 0.0'
-  #[../]
-  #[./grain_force]
-  #  type = GrainForceAndTorqueSum
-  #  execute_on = 'linear nonlinear'
-  #  grain_forces = 'grain_force_dns grain_force_const'
-  #  grain_num = 2
+  #  grain_num = 4
   #[../]
 []
 
@@ -458,10 +384,6 @@
     #off_diag_column = 'c w c   c   gr0 gr1 gr0 gr1'
     #off_diag_row    = 'w c gr0 gr1 c   c  gr1  gr0'
   [../]
-#[./FDP]
-#  type = FDP
-#  full = true
-#  [../]
 []
 
 [Executioner]
@@ -500,7 +422,7 @@
   gnuplot = true
   print_perf_log = true
   #interval = 10
-  file_base = 2016_10_19_2puneql_nonlocal
+  file_base = 2016_10_18_4p_rigid
   [./console]
     type = Console
     perf_log = true
@@ -509,21 +431,21 @@
 
 [ICs]
   [./ic_gr1]
-    int_width = 2.0
+    int_width = 2.5
     x1 = 25.0
     y1 = 10.0
-    radius = 8.0
+    radius = 7.2
     outvalue = 0.0
     variable = gr1
     invalue = 1.0
     type = SmoothCircleIC
   [../]
   [./multip]
-    x_positions = '11.0 25.0'
-    int_width = 2.0
+    x_positions = '10.0 25.0 10.0 25.0'
+    int_width = 2.5
     z_positions = '0 0'
-    y_positions = '13.0 10.0 '
-    radii = '6.0 8.0'
+    y_positions = '10.0 10.0 25.0 25.0 '
+    radii = '7.2 7.2 7.2 7.2'
     3D_spheres = false
     outvalue = 0.001
     variable = c
@@ -532,12 +454,32 @@
     block = 0
   [../]
   [./ic_gr0]
-    int_width = 2.0
-    x1 = 11.0
-    y1 = 13.0
-    radius = 6.0
+    int_width = 2.5
+    x1 = 10.0
+    y1 = 10.0
+    radius = 7.2
     outvalue = 0.0
     variable = gr0
+    invalue = 1.0
+    type = SmoothCircleIC
+  [../]
+  [./ic_gr2]
+    int_width = 2.5
+    x1 = 10.0
+    y1 = 25.0
+    radius = 7.2
+    outvalue = 0.0
+    variable = gr2
+    invalue = 1.0
+    type = SmoothCircleIC
+  [../]
+  [./ic_gr3]
+    int_width = 2.5
+    x1 = 25.0
+    y1 = 25.0
+    radius = 7.2
+    outvalue = 0.0
+    variable = gr3
     invalue = 1.0
     type = SmoothCircleIC
   [../]

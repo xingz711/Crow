@@ -8,12 +8,12 @@
   dim = 2
   nx = 80
   ny = 40
-  nz = 0
+  nz = 40
   xmin = 0.0
   xmax = 40.0
   ymin = 0.0
   ymax = 20.0
-  zmax = 0
+  zmax = 20.0
   elem_type = QUAD4
 []
 
@@ -34,46 +34,56 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
-  [./dF00]
+  [./dF0_x]
     order = CONSTANT
     family = MONOMIAL
   [../]
-  [./dF01]
+  [./dF0_y]
     order = CONSTANT
     family = MONOMIAL
   [../]
-  [./dF10]
+  [./dF1_x]
     order = CONSTANT
     family = MONOMIAL
   [../]
-  [./dF11]
+  [./dF1_y]
     order = CONSTANT
     family = MONOMIAL
   [../]
-  [./vadv_x]
+  [./vadv0_x]
     order = CONSTANT
     family = MONOMIAL
   [../]
-  [./vadv_y]
+  [./vadv0_y]
     order = CONSTANT
     family = MONOMIAL
   [../]
-  #[./vadv_dns_x]
-  #  order = CONSTANT
-  #  family = MONOMIAL
-  #[../]
-  #[./vadv_dns_y]
-  #  order = CONSTANT
-  #  family = MONOMIAL
-  #[../]
-  #[./vadv_ext_x]
-  #  order = CONSTANT
-  #  family = MONOMIAL
-  #[../]
-  #[./vadv_ext_y]
-  #  order = CONSTANT
-  #  family = MONOMIAL
-  #[../]
+  [./vadv1_x]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./vadv1_y]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./grad_eta0_x]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+    order = CONSTANT
+    family = MONOMIAL
+  [./grad_eta0_y]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./grad_eta1_x]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./grad_eta1_y]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
 []
 
 [Kernels]
@@ -97,42 +107,44 @@
   [../]
   [./PolycrystalSinteringKernel]
     c = c
+    consider_rigidbodymotion = false
+    grain_force = grain_force
+    grain_tracker_object = grain_center
+    grain_volumes = grain_volumes
+    translation_constant = 10.0
+    rotation_constant = 2.0
   [../]
   [./motion]
     type = MultiGrainRigidBodyMotion
     variable = w
     c = c
     v = 'gr0 gr1'
-    grain_force = grain_force
-    grain_tracker_object = grain_center
-    grain_volumes = grain_volumes
+    #grain_force = grain_force
+    #grain_tracker_object = grain_center
+    #grain_volumes = grain_volumes
+    #translation_constant = 10.0
+    #rotation_constant = 2.0
   [../]
-  #[./vadv_gr0]
-  #  type = SingleGrainRigidBodyMotion
-  #  variable = gr0
-  #  c = c
-  #  v = 'gr0 gr1'
-  #  grain_force = grain_force
-  #  grain_tracker_object = grain_center
-  #  grain_volumes = grain_volumes
-  #[../]
-  #[./vadv_gr1]
-  #  type = SingleGrainRigidBodyMotion
-  #  variable = gr1
-  #  c = c
-  #  v = 'gr0 gr1'
-  #  op_index = 1
-  #  grain_force = grain_force
-  #  grain_tracker_object = grain_center
-  #  grain_volumes = grain_volumes
-  #[../]
+  [./vadv_gr0]
+    type = SingleGrainRigidBodyMotion
+    variable = gr0
+    c = c
+    v = 'gr0 gr1'
+  [../]
+  [./vadv_gr1]
+    type = SingleGrainRigidBodyMotion
+    variable = gr1
+    c = c
+    v = 'gr0 gr1'
+    op_index = 1
+  [../]
 []
 
 [AuxKernels]
   [./bnds]
     type = BndsCalcAux
     variable = bnds
-    v = 'gr0 gr1 '
+    v = 'gr0 gr1'
   [../]
   [./Total_en]
     type = TotalFreeEnergy
@@ -142,76 +154,76 @@
   [../]
   [./dF00]
     type = MaterialStdVectorRealGradientAux
-    variable = dF00
+    variable = dF0_x
     property = force_density
   [../]
   [./dF01]
     type = MaterialStdVectorRealGradientAux
-    variable = dF01
+    variable = dF0_y
     property = force_density
     component = 1
   [../]
   [./dF10]
     type = MaterialStdVectorRealGradientAux
-    variable = dF10
+    variable = dF1_x
     property = force_density
     index = 1
   [../]
   [./dF11]
     type = MaterialStdVectorRealGradientAux
-    variable = dF11
+    variable = dF1_y
     property = force_density
     index = 1
     component = 1
   [../]
-  [./vadv_x]
-    type = GrainAdvectionAux
+  [./vadv00]
+    type = MaterialStdVectorRealGradientAux
+    variable = vadv0_x
+    property = advection_velocity
+  [../]
+  [./vadv01]
+    type = MaterialStdVectorRealGradientAux
+    variable = vadv0_y
+    property = advection_velocity
+    component = 1
+  [../]
+  [./vadv10]
+    type = MaterialStdVectorRealGradientAux
+    variable = vadv1_x
+    index = 1
+    property = advection_velocity
+  [../]
+  [./vadv11]
+    type = MaterialStdVectorRealGradientAux
+    variable = vadv1_y
+    property = advection_velocity
+    index = 1
+    component = 1
+  [../]
+  [./grad_eta0_x]
+    type = VariableGradientComponent
     component = x
-    grain_tracker_object = grain_center
-    grain_force = grain_force
-    grain_volumes = grain_volumes
-    variable = vadv_x
+    gradient_variable = gr0
+    variable = grad_eta0_x
   [../]
-  [./vadv_y]
-    type = GrainAdvectionAux
+  [./grad_eta0_y]
+    type = VariableGradientComponent
     component = y
-    grain_tracker_object = grain_center
-    grain_volumes = grain_volumes
-    grain_force = grain_force
-    variable = vadv_y
+    gradient_variable = gr0
+    variable = grad_eta0_y
   [../]
-  #[./vadv_dns_x]
-  #  type = GrainAdvectionAux
-  #  component = x
-  #  grain_tracker_object = grain_center
-  #  grain_force = grain_force_dns
-  #  grain_volumes = grain_volumes
-  #  variable = vadv_dns_x
-  #[../]
-  #[./vadv_dns_y]
-  #  type = GrainAdvectionAux
-  #  component = y
-  #  grain_tracker_object = grain_center
-  #  grain_volumes = grain_volumes
-  #  grain_force = grain_force_dns
-  #  variable = vadv_dns_y
-  #[../]
-  #[./vadv_ext_x]
-  #  type = GrainAdvectionAux
-  #  component = x
-  #  grain_tracker_object = grain_center
-  #  grain_force = grain_force_const
-  #  grain_volumes = grain_volumes
-  #  variable = vadv_ext_x
-  #[../]
-  #[./vadv_ext_y]
-  #  type = GrainAdvectionAux
-  #  component = y
-  #  grain_tracker_object = grain_center
-  #  grain_volumes = grain_volumes
-  #  grain_force = grain_force_const
-  #  variable = vadv_ext_y
-  #[../]
+  [./grad_eta1_x]
+    type = VariableGradientComponent
+    component = x
+    gradient_variable = gr1
+    variable = grad_eta1_x
+  [../]
+  [./grad_eta1_y]
+    type = VariableGradientComponent
+    component = y
+    gradient_variable = gr1
+    variable = grad_eta1_y
+  [../]
 []
 
 [BCs]
@@ -223,13 +235,6 @@
   #[../]
 []
 
-[Functions]
-  [./load]
-    type = ConstantFunction
-    value = 0.01
-  [../]
-[]
-
 [Materials]
   [./free_energy]
     type = SinteringFreeEnergy
@@ -238,20 +243,20 @@
     v = 'gr0 gr1'
     #f_name = S
     derivative_order = 2
+    #outputs = console
+  [../]
+  [./CH_mat]
+    type = PFDiffusionGrowth
+    block = 0
+    rho = c
+    v = 'gr0 gr1'
     outputs = console
   [../]
-  #[./CH_mat]
-  #  type = PFDiffusionGrowth
-  #  block = 0
-  #  rho = c
-  #  v = 'gr0 gr1'
-  #  outputs = console
-  #[../]
   [./constant_mat]
     type = GenericConstantMaterial
     block = 0
-    prop_names = 'A B L  kappa_op kappa_c D'
-    prop_values = '16.0 1.0 1.0 0.5 1.0 1.0'
+    prop_names = '  A    B   L   kappa_op kappa_c'
+    prop_values = '16.0 1.0 1.0  0.5      1.0    '
   [../]
   # materials for rigid body motion / grain advection
   [./force_density]
@@ -260,49 +265,24 @@
     c = c
     etas = 'gr0 gr1'
     cgb = 0.14
-    k = 10
+    k = 20
+    ceq = 1.0
   [../]
-  [./force_density_ext]
-    type = ExternalForceDensityMaterial
+  [./advection_vel]
+    type = GrainAdvectionVelocity
     c = c
-    etas = 'gr0 gr1'
-    k = 1.0
-    force_y = load
-  [../]
-[]
-
-[VectorPostprocessors]
-  [./forces]
-    type = GrainForcesPostprocessor
     grain_force = grain_force
-  [../]
-  [./grain_volumes]
-    type = FeatureVolumeVectorPostprocessor
-    flood_counter = grain_center
-    execute_on = 'initial timestep_begin'
+    etas = 'gr0 gr1'
+    grain_data = grain_center
+    translation_constant = 10.0
   [../]
 []
 
 [UserObjects]
-  #[./grain_center]
-  #  type = ComputeGrainCenterUserObject
-  #  etas = 'gr0 gr1'
-  #  execute_on = 'initial timestep_begin'
-  #[../]
-  #[./grain_force]
-  #  type = ComputeGrainForceAndTorque
-  #  execute_on = 'linear nonlinear'
-  #  grain_data = grain_center
-  #  force_density = force_density
-  #  c = c
-  #  etas = 'gr0 gr1'
-  #[../]
-
   [./grain_center]
-    type = GrainTracker
-    outputs = none
-    compute_var_to_feature_map = true
-    execute_on = 'initial timestep_begin'
+    type = ComputeGrainCenterUserObject
+    etas = 'gr0 gr1'
+    execute_on = 'initial timestep_end linear'
   [../]
   [./grain_force]
     type = ComputeGrainForceAndTorque
@@ -313,59 +293,6 @@
     etas = 'gr0 gr1'
     #compute_jacobians = false
   [../]
-  #[./grain_force_const]
-  #  type = ConstantGrainForceAndTorque
-  #  execute_on = 'linear nonlinear'
-  #  force =  '0.3 -0.3 0.0 -0.5 0.5 0.0'
-  #  torque = '0.0 0.0 0.0 0.0 0.0 0.0'
-  #[../]
-  #[./grain_center]
-  #  type = GrainTracker
-  #  outputs = none
-  #  compute_var_to_feature_map = true
-  #  execute_on = 'initial timestep_begin'
-  #[../]
-  #[./grain_force_ext]
-  #  type = ComputeGrainForceAndTorque
-  #  execute_on = 'initial linear nonlinear'
-  #  grain_data = grain_center
-  #  c = c
-  #  etas = 'gr0 gr1'
-  #  force_density = force_density_ext
-  #[../]
-  #[./grain_force]
-  #  type = GrainForceAndTorqueSum
-  #  execute_on = 'linear nonlinear'
-  #  grain_forces = 'grain_force_dns grain_force_const'
-  #  grain_num = 2
-  #[../]
-  #[./grain_force]
-  #  type = MaskedGrainForceAndTorque
-  #  grain_force = grain_force_app
-  #  pinned_grains = 1
-  #  execute_on = 'linear nonlinear'
-  #[../]
-
-  #[./grain_force_dns]
-  #  type = ComputeGrainForceAndTorque
-  #  c = c
-  #  etas = 'gr0 gr1'
-  #  execute_on = 'linear nonlinear'
-  #  grain_data = grain_center
-  #  force_density = force_density
-  #[../]
-  #[./grain_force_const]
-  #  type = ConstantGrainForceAndTorque
-  #  execute_on = 'linear nonlinear'
-  #  force =  '0.5 0.0 0.0 -0.5 0.0 0.0'
-  #  torque = '0.0 0.0 0.0 0.0 0.0 0.0'
-  #[../]
-  #[./grain_force]
-  #  type = GrainForceAndTorqueSum
-  #  execute_on = 'linear nonlinear'
-  #  grain_forces = 'grain_force_dns grain_force_const'
-  #  grain_num = 2
-  #[../]
 []
 
 [Postprocessors]
@@ -454,21 +381,19 @@
 [Preconditioning]
   [./SMP]
     type = SMP
-    full = true
+    #full = true
+    off_diag_column = 'c w c   c   gr0 gr1 gr0 gr1'
+    off_diag_row    = 'w c gr0 gr1 c   c   gr1 gr0'
     #off_diag_column = 'c w c   c   gr0 gr1 gr0 gr1'
     #off_diag_row    = 'w c gr0 gr1 c   c  gr1  gr0'
   [../]
-#[./FDP]
-#  type = FDP
-#  full = true
-#  [../]
 []
 
 [Executioner]
   # Preconditioned JFNK (default)
   type = Transient
   scheme = BDF2
-  solve_type = NEWTON
+  solve_type = PJFNK
   petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
   petsc_options_value = 'asm         31   preonly   lu      1'
   #petsc_options_iname = '-pc_type'
@@ -478,8 +403,8 @@
   #nl_abs_tol = 1e-10
   #nl_rel_tol = 1e-08
   l_tol = 1e-04
-  end_time = 20
-  dt = 0.01
+  end_time = 30
+  #dt = 0.01
   [./TimeStepper]
     type = IterationAdaptiveDT
     dt = 0.01
@@ -500,7 +425,7 @@
   gnuplot = true
   print_perf_log = true
   #interval = 10
-  file_base = 2016_10_19_2puneql_nonlocal
+  #file_base = 2016_11_15_2pUneql_rigid_elstc_old
   [./console]
     type = Console
     perf_log = true
@@ -512,18 +437,18 @@
     int_width = 2.0
     x1 = 25.0
     y1 = 10.0
-    radius = 8.0
+    radius = 7.4
     outvalue = 0.0
     variable = gr1
     invalue = 1.0
     type = SmoothCircleIC
   [../]
   [./multip]
-    x_positions = '11.0 25.0'
+    x_positions = '10.0 25.0'
     int_width = 2.0
     z_positions = '0 0'
-    y_positions = '13.0 10.0 '
-    radii = '6.0 8.0'
+    y_positions = '10.0 10.0 '
+    radii = '7.4 7.4'
     3D_spheres = false
     outvalue = 0.001
     variable = c
@@ -533,9 +458,9 @@
   [../]
   [./ic_gr0]
     int_width = 2.0
-    x1 = 11.0
-    y1 = 13.0
-    radius = 6.0
+    x1 = 10.0
+    y1 = 10.0
+    radius = 7.4
     outvalue = 0.0
     variable = gr0
     invalue = 1.0

@@ -32,7 +32,7 @@ include $(MOOSE_DIR)/modules/modules.mk
 # MARMOT (optional)
 MARMOT_DIR          ?= $(CURDIR)/marmot
 ifneq ($(wildcard $(MARMOT_DIR)/Makefile),)
-  APPLICATION_DIR    := $(MARMOT_DIR)
+ APPLICATION_DIR    := $(MARMOT_DIR)
   APPLICATION_NAME   := marmot
   include            $(FRAMEWORK_DIR)/app.mk
   ADDITIONAL_CPPFLAGS += -DMARMOT_ENABLED

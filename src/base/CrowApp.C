@@ -20,6 +20,7 @@
 #include "CHTemp.h"
 #include "ACSinteringGrowth.h"
 #include "ACParticleGrowth.h"
+#include "ElectricFieldKernel.h"
 #include "VacancySourceTermKernel.h"
 #include "RandomVacancySourceTermKernel.h"
 #include "LangevinNoiseVoid.h"
@@ -27,6 +28,7 @@
 #include "TempDiffusion.h"
 #include "PFDiffusionGrowthConst.h"
 #include "PFDiffusionGrowth.h"
+#include "PFDiffusionGrowthMtrx.h"
 #include "PFDiffusionGrowth1.h"
 #include "PFParticleGrowth.h"
 // #include "PFEigenStrainMaterial.h"
@@ -39,8 +41,10 @@
 #include "ConservedLangevinNoiseVoidSource.h"
 #include "BicrystalIC.h"
 #include "RigidBodyMotionKernel.h"
+#include "ResistivityMaterial.h"
 #include "SinteringFreeEnergy.h"
 #include "SinteringMobility.h"
+#include "SinteringMtrxMobility.h"
 #include "SinteringDiffusion.h"
 #include "ThermalVariation.h"
 
@@ -55,6 +59,9 @@
 #include "RandomVoidSourceAux.h"
 
 #include "ConservedUniformVoidSource.h"
+
+#include "InterfaceAreaPostprocessor.h"
+// #include "ConservationCheck.h"
 
 //#include "MobilityFn.h"
 
@@ -127,6 +134,7 @@ CrowApp::registerObjects(Factory & factory)
   registerKernel(CHTemp);
   registerKernel(ACSinteringGrowth);
   registerKernel(ACParticleGrowth);
+  registerKernel(ElectricFieldKernel);
   registerKernel(VacancySourceTermKernel);
   registerKernel(RandomVacancySourceTermKernel);
   registerKernel(ConservedLangevinNoiseVoidSource);
@@ -138,6 +146,7 @@ CrowApp::registerObjects(Factory & factory)
   registerMaterial(TempDiffusion);
   registerMaterial(PFDiffusionGrowthConst);
   registerMaterial(PFDiffusionGrowth);
+  registerMaterial(PFDiffusionGrowthMtrx);
   registerMaterial(PFDiffusionGrowth1);
   // registerMaterial(PFEigenStrainMaterial);
   // registerMaterial(PFEigenStrainMaterial1);
@@ -145,8 +154,10 @@ CrowApp::registerObjects(Factory & factory)
   registerMaterial(PFTempMobility);
   registerMaterial(Mobility);
   registerMaterial(RandomVacancySourceTermMaterial);
+  registerMaterial(ResistivityMaterial);
   registerMaterial(SinteringFreeEnergy);
   registerMaterial(SinteringMobility);
+  registerMaterial(SinteringMtrxMobility);
   registerMaterial(SinteringDiffusion);
 
   registerInitialCondition(TwoParticleGrainsIC);
@@ -155,6 +166,8 @@ CrowApp::registerObjects(Factory & factory)
   registerInitialCondition(MultiSmoothParticleIC);
   //registerFunction(MobilityFn);
   registerAux(RandomVoidSourceAux);
+  registerPostprocessor(InterfaceAreaPostprocessor);
+  // registerPostprocessor(ConservationCheck);
 
   registerUserObject(ConservedUniformVoidSource);
 

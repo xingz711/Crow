@@ -83,10 +83,10 @@ SinteringMobility::SinteringMobility(const InputParameters & parameters) :
 }
 
 void
-SinteringMobility::computeProperties()
+SinteringMobility::computeQpProperties()
 {
-  for (_qp = 0; _qp < _qrule->n_points(); ++_qp)
-  {
+  // for (_qp = 0; _qp < _qrule->n_points(); ++_qp)
+  // {
     /* the model parameters will be non-dimensionalized for convenience and consistency
      * in calculating the different residuals (Rc and Rw). However, the physical values
      * of the model parameters can be obtained by converting them back to their physical
@@ -153,8 +153,8 @@ SinteringMobility::computeProperties()
        * non-negative everywhere in the domain
        */
       Dsurf = Ds0_c * std::exp(-_Qs/(_kb * _T[_qp]));
-      mult_surf = 30 * (c*c * mc*mc);
-      dmult_surf = 30 * (2.0*c*mc*mc - 2.0*c*c*mc);
+      mult_surf = (c * mc);
+      dmult_surf = (1 - 2.0*c);
     }
 
     // Compute different mobility tensors and their derivatives
@@ -172,5 +172,5 @@ SinteringMobility::computeProperties()
     // // Compute the mobility determinant
     // _detM[_qp] = _M[_qp].det(); // to make sure it is non-negative anywhere in the domain
 
-  }
+  // }
 }

@@ -21,26 +21,27 @@ private:
   std::vector<const VariableValue *> _vals;
   std::vector<unsigned int> _vals_var;
 
-  Real _Dvol0;
-  Real _Dvap0;
-  Real _Dsurf0;
-  Real _Dgb0;
-  Real _int_width;
-  Real _length_scale;
-  Real _time_scale;
-  Real _Qv;
-  Real _GB_energy;
-  Real _surface_energy;
-  Real _GBmob0;
-  Real _Q;
-  Real _Qs;
-  Real _Qgb;
-  Real _Vm;
-  Real _GBMobility;
+  const Real _Dvol0;
+  const Real _Dvap0;
+  const Real _Dsurf0;
+  const Real _Dgb0;
+  const Real _int_width;
+  const Real _length_scale;
+  const Real _time_scale;
+  const Real _Qv;
+  const Real _GB_energy;
+  const Real _surface_energy;
+  const Real _GBmob0;
+  const Real _Q;
+  const Real _Qs;
+  const Real _Qgb;
+  const Real _Vm;
+  const Real _GBMobility;
   const Real _kb;
+  const Real _JtoeV;
 
-  const VariableValue & _rho;
-  const VariableGradient & _grad_rho;
+  const VariableValue & _c;
+  const VariableGradient & _grad_c;
   const VariableValue & _T;
 
   MaterialProperty<Real> & _D;
@@ -48,10 +49,14 @@ private:
   MaterialProperty<Real> & _dDdc;
   MaterialProperty<Real> & _M;
   MaterialProperty<Real> & _dMdc;
-  // MaterialProperty<Real> & _L;
+  MaterialProperty<Real> & _L;
   // MaterialProperty<Real> & _kappa_op;
+  // MaterialProperty<Real> & _A;
+  // MaterialProperty<Real> & _B;
+  const MaterialProperty<Real> & _A;
+  const MaterialProperty<Real> & _B;
 
-  unsigned int _ncrys;
+  unsigned int _op_num;
 };
 
 #endif //SinteringDiffusion_H

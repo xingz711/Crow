@@ -19,13 +19,13 @@ VacancyAnnihilationKernel::VacancyAnnihilationKernel(const InputParameters & par
     _Svgb(getMaterialProperty<Real>(_Svgb_name)),
     _ceq(getParam<Real>("ceq"))
     //_c(coupledValue("c"))
-    
+
 {
   // Array of coupled variables is created in the constructor
   _ncrys = coupledComponents("v"); //determine number of grains from the number of names passed in.  Note this is the actual number -1
   _vals.resize(_ncrys); //Size variable arrays
   _vals_var.resize(_ncrys);
-  
+
   // _gamma = 1.5;
 
   //Loop through grains and load coupled variables into the arrays
@@ -45,7 +45,7 @@ VacancyAnnihilationKernel::computeQpResidual()
     SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp]; //Sum all other order parameters
 
     //SumEtaj = (*_vals[i])[_qp];
-  
+
   return  _Svgb[_qp]* (1-SumEtaj)*(_u[_qp] - _ceq)*_test[_i][_qp];
 
 }
@@ -59,5 +59,5 @@ VacancyAnnihilationKernel::computeQpJacobian()
     SumEtaj += (*_vals[i])[_qp]*(*_vals[i])[_qp];//Sum all other order parameters
     //SumEtaj = (*_vals[i])[_qp];
 
-  return   _test[_i][_qp] * _Svgb[_qp]* (1-SumEtaj)* _phi[_j][_qp];  
+  return   _test[_i][_qp] * _Svgb[_qp]* (1-SumEtaj)* _phi[_j][_qp];
 }

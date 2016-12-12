@@ -6,14 +6,12 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 80
+  nx = 70
   ny = 40
-  nz = 40
-  xmin = 0.0
-  xmax = 40.0
+  xmin = 3.0
+  xmax = 38.0
   ymin = 0.0
   ymax = 20.0
-  zmax = 20.0
   elem_type = QUAD4
 []
 
@@ -318,6 +316,7 @@
   [../]
   [./dofs]
     type = NumDOFs
+    system = NL
   [../]
   [./tstep]
     type = TimestepSize
@@ -425,7 +424,7 @@
   gnuplot = true
   print_perf_log = true
   #interval = 10
-  #file_base = 2016_11_15_2pUneql_rigid_elstc_old
+  file_base = 2016_11_15_2pUneql_rigid_old_40X70
   [./console]
     type = Console
     perf_log = true

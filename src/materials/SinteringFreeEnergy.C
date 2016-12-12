@@ -13,6 +13,8 @@ InputParameters validParams<SinteringFreeEnergy>()
   params.addClassDescription("Material that implements the sintering free energy and its derivatives: \nF = 1/4(1 + c)^2*(1 - c)^2");
   params.addRequiredCoupledVar("c","Concentration variable");
   params.addCoupledVar("v","Vector of all the coupled order parameters");
+  params.addParam<MaterialPropertyName>("A", "A", "The co-efficient used for free energy");
+  params.addParam<MaterialPropertyName>("B", "B", "The co-efficient used for free energy");
   return params;
 }
 

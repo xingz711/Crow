@@ -3,52 +3,51 @@
 template<>
 InputParameters validParams<ElectricFieldKernel>()
 {
-  InputParameters params = validParams<Kernel>();
+  InputParameters params = validParams<HeatSource>();
   params.addCoupledVar("elec", "Electric potential for joule heating.");
-  params.addParam<MaterialPropertyName>("electic_conductivity", "electic_conductivity", "material property providing electrical resistivity of the material.");
+  params.addCoupledVar("args", "Vector of arguments of the diffusivity");
+  params.addParam<MaterialPropertyName>("electrical_conductivity", "electrical_conductivity", "material property providing electrical resistivity of the material.");
   return params;
 }
 
 ElectricFieldKernel::ElectricFieldKernel(const InputParameters & parameters) :
-    DerivativeMaterialInterface<JvarMapKernelInterface<Kernel> >(parameters),
-    _elec(coupledValue("elec")),
+  DerivativeMaterialInterface<JvarMapKernelInterface<HeatSource> >(parameters),
     _grad_elec(coupledGradient("elec")),
     _elec_var(coupled("elec")),
-    _electic_conductivity(getMaterialProperty<Real>("electic_conductivity")),
-    _dRdT(getMaterialPropertyDerivative<Real>("electic_conductivity", _var.name()))
+    _elec_cond(getMaterialProperty<Real>("electrical_conductivity")),
+    _delec_cond_dT(getMaterialPropertyDerivative<Real>("electrical_conductivity", _var.name())),
+    _delec_cond_darg(_coupled_moose_vars.size())
 {
-  // Get number of coupled variables
-  unsigned int nvar = _coupled_moose_vars.size();
+  for (unsigned int i = 0; i < _delec_cond_darg.size(); ++i)
+    _delec_cond_darg[i] = &getMaterialPropertyDerivative<Real>("electrical_conductivity", _coupled_moose_vars[i]->name());
+}
 
-  // reserve space for derivatives
-  _dRdarg.resize(nvar);
-
-  // Iterate over all coupled variables
-  for (unsigned int i = 0; i < nvar; ++i)
-    _dRdarg[i] = &getMaterialPropertyDerivative<Real>("electic_conductivity", _coupled_moose_vars[i]->name());
+void
+ElectricFieldKernel::initialSetup()
+{
+  validateNonlinearCoupling<Real>("electrical_conductivity");
 }
 
 Real
 ElectricFieldKernel::computeQpResidual()
 {
-  return -_electic_conductivity[_qp] * _grad_elec[_qp] * _grad_elec[_qp] * _test[_i][_qp];
+  return -_elec_cond[_qp] * _grad_elec[_qp] * _grad_elec[_qp] * _test[_i][_qp];
 }
 
 Real
 ElectricFieldKernel::computeQpJacobian()
 {
-  return -_dRdT[_qp] * _grad_elec[_qp] * _grad_elec[_qp] * _test[_i][_qp] * _phi[_j][_qp];
+  return -_delec_cond_dT[_qp] * _grad_elec[_qp] * _grad_elec[_qp] * _phi[_j][_qp] * _test[_i][_qp];
 }
 
 Real
 ElectricFieldKernel::computeQpOffDiagJacobian(unsigned int jvar)
 {
-  if (jvar == _elec_var)
-    return -2 * _electic_conductivity[_qp] * _grad_elec[_qp] * _test[_i][_qp] * _grad_phi[_j][_qp];
-  else
-  {  // Get the coupled variable jvar is referring to
-    const unsigned int cvar = mapJvarToCvar(jvar);
+  const unsigned int cvar = mapJvarToCvar(jvar);
 
-    return -(*_dRdarg[cvar])[_qp] * _grad_elec[_qp] * _grad_elec[_qp] * _test[_i][_qp] * _phi[_j][_qp];
-  }
+  if (jvar == _elec_var)
+    return -2 * _elec_cond[_qp] * _grad_elec[_qp] * _grad_phi[_j][_qp] * _test[_i][_qp]
+           -(*_delec_cond_darg[cvar])[_qp] * _grad_elec[_qp] * _grad_elec[_qp] * _phi[_j][_qp] * _test[_i][_qp];
+
+  return -(*_delec_cond_darg[cvar])[_qp] * _grad_elec[_qp] * _grad_elec[_qp] * _phi[_j][_qp] * _test[_i][_qp];
 }

@@ -1,21 +1,20 @@
 [GlobalParams]
   var_name_base = gr
   op_num = 2.0
+  block = 0
 []
 
 [Mesh]
   type = GeneratedMesh
-  dim = 2
-  nx = 80
+  dim = 3
+  nx = 60
   ny = 40
-  nz = 0
-  xmin = 0.0
-  xmax = 400.0
-  ymin = 0.0
-  ymax = 200.0
-  zmax = 0
-  elem_type = QUAD4
-  uniform_refine = 3
+  nz = 40
+  xmax = 130.0
+  ymax = 80.0
+  zmax = 80.0
+  #elem_type = QUAD4
+  elem_type = HEX8
 []
 
 [Variables]
@@ -32,22 +31,6 @@
   [./bnds]
   [../]
   [./total_en]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./dF0_x]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./dF0_y]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./dF1_x]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./dF1_y]
     order = CONSTANT
     family = MONOMIAL
   [../]
@@ -79,6 +62,24 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
+  [./grad_eta0_x]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+    order = CONSTANT
+    family = MONOMIAL
+  [./grad_eta0_y]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./grad_eta1_x]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./grad_eta1_y]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
 []
 
 [Kernels]
@@ -88,10 +89,10 @@
     kappa_name = kappa_c
     w = w
     f_name = F
-    args = 'gr0 gr1'
+    args = 'gr0 gr1   '
   [../]
   [./wres]
-    type = SplitCHWRes
+    type = SplitCHWResAniso
     variable = w
     mob_name = D
   [../]
@@ -113,7 +114,7 @@
     type = MultiGrainRigidBodyMotion
     variable = w
     c = c
-    v = 'gr0 gr1'
+    v = 'gr0 gr1   '
     grain_force = grain_force
     grain_tracker_object = grain_center
     grain_volumes = grain_volumes
@@ -126,37 +127,13 @@
   [./bnds]
     type = BndsCalcAux
     variable = bnds
-    v = 'gr0 gr1'
+    v = 'gr0 gr1   '
   [../]
   [./Total_en]
     type = TotalFreeEnergy
     variable = total_en
     kappa_names = 'kappa_c kappa_op kappa_op'
-    interfacial_vars = 'c  gr0 gr1'
-  [../]
-  [./dF00]
-    type = MaterialStdVectorRealGradientAux
-    variable = dF0_x
-    property = force_density
-  [../]
-  [./dF01]
-    type = MaterialStdVectorRealGradientAux
-    variable = dF0_y
-    property = force_density
-    component = 1
-  [../]
-  [./dF10]
-    type = MaterialStdVectorRealGradientAux
-    variable = dF1_x
-    property = force_density
-    index = 1
-  [../]
-  [./dF11]
-    type = MaterialStdVectorRealGradientAux
-    variable = dF1_y
-    property = force_density
-    index = 1
-    component = 1
+    interfacial_vars = 'c  gr0 gr1    '
   [../]
   [./vt_x]
     type = GrainAdvectionAux
@@ -219,46 +196,134 @@
     field_display = CENTROID
     flood_counter = grain_center
   [../]
-[]
-
-[BCs]
-  #[./Periodic]
-  #  [./All]
-  #    auto_direction = 'x y'
-  #    variable = 'c w'
-  #  [../]
-  #[../]
-[]
-
-[Functions]
-  [./load]
-    type = ConstantFunction
-    value = 0.01
+  [./grad_eta0_x]
+    type = VariableGradientComponent
+    component = x
+    gradient_variable = gr0
+    variable = grad_eta0_x
+  [../]
+  [./grad_eta0_y]
+    type = VariableGradientComponent
+    component = y
+    gradient_variable = gr0
+    variable = grad_eta0_y
+  [../]
+  [./grad_eta1_x]
+    type = VariableGradientComponent
+    component = x
+    gradient_variable = gr1
+    variable = grad_eta1_x
+  [../]
+  [./grad_eta1_y]
+    type = VariableGradientComponent
+    component = y
+    gradient_variable = gr1
+    variable = grad_eta1_y
   [../]
 []
+
+#[BCs]
+#  #[./Periodic]
+#  #  [./All]
+#  #    auto_direction = 'x y'
+#  #    variable = 'c w'
+#  #  [../]
+#  #[../]
+#  [./bottom_y]
+#    type = PresetBC
+#    variable = disp_y
+#    boundary = bottom
+#    value = 0
+#  [../]
+#  [./left_x]
+#    type = PresetBC
+#    variable = disp_x
+#    boundary = left
+#    value = 0
+#  [../]
+#  [./right_x]
+#    type = PresetBC
+#    variable = disp_x
+#    boundary = right
+#    value = 0
+#  [../]
+#  [./front_z]
+#    type = PresetBC
+#    variable = disp_z
+#    boundary = 'front'
+#    value = 0
+#  [../]
+#  [./back_z]
+#    type = PresetBC
+#    variable = disp_z
+#    boundary = 'back'
+#    value = 0
+#  [../]
+#  [./top_y]
+#    type = FunctionPresetBC
+#    variable = disp_y
+#    boundary = top
+#    function = load
+#  [../]
+#[]
+#
+#[Functions]
+#  [./load]
+#    type = ConstantFunction
+#    value = 0.01
+#  [../]
+#[]
+
+#[Functions]
+#  [./load]
+#    type = PiecewiseLinear
+#    y = '0.0 -4.0 -4.0'
+#    x = '0.0 100.0 200.0'
+#  [../]
+#[]
 
 [Materials]
   [./free_energy]
     type = SinteringFreeEnergy
     block = 0
     c = c
-    v = 'gr0 gr1'
-    #f_name = S
+    v = 'gr0 gr1   '
+    f_name = F
     derivative_order = 2
     #outputs = console
   [../]
-  [./CH_mat]
-    type = PFDiffusionGrowth
-    block = 0
-    rho = c
+  #[./CH_mat]
+  #  type = PFDiffusionGrowth
+  #  block = 0
+  #  rho = c
+  #  v = 'gr0 gr1'
+  #  outputs = console
+  #[../]
+  [./mob]
+    type = SinteringMtrxMobility
+    T = 2100.0
+    int_width = 5
+    Dvol0 = 4e-6
+    GBmob0 = 3.986e-6
+    Qv = 2.0
+    Qs = 3.14
+    Qgb = 4.14
+    Dsurf0 = 1.41e-5
+    Dgb0 = 4.0e-4
+    Vm = 1.58e-29
+    bulkindex = 1.0
+    surfindex = 1.0
+    gbindex = 1.0
+    c = c
     v = 'gr0 gr1'
-    outputs = console
+    length_scale = 1e-07
+    time_scale = 0.001
   [../]
   [./constant_mat]
     type = GenericConstantMaterial
     block = 0
-    prop_names = '  A    B   L   kappa_op kappa_c'
-    prop_values = '16.0 1.0 10.0  1000.0      1000.0 '
+    prop_names = '  A       B     L   kappa_op   kappa_c'
+    prop_values = '7.9891 0.8488 1.0  15.9158    21.7673    '
   [../]
   # materials for rigid body motion / grain advection
   [./force_density]
@@ -273,10 +338,10 @@
 []
 
 [VectorPostprocessors]
-  [./forces]
-    type = GrainForcesPostprocessor
-    grain_force = grain_force
-  [../]
+  #[./forces]
+  #  type = GrainForcesPostprocessor
+  #  grain_force = grain_force
+  #[../]
   [./grain_volumes]
     type = FeatureVolumeVectorPostprocessor
     flood_counter = grain_center
@@ -297,16 +362,16 @@
     grain_data = grain_center
     force_density = force_density
     c = c
-    etas = 'gr0 gr1'
+    etas = 'gr0 gr1   '
     compute_jacobians = false
   [../]
 []
 
 [Postprocessors]
-  [./mat_D]
-    type = ElementIntegralMaterialProperty
-    mat_prop = D
-  [../]
+  #[./mat_D]
+  #  type = ElementIntegralMaterialProperty
+  #  mat_prop = D
+  #[../]
   [./elem_c]
     type = ElementIntegralVariablePostprocessor
     variable = c
@@ -343,73 +408,13 @@
     type = PerformanceData
     event = 'ACTIVE'
   [../]
-  [./res_calls]
-    type = PerformanceData
-    column = n_calls
-    event = compute_residual()
-  [../]
-  [./jac_calls]
-    type = PerformanceData
-    column = n_calls
-    event = compute_jacobian()
-  [../]
-  [./jac_total_time]
-    type = PerformanceData
-    column = total_time
-    event = compute_jacobian()
-  [../]
-  [./jac_average_time]
-    type = PerformanceData
-    column = average_time
-    event = compute_jacobian()
-  [../]
-  [./jac_total_time_with_sub]
-    type = PerformanceData
-    column = total_time_with_sub
-    event = compute_jacobian()
-  [../]
-  [./jac_average_time_with_sub]
-    type = PerformanceData
-    column = average_time_with_sub
-    event = compute_jacobian()
-  [../]
-  [./jac_percent_of_active_time]
-    type = PerformanceData
-    column = percent_of_active_time
-    event = compute_jacobian()
-  [../]
-  [./jac_percent_of_active_time_with_sub]
-    type = PerformanceData
-    column = percent_of_active_time_with_sub
-    event = compute_jacobian()
-  [../]
-  [./int_area]
-    type = InterfaceAreaPostprocessor
-    variable = c
-  [../]
-  #[./mass_conservation]
-  #  type = ConservationCheck
-  #  grain_force = grain_force
-  #  grain_tracker_object = grain_center
-  #  grain_volumes = grain_volumes
-  #  translation_constant = 10.0
-  #  rotation_constant = 1
-  #  execute_on = TIMESTEP_END
-  #  variable = c
-  #[../]
 []
 
 [Preconditioning]
   [./SMP]
     type = SMP
-    #full = true
-    off_diag_column = 'c w c   c   gr0 gr1 gr0 gr1'
-    off_diag_row    = 'w c gr0 gr1 c   c  gr1  gr0'
+    coupled_groups = 'c,w c,gr0,gr1'
   [../]
-#[./FDP]
-#  type = FDP
-#  full = true
-#  [../]
 []
 
 [Executioner]
@@ -426,7 +431,7 @@
   #nl_abs_tol = 1e-10
   #nl_rel_tol = 1e-08
   l_tol = 1e-04
-  end_time = 20
+  end_time = 200
   #dt = 0.01
   [./TimeStepper]
     type = IterationAdaptiveDT
@@ -442,8 +447,8 @@
 []
 
 [Adaptivity]
-  marker = errorfrac
-  max_h_level = 4
+  marker = bound_adapt
+  max_h_level = 2
   [./Indicators]
     [./error]
       type = GradientJumpIndicator
@@ -452,19 +457,17 @@
   [../]
   [./Markers]
     [./bound_adapt]
-      type = ValueThresholdMarker
-      third_state = DO_NOTHING
-      coarsen = 1.0
-      refine = 0.99
+      type = ValueRangeMarker
+      lower_bound = 0.05
+      upper_bound = 0.99
       variable = bnds
-      invert = true
     [../]
-    [./errorfrac]
-      type = ErrorFractionMarker
-      coarsen = 0.1
-      indicator = error
-      refine = 0.7
-    [../]
+    #[./errorfrac]
+    #  type = ErrorFractionMarker
+    #  coarsen = 0.5
+    #  indicator = error
+    #  refine = 0.8
+    #[../]
   [../]
 []
 
@@ -475,6 +478,7 @@
   gnuplot = true
   print_perf_log = true
   #interval = 10
+  #file_base = 2016_10_20_2puneql_oldnonlocal_adv20_25
   [./console]
     type = Console
     perf_log = true
@@ -482,38 +486,108 @@
 []
 
 [ICs]
+  #[./ic_gr1]
+  #  x_positions = '50.0 95.0'
+  #  y_positions = '50.0 100.0'
+  #  z_positions = '50.0 100.0'
+  #  int_width = 5.0
+  #  radii = '20.0 20.0'
+  #  3D_spheres = true
+  #  outvalue = 0
+  #  variable = gr1
+  #  invalue = 1
+  #  type = SpecifiedSmoothCircleIC
+  #  block = 0
+  #[../]
+  #[./multip]
+  #  x_positions = '50.0 100.0 55.0 100.0 55.0 100.0 50.0 95.0 160.0'
+  #  y_positions = '50.0 50.0 100.0 100.0 50.0 50.0 100.0 100.0 75.0'
+  #  z_positions = '50.0 50.0 50.0  50.0 100.0 100.0 100.0 100.0 75.0'
+  #  int_width = 5.0
+  #  radii = '20.0 25.0 25.0 20.0 25.0 20.0 20.0 20.0 34.0'
+  #  3D_spheres = true
+  #  outvalue = 0.001
+  #  variable = c
+  #  invalue = 0.999
+  #  type = SpecifiedSmoothCircleIC
+  #  block = 0
+  #[../]
+  #[./ic_gr0]
+  #  x_positions = '55.0 160.0'
+  #  int_width = 5.0
+  #  z_positions = '50.0 75.0'
+  #  y_positions = '100.0 75.0'
+  #  radii = '25.0 34.0'
+  #  3D_spheres = true
+  #  outvalue = 0.0
+  #  variable = gr0
+  #  invalue = 1.0
+  #  type = SpecifiedSmoothCircleIC
+  #  block = 0
+  #[../]
+  #[./ic_]
+  #  x_positions = '50.0 100.0'
+  #  int_width = 5.0
+  #  z_positions = '100.0 50.0'
+  #  y_positions = '100.0 50.0 '
+  #  radii = '20.0 25.0 '
+  #  3D_spheres = true
+  #  outvalue = 0.0
+  #  variable =
+  #  invalue = 1.0
+  #  type = SpecifiedSmoothCircleIC
+  #  block = 0
+  #[../]
+  #[./ic_]
+  #  x_positions = '100.0 55.0'
+  #  int_width = 5.0
+  #  z_positions = '50.0 100.0'
+  #  y_positions = '100.0 50.0'
+  #  radii = '20.0 25.0'
+  #  3D_spheres = true
+  #  outvalue = 0.0
+  #  variable =
+  #  invalue = 1.0
+  #  type = SpecifiedSmoothCircleIC
+  #  block = 0
+  #[../]
   [./ic_gr1]
-    int_width = 40.0
-    x1 = 250.0
-    y1 = 100.0
-    radius = 70.0
+    type = SmoothCircleIC
+    int_width = 5.0
+    x1 = 95.0
+    y1 = 50.0
+    z1 = 50.0
+    radius = 20.0
+    outvalue = 0.0
+    variable = gr0
+    invalue = 1.0
+    3D_spheres = true
+  [../]
+  [./ic_gr0]
+    type = SmoothCircleIC
+    int_width = 5.0
+    x1 = 50.0
+    y1 = 50.0
+    z1 = 50.0
+    radius = 25.0
     outvalue = 0.0
     variable = gr1
     invalue = 1.0
-    type = SmoothCircleIC
+    3D_spheres = true
   [../]
+
   [./multip]
-    x_positions = '100.0 250.0'
-    int_width = 40.0
-    z_positions = '0 0'
-    y_positions = '100.0 100.0 '
-    radii = '70.0 70.0'
-    3D_spheres = false
+    x_positions = '50.0 95.0'
+    y_positions = '50.0 50.0'
+    z_positions = '50.0 50.0'
+    int_width = 5.0
+    radii = '25.0 20.0'
+    3D_spheres = true
     outvalue = 0.001
     variable = c
     invalue = 0.999
     type = SpecifiedSmoothCircleIC
     block = 0
-  [../]
-  [./ic_gr0]
-    int_width = 40.0
-    x1 = 100.0
-    y1 = 100.0
-    radius = 70.0
-    outvalue = 0.0
-    variable = gr0
-    invalue = 1.0
-    type = SmoothCircleIC
   [../]
 []
 

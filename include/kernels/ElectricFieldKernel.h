@@ -1,7 +1,7 @@
 #ifndef ELECTRICFIELDKERNEL_H
 #define ELECTRICFIELDKERNEL_H
 
-#include "Kernel.h"
+#include "HeatSource.h"
 #include "JvarMapInterface.h"
 #include "DerivativeMaterialInterface.h"
 
@@ -12,29 +12,27 @@ template<>
 InputParameters validParams<ElectricFieldKernel>();
 
 /**
- * This kernel calculates the residual for grain growth during sintering.
- * It calculates the residual of the ith order parameter, and the values of
- * all other order parameters are coupled variables and are stored in vals.
+ * This kernel calculates the heat source term corresponding to joule heating,
+ * Q = J * E = elec_cond * grad_phi * grad_phi, where phi is the electrical potenstial.
  */
-class ElectricFieldKernel : public DerivativeMaterialInterface<JvarMapKernelInterface<Kernel> >
+class ElectricFieldKernel : public DerivativeMaterialInterface<JvarMapKernelInterface<HeatSource> >
 {
 public:
   ElectricFieldKernel(const InputParameters & parameters);
+  virtual void initialSetup();
 
 protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
-  virtual Real computeQpOffDiagJacobian(unsigned int javar);
+  virtual Real computeQpOffDiagJacobian(unsigned int jvar);
 
 private:
-  const VariableValue & _elec;
   const VariableGradient & _grad_elec;
-  unsigned int _elec_var;
+  const unsigned int _elec_var;
 
-  const MaterialProperty<Real> & _electic_conductivity;
-  const MaterialProperty<Real> & _dRdT;
-  std::vector<const MaterialProperty<Real> *> _dRdarg;
-
+  const MaterialProperty<Real> & _elec_cond;
+  const MaterialProperty<Real> & _delec_cond_dT;
+  std::vector<const MaterialProperty<Real> *> _delec_cond_darg;
 };
 
 #endif //ELECTRICFIELDKERNEL_H

@@ -1,6 +1,6 @@
 [GlobalParams]
   var_name_base = gr
-  op_num = 2.0
+  op_num = 6.0
   block = 0
   #en_ratio = 1
 []

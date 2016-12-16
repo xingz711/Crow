@@ -234,7 +234,7 @@
 [Functions]
   [./load]
     type = ConstantFunction
-    value = 0.01
+    value = 0.1
   [../]
 []
 
@@ -268,19 +268,24 @@
   #[../]
   [./MoHe]
     type = SinteringMtrxMobility
-    block = '0'
-    T = 500.0
-    int_width = 20
-    D0 = 3.1376e-07
-    Em = 0.94498
-    GB_energy = 2.4
-    surface_energy = 2.4
-    GBmob0 = 3.986e-6
-    Q = 1.0307
-    Qs = 1.0
-    Qgb = 0.9
-    Ds0 = 1.41e-5
-    Dgb0 = 4.0e-4
+    T = 2100.0;
+    int_width = 5;
+    Dvol0 = 4e-6;
+    Em = 0.94498;
+    GB_energy = 6.8;
+    surface_energy = 9.3;
+    GBmob0 = 3.986e-6;
+    Qv = 2.0;
+    Qs = 3.14;
+    Qgb = 4.14;
+    Dsurf0 = 1.41e-5;
+    Dgb0 = 4.0e-4;
+    Vm = 1.58e-29;
+    bulkindex = 1.0;
+    surfindex = 1.0;
+    gbindex = 1.0;
+    kb = 8.617343e-5;
+    JtoeV = 6.24150974e18;
     c = c
     bulkindex = 1.0
     surfindex = 1.0

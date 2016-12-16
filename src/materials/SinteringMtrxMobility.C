@@ -42,7 +42,7 @@ SinteringMtrxMobility::SinteringMtrxMobility(const InputParameters & parameters)
     _dDdc(declareProperty<RealTensorValue>("dDdc")),
     _M(declareProperty<RealTensorValue>("M")),
     _dMdc(declareProperty<RealTensorValue>("dMdc")),
-    _L(declareProperty<Real>("L")),
+    // _L(declareProperty<Real>("L")),
     _A(getMaterialProperty<Real>("A")),
     _B(getMaterialProperty<Real>("B")),
     _time_scale(getParam<Real>("time_scale")),
@@ -119,7 +119,7 @@ SinteringMtrxMobility::computeProperties()
     else
       GBmob = _GBMobility * _time_scale / (_JtoeV * (_length_scale*_length_scale*_length_scale*_length_scale));; // GBMobility in m^4/(J*s)
 
-    _L[_qp] = 4.0/3.0 * GBmob / int_width_c; // Non-dimensionalized Allen-Cahn Mobility
+    // _L[_qp] = 4.0/3.0 * GBmob / int_width_c; // Non-dimensionalized Allen-Cahn Mobility
 
     // Real GB_M = GBmob * _time_scale * energy_scale /_length_scale; // Non-dimensionalized GB Mobility
 

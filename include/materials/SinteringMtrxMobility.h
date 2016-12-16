@@ -32,7 +32,7 @@ private:
   MaterialProperty<RealTensorValue> & _dDdc;
   MaterialProperty<RealTensorValue> & _M;
   MaterialProperty<RealTensorValue> & _dMdc;
-  MaterialProperty<Real> & _L;
+  // MaterialProperty<Real> & _L;
   // MaterialProperty<Real> & _kappa_c;
   // MaterialProperty<Real> & _kappa_op;
   const MaterialProperty<Real> & _A;

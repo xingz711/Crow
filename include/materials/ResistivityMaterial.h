@@ -2,9 +2,11 @@
 #define RESISTIVITYMATERIAL_H
 
 #include "Material.h"
+#include "DerivativeMaterialInterface.h"
 
 //Forward Declarations
 class ResistivityMaterial;
+// class DerivativeMaterialInterface;
 
 template<>
 InputParameters validParams<ResistivityMaterial>();
@@ -15,7 +17,7 @@ InputParameters validParams<ResistivityMaterial>();
  * Materials, Vol. 279 p. 1-18, 2000.
  * \see MesoUO2
  */
-class ResistivityMaterial : public Material
+class ResistivityMaterial : public DerivativeMaterialInterface<Material>
 {
 public:
   ResistivityMaterial(const InputParameters & parameters);
@@ -32,7 +34,9 @@ private:
 
   std::string _base_name;
   MaterialProperty<Real> & _resistivity;
-  MaterialProperty<Real> & _electic_conductivity;
+  MaterialProperty<Real> & _dresistivity_dT;
+  MaterialProperty<Real> & _electric_conductivity;
+  MaterialProperty<Real> & _delectric_conductivity_dT;
 };
 
 #endif //RESISTIVITYMATERIAL_H

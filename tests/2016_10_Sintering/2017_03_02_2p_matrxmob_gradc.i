@@ -264,8 +264,8 @@
   [./constant_mat]
     type = GenericConstantMaterial
     block = 0
-    prop_names = '  A         B       kappa_op    kappa_c'
-    prop_values = '19.9728   2.1221   636.6340   870.6906'
+    prop_names = '  A         B       kappa_op    kappa_c L'
+    prop_values = '19.9728   2.1221   636.6340   870.6906 10.0'
     #prop_names = '  A    B  '
     #prop_values = '16.0 1.0 '
   [../]

@@ -9,7 +9,8 @@
   zmax = 0
   #skip_partitioning = true
   elem_type = QUAD4
-  uniform_refine = 2
+  uniform_refine = 1
+  skip_partitioning = true
 []
 
 [GlobalParams]
@@ -73,16 +74,16 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
-  #[./peeq]
-  #  order = CONSTANT
-  #  family = MONOMIAL
-  #  block = 0
-  #[../]
-  #[./fp_yy]
-  #  order = CONSTANT
-  #  family = MONOMIAL
-  #  block = 0
-  #[../]
+  [./peeq]
+    order = CONSTANT
+    family = MONOMIAL
+    block = 0
+  [../]
+  [./fp_yy]
+    order = CONSTANT
+    family = MONOMIAL
+    block = 0
+  [../]
   [./stress_yy]
     order = CONSTANT
     family = MONOMIAL
@@ -138,14 +139,15 @@
     type = FeatureFloodCountAux
     variable = unique_grains
     execute_on = timestep_end
-    bubble_object = grain_tracker
+    flood_counter = grain_tracker
+    #flood_counter = grain_tracker
     field_display = UNIQUE_REGION
   [../]
   [./var_indices]
     type = FeatureFloodCountAux
     variable = var_indices
     execute_on = timestep_end
-    bubble_object = grain_tracker
+    flood_counter = grain_tracker
     field_display = VARIABLE_COLORING
   [../]
   [./C1111]
@@ -164,22 +166,22 @@
     rank_two_tensor = stress
     scalar_type = VonMisesStress
   [../]
-  #[./peeq]
-  #  type = MaterialRealAux
-  #  variable = peeq
-  #  property = ep_eqv
-  #  execute_on = timestep_end
-  #  block = 0
-  #[../]
-  #[./fp_yy]
-  #  type = RankTwoAux
-  #  variable = fp_yy
-  #  rank_two_tensor = fp
-  #  index_j = 1
-  #  index_i = 1
-  #  execute_on = timestep_end
-  #  block = 0
-  #[../]
+  [./peeq]
+    type = MaterialRealAux
+    variable = peeq
+    property = ep_eqv
+    execute_on = timestep_end
+    block = 0
+  [../]
+  [./fp_yy]
+    type = RankTwoAux
+    variable = fp_yy
+    rank_two_tensor = fp
+    index_j = 1
+    index_i = 1
+    execute_on = timestep_end
+    block = 0
+  [../]
   [./stress_yy]
     type = RankTwoAux
     variable = stress_yy
@@ -193,7 +195,7 @@
     type = OutputEulerAngles
     variable = euler_angle
     euler_angle_provider = euler_angle_file
-    GrainTracker_object = grain_tracker
+    grain_tracker = grain_tracker
     output_euler_angle = 'phi1'
   [../]
 []
@@ -205,11 +207,17 @@
       variable = 'gr0 gr1 gr2 gr3 gr4 gr5 gr6 gr7 gr8 gr9'
     [../]
   [../]
-  [./top_displacement]
-    type = PresetBC
+  #[./top_displacement]
+  #  type = PresetBC
+  #  variable = disp_y
+  #  boundary = top
+  #  value = -5.0
+  #[../]
+  [./tdisp]
+    type = FunctionPresetBC
     variable = disp_y
     boundary = top
-    value = -5.0
+    function = '-0.0001*t'
   [../]
   [./x_anchor]
     type = PresetBC
@@ -226,29 +234,33 @@
 []
 
 [UserObjects]
-  #[./flowstress]
-  #  type = HEVPLinearHardening
-  #  yield_stress = 100
-  #  slope = 10
-  #  intvar_prop_name = ep_eqv
-  #[../]
-  #[./flowrate]
-  #  type = HEVPFlowRatePowerLawJ2
-  #  reference_flow_rate = 0.0001
-  #  flow_rate_exponent = 50.0
-  #  flow_rate_tol = 1
-  #  strength_prop_name = flowstress
-  #[../]
-  #[./ep_eqv]
-  #   type = HEVPEqvPlasticStrain
-  #   intvar_rate_prop_name = ep_eqv_rate
-  #[../]
-  #[./ep_eqv_rate]
-  #   type = HEVPEqvPlasticStrainRate
-  #   flow_rate_prop_name = flowrate
-  #[../]
+  [./flowstress]
+    type = HEVPLinearHardening
+    yield_stress = 100
+    slope = 10
+    intvar_prop_name = ep_eqv
+  [../]
+  [./flowrate]
+    type = HEVPFlowRatePowerLawJ2
+    reference_flow_rate = 0.0001
+    flow_rate_exponent = 50.0
+    flow_rate_tol = 1
+    strength_prop_name = flowstress
+  [../]
+  [./ep_eqv]
+     type = HEVPEqvPlasticStrain
+     intvar_rate_prop_name = ep_eqv_rate
+  [../]
+  [./ep_eqv_rate]
+     type = HEVPEqvPlasticStrainRate
+     flow_rate_prop_name = flowrate
+  [../]
+  [./euler_angle_file]
+    type = EulerAngleFileReader
+    file_name = grn_36_rand_2D.tex
+  [../]
   [./grain_tracker]
-    type = GrainTracker
+    type = GrainTrackerElasticity
     threshold = 0.2
     convex_hull_buffer = 5.0
     use_single_map = false
@@ -258,10 +270,10 @@
     compute_op_maps = true
     execute_on = 'initial timestep_begin'
     flood_entity_type = elemental
-  [../]
-  [./euler_angle_file]
-    type = EulerAngleFileReader
-    file_name = grn_36_rand_2D.tex
+    C_ijkl = '1.27e5 0.708e5 0.708e5 1.27e5 0.708e5 1.27e5 0.7355e5 0.7355e5 0.7355e5'
+    fill_method = symmetric9
+    euler_angle_provider = euler_angle_file
+    compute_var_to_feature_map = true
   [../]
 []
 
@@ -282,35 +294,35 @@
     #reading C_11  C_12  C_13  C_22  C_23  C_33  C_44  C_55  C_66
     #Elastic_constants = '2.8e5 1.2e5 1.2e5 2.8e5 1.2e5 2.8e5 0.8e5 0.8e5 0.8e5'
     Elastic_constants = '1.27e5 0.708e5 0.708e5 1.27e5 0.708e5 1.27e5 0.7355e5 0.7355e5 0.7355e5'
-    GrainTracker_object = grain_tracker
+    grain_tracker = grain_tracker
     euler_angle_provider = euler_angle_file
   [../]
-  #[./strain]
-  #  type = ComputeFiniteStrain
-  #  block = 0
-  #  displacements = 'disp_x disp_y'
-  #[../]
-  #[./viscop]
-  #  type = FiniteStrainHyperElasticViscoPlastic
-  #  block = 0
-  #  resid_abs_tol = 1e-18
-  #  resid_rel_tol = 1e-8
-  #  maxiters = 50
-  #  max_substep_iteration = 5
-  #  flow_rate_user_objects = 'flowrate'
-  #  strength_user_objects = 'flowstress'
-  #  internal_var_user_objects = 'ep_eqv'
-  #  internal_var_rate_user_objects = 'ep_eqv_rate'
-  #[../]
   [./strain]
-    type = ComputeSmallStrain
+    type = ComputeFiniteStrain
     block = 0
     displacements = 'disp_x disp_y'
   [../]
-  [./stress]
-    type = ComputeLinearElasticStress
+  [./viscop]
+    type = FiniteStrainHyperElasticViscoPlastic
     block = 0
+    resid_abs_tol = 1e-18
+    resid_rel_tol = 1e-8
+    maxiters = 50
+    max_substep_iteration = 5
+    flow_rate_user_objects = 'flowrate'
+    strength_user_objects = 'flowstress'
+    internal_var_user_objects = 'ep_eqv'
+    internal_var_rate_user_objects = 'ep_eqv_rate'
   [../]
+  #[./strain]
+  #  type = ComputeSmallStrain
+  #  block = 0
+  #  displacements = 'disp_x disp_y'
+  #[../]
+  #[./stress]
+  #  type = ComputeLinearElasticStress
+  #  block = 0
+  #[../]
   [./elastic_en]
     type = ElasticEnergyMaterial
     args = 'gr0 gr1 gr2 gr3 gr4 gr5 gr6 gr7 gr8 gr9'
@@ -318,6 +330,13 @@
     derivative_order = 2
     output_properties = 'F'
   [../]
+  #[./plastic_en]
+  #  type = EnergyMaterial
+  #  args = 'gr0 gr1 gr2 gr3 gr4 gr5 gr6 gr7 gr8 gr9'
+  #  outputs = exodus
+  #  derivative_order = 2
+  #  output_properties = 'F'
+  #[../]
 []
 
 [Postprocessors]
@@ -382,16 +401,19 @@
   solve_type = PJFNK
   petsc_options_iname = '-pc_type -pc_hypre_type -ksp_gmres_restart -pc_hypre_boomeramg_strong_threshold'
   petsc_options_value = 'hypre boomeramg 31 0.7'
+  #petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
+  #petsc_options_value = 'asm         31   preonly   ilu      1'
   l_tol = 1.0e-4
-  l_max_its = 30
-  nl_max_its = 25
+  l_max_its = 20
+  nl_max_its = 20
   nl_rel_tol = 1.0e-7
+  nl_abs_tol = 1e-10
   #start_time = 0.0
   #num_steps = 50
   end_time = 50.0
   [./TimeStepper]
     type = IterationAdaptiveDT
-    dt = 1.5
+    dt = 0.1
     growth_factor = 1.2
     cutback_factor = 0.8
     optimal_iterations = 8

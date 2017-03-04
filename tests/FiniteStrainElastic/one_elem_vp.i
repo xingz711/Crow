@@ -2,9 +2,9 @@
   type = GeneratedMesh
   dim = 3
   elem_type = HEX8
-  nx = 5
-  ny = 5
-  nz = 5
+  nx = 10
+  ny = 10
+  nz = 10
   displacements = 'ux uy uz'
 []
 
@@ -96,7 +96,7 @@
     type = FunctionPresetBC
     variable = uz
     boundary = front
-    function = '0.01*t'
+    function = '0.0001*t'
   [../]
 []
 
@@ -170,11 +170,16 @@
     internal_var_tensor_user_objects = 'intvar_tensor'
     internal_var_tensor_rate_user_objects = 'intvarrate_tensor'
   [../]
+  #[./elasticity_tensor]
+  #  type = ComputeElasticityTensor
+  #  block = 0
+  #  C_ijkl = '2.8e5 1.2e5 1.2e5 2.8e5 1.2e5 2.8e5 0.8e5 0.8e5 0.8e5'
+  #  fill_method = symmetric9
+  #[../]
   [./elasticity_tensor]
     type = ComputeElasticityTensor
-    block = 0
-    C_ijkl = '2.8e5 1.2e5 1.2e5 2.8e5 1.2e5 2.8e5 0.8e5 0.8e5 0.8e5'
-    fill_method = symmetric9
+    C_ijkl = '120.0 80.0'
+    fill_method = symmetric_isotropic
   [../]
 []
 
@@ -212,11 +217,14 @@
   #petsc_options_value = boomerang
   petsc_options_iname = '-pc_type -ksp_grmres_restart -sub_ksp_type -sub_pc_type -pc_asm_overlap'
   petsc_options_value = 'asm         31   preonly   lu      1'
-  dtmax = 10.0
-  nl_rel_tol = 1e-10
+  nl_rel_tol = 1e-8
   l_tol = 1e-04
-  dtmin = 0.02
-  num_steps = 10
+  l_max_its = 10
+  nl_max_its = 10
+  dt = 0.1
+  dtmin = 1e-4
+  dtmax = 10.0
+  num_steps = 1000
 []
 
 [Outputs]
